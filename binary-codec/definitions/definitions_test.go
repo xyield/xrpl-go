@@ -16,5 +16,6 @@ func TestLoadDefinitions(t *testing.T) {
 	assert.Equal(t, int64(-399), definitions.TransactionResults["telLOCAL_ERROR"])
 	assert.Equal(t, int64(1), definitions.TransactionTypes["EscrowCreate"])
 	assert.Equal(t, fieldInfo{Nth: int64(0), IsVLEncoded: false, IsSerialized: false, IsSigningField: false, Type: "Unknown"}, definitions.Fields["Generic"].FieldInfo)
-
+	assert.Equal(t, fieldInfo{Nth: int64(28), IsVLEncoded: false, IsSerialized: true, IsSigningField: true, Type: "Hash256"}, definitions.Fields["NFTokenBuyOffer"].FieldInfo)
+	assert.Equal(t, fieldInfo{Nth: int64(16), IsVLEncoded: false, IsSerialized: true, IsSigningField: true, Type: "UInt8"}, definitions.Fields["TickSize"].FieldInfo)
 }
