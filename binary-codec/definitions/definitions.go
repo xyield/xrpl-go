@@ -3,8 +3,8 @@ package definitions
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
+	"log"
 	"path"
 	"runtime"
 )
@@ -12,11 +12,11 @@ import (
 var definitions Definitions
 
 type Definitions struct {
-	Types              map[string]int64         `json:"TYPES"`
-	LedgerEntryTypes   map[string]int64         `json:"LEDGER_ENTRY_TYPES"`
-	Fields             map[string]fieldInstance `json:"FIELDS"`
-	TransactionResults map[string]int64         `json:"TRANSACTION_RESULTS"`
-	TransactionTypes   map[string]int64         `json:"TRANSACTION_TYPES"`
+	Types              map[string]int64          `json:"TYPES"`
+	LedgerEntryTypes   map[string]int64          `json:"LEDGER_ENTRY_TYPES"`
+	Fields             map[string]*fieldInstance `json:"FIELDS"`
+	TransactionResults map[string]int64          `json:"TRANSACTION_RESULTS"`
+	TransactionTypes   map[string]int64          `json:"TRANSACTION_TYPES"`
 }
 
 func LoadDefinitions() error {
@@ -45,6 +45,7 @@ func LoadDefinitions() error {
 	definitions.TransactionResults = castMap(transactionResults)
 	definitions.TransactionTypes = castMap(transactionTypes)
 	definitions.Fields = convertToFieldInstanceMap(fields)
+	addFieldHeaders(definitions.Types, definitions.Fields)
 
 	return nil
 }
@@ -57,18 +58,17 @@ func castMap(m map[string]interface{}) map[string]int64 {
 	return nm
 }
 
-func convertToFieldInstanceMap(m []interface{}) map[string]fieldInstance {
-	nm := make(map[string]fieldInstance, len(m))
+func convertToFieldInstanceMap(m []interface{}) map[string]*fieldInstance {
+	nm := make(map[string]*fieldInstance, len(m))
 
 	for _, j := range m {
 		if v, ok := j.([]interface{}); ok {
 			k := v[0].(string)
 			fi, _ := castFieldInfo(v[1])
-			nm[k] = fieldInstance{
+			nm[k] = &fieldInstance{
 				FieldName: k,
 				FieldInfo: fi,
 			}
-			fmt.Printf("%+v\n", nm[k])
 		}
 	}
 	return nm
@@ -85,4 +85,17 @@ func castFieldInfo(v interface{}) (fieldInfo, error) {
 		}, nil
 	}
 	return fieldInfo{}, errors.New("unable to cast to field info")
+}
+
+func addFieldHeaders(typeMap map[string]int64, fieldInstances map[string]*fieldInstance) {
+	for k, _ := range fieldInstances {
+		t := typeMap[fieldInstances[k].FieldInfo.Type]
+		log.Println(t)
+		if fi, ok := fieldInstances[k]; ok {
+			fi.FieldHeader = fieldHeader{
+				TypeCode:  byte(t),
+				FieldCode: byte(fieldInstances[k].FieldInfo.Nth),
+			}
+		}
+	}
 }
