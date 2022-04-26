@@ -8,7 +8,7 @@ import (
 
 func TestLoadDefinitions(t *testing.T) {
 
-	err := LoadDefinitions()
+	err := loadDefinitions()
 	assert.NoError(t, err)
 	assert.Equal(t, int64(-1), definitions.Types["Done"])
 	assert.Equal(t, int64(4), definitions.Types["Hash128"])
@@ -22,4 +22,51 @@ func TestLoadDefinitions(t *testing.T) {
 	assert.Equal(t, fieldHeader{TypeCode: 18, FieldCode: 1}, definitions.Fields["Paths"].FieldHeader)
 	assert.Equal(t, fieldHeader{TypeCode: 2, FieldCode: 33}, definitions.Fields["SetFlag"].FieldHeader)
 	assert.Equal(t, fieldHeader{TypeCode: 16, FieldCode: 16}, definitions.Fields["TickSize"].FieldHeader)
+	assert.Equal(t, definitions.Types["Done"], int64(-1))
+
+}
+
+func TestGetTypeByName(t *testing.T) {
+
+	tt := []struct {
+		description   string
+		input         string
+		expected      int64
+		expectedError error
+	}{
+		{
+			description:   "test that `Done` gives correct code",
+			input:         "Done",
+			expected:      int64(-1),
+			expectedError: nil,
+		},
+		{
+			description:   "test that `Hash128` gives correct code",
+			input:         "Hash128",
+			expected:      int64(4),
+			expectedError: nil,
+		},
+		{
+			description:   "test that incorrect value gives an error",
+			input:         "yurt",
+			expected:      0,
+			expectedError: &TypeCodeError{},
+		},
+	}
+
+	for _, test := range tt {
+
+		t.Run(test.description, func(t *testing.T) {
+			got, err := definitions.GetTypeByName(test.input)
+			if test.expectedError != nil {
+				assert.Error(t, test.expectedError, err.Error())
+				assert.Zero(t, got)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, got)
+			}
+		})
+
+	}
+
 }

@@ -11,6 +11,18 @@ import (
 
 var definitions Definitions
 
+type TypeCodeError struct{}
+
+func (tce *TypeCodeError) Error() string {
+	return "Type code incorrect"
+}
+
+// type TypeNameError struct{}
+
+// func (tne *TypeNameError) Error() string {
+// 	return "Type name incorrect"
+// }
+
 type Definitions struct {
 	Types              map[string]int64          `json:"TYPES"`
 	LedgerEntryTypes   map[string]int64          `json:"LEDGER_ENTRY_TYPES"`
@@ -19,7 +31,16 @@ type Definitions struct {
 	TransactionTypes   map[string]int64          `json:"TRANSACTION_TYPES"`
 }
 
-func LoadDefinitions() error {
+func (d *Definitions) GetTypeByName(n string) (int64, error) {
+	typeCode, ok := d.Types[n]
+
+	if !ok {
+		return 0, &TypeCodeError{}
+	}
+	return typeCode, nil
+}
+
+func loadDefinitions() error {
 
 	_, f, _, _ := runtime.Caller(0)
 	wd := path.Dir(f)
