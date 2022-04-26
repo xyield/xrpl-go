@@ -50,7 +50,7 @@ func TestGetTypeByName(t *testing.T) {
 			description:   "test that incorrect value gives an error",
 			input:         "yurt",
 			expected:      0,
-			expectedError: &TypeCodeError{},
+			expectedError: &TypeNotFoundError{},
 		},
 	}
 

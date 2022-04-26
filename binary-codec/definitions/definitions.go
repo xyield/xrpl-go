@@ -11,17 +11,11 @@ import (
 
 var definitions Definitions
 
-type TypeCodeError struct{}
+type TypeNotFoundError struct{}
 
-func (tce *TypeCodeError) Error() string {
+func (tce *TypeNotFoundError) Error() string {
 	return "Type code incorrect"
 }
-
-// type TypeNameError struct{}
-
-// func (tne *TypeNameError) Error() string {
-// 	return "Type name incorrect"
-// }
 
 type Definitions struct {
 	Types              map[string]int64          `json:"TYPES"`
@@ -35,7 +29,7 @@ func (d *Definitions) GetTypeByName(n string) (int64, error) {
 	typeCode, ok := d.Types[n]
 
 	if !ok {
-		return 0, &TypeCodeError{}
+		return 0, &TypeNotFoundError{}
 	}
 	return typeCode, nil
 }
@@ -66,7 +60,7 @@ func loadDefinitions() error {
 	definitions.TransactionResults = castMap(transactionResults)
 	definitions.TransactionTypes = castMap(transactionTypes)
 	definitions.Fields = convertToFieldInstanceMap(fields)
-	addFieldHeaders(definitions.Types, definitions.Fields)
+	addFieldHeaders()
 
 	return nil
 }
@@ -108,14 +102,14 @@ func castFieldInfo(v interface{}) (fieldInfo, error) {
 	return fieldInfo{}, errors.New("unable to cast to field info")
 }
 
-func addFieldHeaders(typeMap map[string]int64, fieldInstances map[string]*fieldInstance) {
-	for k, _ := range fieldInstances {
-		t := typeMap[fieldInstances[k].FieldInfo.Type]
+func addFieldHeaders() {
+	for k, _ := range definitions.Fields {
+		t, _ := definitions.GetTypeByName(k)
 		log.Println(t)
-		if fi, ok := fieldInstances[k]; ok {
+		if fi, ok := definitions.Fields[k]; ok {
 			fi.FieldHeader = fieldHeader{
 				TypeCode:  byte(t),
-				FieldCode: byte(fieldInstances[k].FieldInfo.Nth),
+				FieldCode: byte(definitions.Fields[k].FieldInfo.Nth),
 			}
 		}
 	}
