@@ -42,7 +42,7 @@ func TestGetTypeNameByFieldName(t *testing.T) {
 			expectedError: nil,
 		},
 		{
-			description:   "test that non-existent value gives an error",
+			description:   "test that invalid value gives an error",
 			input:         "yurt",
 			expected:      "",
 			expectedError: &TypeNotFoundError{},
@@ -168,7 +168,7 @@ func TestGetFieldCodeByFieldName(t *testing.T) {
 			expectedError: nil,
 		},
 		{
-			description:   "non-existent FieldName",
+			description:   "Invalid FieldName",
 			input:         "yurt",
 			expected:      0,
 			expectedError: &TypeNotFoundError{},
@@ -179,6 +179,135 @@ func TestGetFieldCodeByFieldName(t *testing.T) {
 
 		t.Run(test.description, func(t *testing.T) {
 			got, err := definitions.GetFieldCodeByFieldName(test.input)
+			if test.expectedError != nil {
+				assert.Error(t, test.expectedError, err.Error())
+				assert.Zero(t, got)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, got)
+			}
+		})
+	}
+}
+
+func TestGetFieldHeaderByFieldName(t *testing.T) {
+	tt := []struct {
+		description   string
+		input         string
+		expected      fieldHeader
+		expectedError error
+	}{
+		{
+			description: "correct FieldHeader",
+			input:       "TransferRate",
+			expected: fieldHeader{
+				TypeCode:  2,
+				FieldCode: 11,
+			},
+			expectedError: nil,
+		},
+		{
+			description:   "Invalid FieldName",
+			input:         "yurt",
+			expected:      fieldHeader{},
+			expectedError: &TypeNotFoundError{},
+		},
+	}
+
+	for _, test := range tt {
+
+		t.Run(test.description, func(t *testing.T) {
+			got, err := definitions.GetFieldHeaderByFieldName(test.input)
+			if test.expectedError != nil {
+				assert.Error(t, test.expectedError, err.Error())
+				assert.Zero(t, got)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, got)
+			}
+		})
+	}
+}
+
+func TestGetFieldInfoByFieldName(t *testing.T) {
+	tt := []struct {
+		description   string
+		input         string
+		expected      fieldInfo
+		expectedError error
+	}{
+		{
+			description: "correct FieldInfo",
+			input:       "TransferRate",
+			expected: fieldInfo{
+				Nth:            11,
+				IsVLEncoded:    false,
+				IsSerialized:   true,
+				IsSigningField: true,
+				Type:           "UInt32",
+			},
+			expectedError: nil,
+		},
+		{
+			description:   "invalid FieldInfo",
+			input:         "yurt",
+			expected:      fieldInfo{},
+			expectedError: &TypeNotFoundError{},
+		},
+	}
+
+	for _, test := range tt {
+		t.Run(test.description, func(t *testing.T) {
+			got, err := definitions.GetFieldInfoByFieldName(test.input)
+			if test.expectedError != nil {
+				assert.Error(t, test.expectedError, err.Error())
+				assert.Zero(t, got)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, got)
+			}
+
+		})
+	}
+}
+
+func TestGetFieldInstanceByFieldName(t *testing.T) {
+	tt := []struct {
+		description   string
+		input         string
+		expected      fieldInstance
+		expectedError error
+	}{
+		{
+			description: "correct FieldInstance",
+			input:       "TransferRate",
+			expected: fieldInstance{
+				FieldName: "TransferRate",
+				FieldInfo: fieldInfo{
+					Nth:            11,
+					IsVLEncoded:    false,
+					IsSerialized:   true,
+					IsSigningField: true,
+					Type:           "UInt32",
+				},
+				FieldHeader: fieldHeader{
+					TypeCode:  2,
+					FieldCode: 11,
+				},
+			},
+		},
+		{
+			description:   "invalid FieldName",
+			input:         "yurt",
+			expected:      fieldInstance{},
+			expectedError: &TypeNotFoundError{},
+		},
+	}
+
+	for _, test := range tt {
+
+		t.Run(test.description, func(t *testing.T) {
+			got, err := definitions.GetFieldInstanceByFieldName(test.input)
 			if test.expectedError != nil {
 				assert.Error(t, test.expectedError, err.Error())
 				assert.Zero(t, got)

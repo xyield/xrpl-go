@@ -27,13 +27,13 @@ type Definitions struct {
 
 func (d *Definitions) GetTypeNameByFieldName(n string) (string, error) {
 
-	fieldInstance, ok := d.Fields[n]
+	fieldName, ok := d.Fields[n]
 
 	if !ok {
 		return "", &TypeNotFoundError{}
 	}
 
-	typeName := fieldInstance.FieldInfo.Type
+	typeName := fieldName.FieldInfo.Type
 
 	return typeName, nil
 }
@@ -73,6 +73,60 @@ func (d *Definitions) GetFieldCodeByFieldName(n string) (int64, error) {
 	}
 
 	return fieldName.FieldInfo.Nth, nil
+}
+
+func (d *Definitions) GetFieldHeaderByFieldName(n string) (fieldHeader, error) {
+
+	fieldCode, err := d.GetFieldCodeByFieldName(n)
+
+	if err != nil {
+		return fieldHeader{}, &TypeNotFoundError{}
+	}
+
+	typeCode, _ := d.GetTypeCodeByFieldName(n)
+
+	return fieldHeader{
+		TypeCode:  byte(typeCode),
+		FieldCode: byte(fieldCode),
+	}, nil
+}
+
+func (d *Definitions) GetFieldInfoByFieldName(n string) (fieldInfo, error) {
+
+	fieldName, ok := d.Fields[n]
+
+	if !ok {
+		return fieldInfo{}, &TypeNotFoundError{}
+	}
+
+	return fieldInfo{
+		Nth:            fieldName.FieldInfo.Nth,
+		IsVLEncoded:    fieldName.FieldInfo.IsVLEncoded,
+		IsSerialized:   fieldName.FieldInfo.IsSerialized,
+		IsSigningField: fieldName.FieldInfo.IsSigningField,
+		Type:           fieldName.FieldInfo.Type,
+	}, nil
+}
+
+func (d *Definitions) GetFieldInstanceByFieldName(n string) (fieldInstance, error) {
+
+	fieldHeader, err := d.GetFieldHeaderByFieldName(n)
+
+	if err != nil {
+		return fieldInstance{}, &TypeNotFoundError{}
+	}
+
+	fieldInfo, _ := d.GetFieldInfoByFieldName(n)
+
+	if err != nil {
+		return fieldInstance{}, &TypeNotFoundError{}
+	}
+
+	return fieldInstance{
+		FieldName:   n,
+		FieldInfo:   fieldInfo,
+		FieldHeader: fieldHeader,
+	}, nil
 }
 
 func loadDefinitions() error {
