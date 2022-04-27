@@ -23,10 +23,50 @@ func TestLoadDefinitions(t *testing.T) {
 	assert.Equal(t, fieldHeader{TypeCode: 2, FieldCode: 33}, definitions.Fields["SetFlag"].FieldHeader)
 	assert.Equal(t, fieldHeader{TypeCode: 16, FieldCode: 16}, definitions.Fields["TickSize"].FieldHeader)
 	assert.Equal(t, definitions.Types["Done"], int64(-1))
+	assert.Equal(t, "UInt32", definitions.Fields["TransferRate"].FieldInfo.Type)
 
 }
 
-func TestGetTypeByName(t *testing.T) {
+func TestGetTypeNameByFieldName(t *testing.T) {
+
+	tt := []struct {
+		description   string
+		input         string
+		expected      string
+		expectedError error
+	}{
+		{
+			description:   "test that `TransferRate` gives `UInt32`",
+			input:         "TransferRate",
+			expected:      "UInt32",
+			expectedError: nil,
+		},
+		{
+			description:   "test that non-existent value gives an error",
+			input:         "yurt",
+			expected:      "",
+			expectedError: &TypeNotFoundError{},
+		},
+	}
+
+	for _, test := range tt {
+
+		t.Run(test.description, func(t *testing.T) {
+			got, err := definitions.GetTypeNameByFieldName(test.input)
+			if test.expectedError != nil {
+				assert.Error(t, test.expectedError, err.Error())
+				assert.Zero(t, got)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, got)
+			}
+		})
+
+	}
+
+}
+
+func TestGetTypeCodeByTypeName(t *testing.T) {
 
 	tt := []struct {
 		description   string
@@ -57,7 +97,7 @@ func TestGetTypeByName(t *testing.T) {
 	for _, test := range tt {
 
 		t.Run(test.description, func(t *testing.T) {
-			got, err := definitions.GetTypeByName(test.input)
+			got, err := definitions.GetTypeCodeByTypeName(test.input)
 			if test.expectedError != nil {
 				assert.Error(t, test.expectedError, err.Error())
 				assert.Zero(t, got)
@@ -69,4 +109,83 @@ func TestGetTypeByName(t *testing.T) {
 
 	}
 
+}
+
+func TestGetTypeCodeByFieldName(t *testing.T) {
+	tt := []struct {
+		description   string
+		input         string
+		expected      int64
+		expectedError error
+	}{
+		{
+			description:   "test that `TransferRate` gives `int64(2)`",
+			input:         "TransferRate",
+			expected:      int64(2),
+			expectedError: nil,
+		},
+		{
+			description:   "test that `OwnerNode` gives `int64(3)`",
+			input:         "OwnerNode",
+			expected:      int64(3),
+			expectedError: nil,
+		},
+		{
+			description:   "test that non-existent value gives error",
+			input:         "yurt",
+			expected:      0,
+			expectedError: &TypeNotFoundError{},
+		},
+	}
+
+	for _, test := range tt {
+
+		t.Run(test.description, func(t *testing.T) {
+			got, err := definitions.GetTypeCodeByFieldName(test.input)
+			if test.expectedError != nil {
+				assert.Error(t, test.expectedError, err.Error())
+				assert.Zero(t, got)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, got)
+			}
+		})
+	}
+}
+
+func TestGetFieldCodeByFieldName(t *testing.T) {
+
+	tt := []struct {
+		description   string
+		input         string
+		expected      int64
+		expectedError error
+	}{
+		{
+			description:   "correct FieldCode",
+			input:         "TransferRate",
+			expected:      int64(11),
+			expectedError: nil,
+		},
+		{
+			description:   "non-existent FieldName",
+			input:         "yurt",
+			expected:      0,
+			expectedError: &TypeNotFoundError{},
+		},
+	}
+
+	for _, test := range tt {
+
+		t.Run(test.description, func(t *testing.T) {
+			got, err := definitions.GetFieldCodeByFieldName(test.input)
+			if test.expectedError != nil {
+				assert.Error(t, test.expectedError, err.Error())
+				assert.Zero(t, got)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, got)
+			}
+		})
+	}
 }

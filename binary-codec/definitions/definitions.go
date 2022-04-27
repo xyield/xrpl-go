@@ -13,8 +13,8 @@ var definitions Definitions
 
 type TypeNotFoundError struct{}
 
-func (tce *TypeNotFoundError) Error() string {
-	return "Type code incorrect"
+func (tnf *TypeNotFoundError) Error() string {
+	return "Type not found"
 }
 
 type Definitions struct {
@@ -25,13 +25,54 @@ type Definitions struct {
 	TransactionTypes   map[string]int64          `json:"TRANSACTION_TYPES"`
 }
 
-func (d *Definitions) GetTypeByName(n string) (int64, error) {
+func (d *Definitions) GetTypeNameByFieldName(n string) (string, error) {
+
+	fieldInstance, ok := d.Fields[n]
+
+	if !ok {
+		return "", &TypeNotFoundError{}
+	}
+
+	typeName := fieldInstance.FieldInfo.Type
+
+	return typeName, nil
+}
+
+func (d *Definitions) GetTypeCodeByTypeName(n string) (int64, error) {
 	typeCode, ok := d.Types[n]
 
 	if !ok {
 		return 0, &TypeNotFoundError{}
 	}
 	return typeCode, nil
+}
+
+func (d *Definitions) GetTypeCodeByFieldName(n string) (int64, error) {
+	typeName, err := d.GetTypeNameByFieldName(n)
+
+	if err != nil {
+		log.Println("TypeName not found from the FieldName provided.")
+		return 0, err
+	}
+
+	typeCode, ok := d.Types[typeName]
+
+	if !ok {
+		return 0, &TypeNotFoundError{}
+	}
+
+	return typeCode, nil
+}
+
+func (d *Definitions) GetFieldCodeByFieldName(n string) (int64, error) {
+
+	fieldName, ok := d.Fields[n]
+
+	if !ok {
+		return 0, &TypeNotFoundError{}
+	}
+
+	return fieldName.FieldInfo.Nth, nil
 }
 
 func loadDefinitions() error {
@@ -60,7 +101,7 @@ func loadDefinitions() error {
 	definitions.TransactionResults = castMap(transactionResults)
 	definitions.TransactionTypes = castMap(transactionTypes)
 	definitions.Fields = convertToFieldInstanceMap(fields)
-	addFieldHeaders()
+	addFieldHeaders(definitions.Types, definitions.Fields)
 
 	return nil
 }
@@ -102,14 +143,14 @@ func castFieldInfo(v interface{}) (fieldInfo, error) {
 	return fieldInfo{}, errors.New("unable to cast to field info")
 }
 
-func addFieldHeaders() {
-	for k, _ := range definitions.Fields {
-		t, _ := definitions.GetTypeByName(k)
-		log.Println(t)
-		if fi, ok := definitions.Fields[k]; ok {
+func addFieldHeaders(typeMap map[string]int64, fieldInstances map[string]*fieldInstance) {
+	for k, _ := range fieldInstances {
+		t := typeMap[fieldInstances[k].FieldInfo.Type]
+		// log.Println(t)
+		if fi, ok := fieldInstances[k]; ok {
 			fi.FieldHeader = fieldHeader{
 				TypeCode:  byte(t),
-				FieldCode: byte(definitions.Fields[k].FieldInfo.Nth),
+				FieldCode: byte(fieldInstances[k].FieldInfo.Nth),
 			}
 		}
 	}
