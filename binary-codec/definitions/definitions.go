@@ -91,6 +91,10 @@ func (d *Definitions) GetFieldHeaderByFieldName(n string) (fieldHeader, error) {
 	}, nil
 }
 
+func (d *Definitions) GetFieldNameByFieldHeader(fh fieldHeader) (string, error) {
+	return "TransferRate", nil
+}
+
 func (d *Definitions) GetFieldInfoByFieldName(n string) (fieldInfo, error) {
 
 	fieldName, ok := d.Fields[n]
@@ -127,6 +131,20 @@ func (d *Definitions) GetFieldInstanceByFieldName(n string) (fieldInstance, erro
 		FieldInfo:   fieldInfo,
 		FieldHeader: fieldHeader,
 	}, nil
+}
+
+func (d *Definitions) GetTransactionTypeCodeByTransactionTypeName(n string) (int64, error) {
+	txTypeCode, ok := d.TransactionTypes[n]
+
+	if !ok {
+		return 0, &TypeNotFoundError{}
+	}
+
+	return txTypeCode, nil
+}
+
+func (d *Definitions) GetTransactionTypeNameByTransactionTypeCode(c int64) (string, error) {
+	return "EscrowCreate", nil
 }
 
 func loadDefinitions() error {

@@ -228,6 +228,37 @@ func TestGetFieldHeaderByFieldName(t *testing.T) {
 		})
 	}
 }
+func TestGetFieldNameByFieldHeader(t *testing.T) {
+	tt := []struct {
+		description   string
+		input         fieldHeader
+		expected      string
+		expectedError error
+	}{
+		{
+			description: "correct FieldName",
+			input: fieldHeader{
+				TypeCode:  2,
+				FieldCode: 11,
+			},
+			expected:      "TransferRate",
+			expectedError: nil,
+		},
+	}
+
+	for _, test := range tt {
+		t.Run(test.description, func(t *testing.T) {
+			got, err := definitions.GetFieldNameByFieldHeader(test.input)
+			if err != nil {
+				assert.Error(t, test.expectedError, err.Error())
+				assert.Zero(t, got)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, got)
+			}
+		})
+	}
+}
 
 func TestGetFieldInfoByFieldName(t *testing.T) {
 	tt := []struct {
@@ -308,6 +339,70 @@ func TestGetFieldInstanceByFieldName(t *testing.T) {
 
 		t.Run(test.description, func(t *testing.T) {
 			got, err := definitions.GetFieldInstanceByFieldName(test.input)
+			if test.expectedError != nil {
+				assert.Error(t, test.expectedError, err.Error())
+				assert.Zero(t, got)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, got)
+			}
+		})
+	}
+}
+
+func TestGetTransactionTypeCodeByTransactionTypeName(t *testing.T) {
+	tt := []struct {
+		description   string
+		input         string
+		expected      int64
+		expectedError error
+	}{
+		{
+			description:   "correct TypeCode",
+			input:         "EscrowCreate",
+			expected:      int64(1),
+			expectedError: nil,
+		},
+		{
+			description:   "invalid TypeName",
+			input:         "yurt",
+			expected:      0,
+			expectedError: &TypeNotFoundError{},
+		},
+	}
+
+	for _, test := range tt {
+		t.Run(test.description, func(t *testing.T) {
+			got, err := definitions.GetTransactionTypeCodeByTransactionTypeName(test.input)
+			if test.expectedError != nil {
+				assert.Error(t, test.expectedError, err.Error())
+				assert.Zero(t, got)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, got)
+			}
+		})
+	}
+}
+
+func TestGetTransactionTypeNameByTransactionTypeCode(t *testing.T) {
+	tt := []struct {
+		description   string
+		input         int64
+		expected      string
+		expectedError error
+	}{
+		{
+			description:   "correct TypeName",
+			input:         int64(1),
+			expected:      "EscrowCreate",
+			expectedError: nil,
+		},
+	}
+
+	for _, test := range tt {
+		t.Run(test.description, func(t *testing.T) {
+			got, err := definitions.GetTransactionTypeNameByTransactionTypeCode(test.input)
 			if test.expectedError != nil {
 				assert.Error(t, test.expectedError, err.Error())
 				assert.Zero(t, got)
