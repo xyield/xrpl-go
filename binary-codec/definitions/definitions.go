@@ -33,7 +33,7 @@ func (d *Definitions) GetTypeNameByFieldName(n string) (string, error) {
 		return "", &TypeNotFoundError{}
 	}
 
-	typeName := fieldName.FieldInfo.Type
+	typeName := fieldName.Type
 
 	return typeName, nil
 }
@@ -72,7 +72,7 @@ func (d *Definitions) GetFieldCodeByFieldName(n string) (int64, error) {
 		return 0, &TypeNotFoundError{}
 	}
 
-	return fieldName.FieldInfo.Nth, nil
+	return fieldName.Nth, nil
 }
 
 func (d *Definitions) GetFieldHeaderByFieldName(n string) (fieldHeader, error) {
@@ -91,10 +91,6 @@ func (d *Definitions) GetFieldHeaderByFieldName(n string) (fieldHeader, error) {
 	}, nil
 }
 
-func (d *Definitions) GetFieldNameByFieldHeader(fh fieldHeader) (string, error) {
-	return "TransferRate", nil
-}
-
 func (d *Definitions) GetFieldInfoByFieldName(n string) (fieldInfo, error) {
 
 	fieldName, ok := d.Fields[n]
@@ -104,11 +100,11 @@ func (d *Definitions) GetFieldInfoByFieldName(n string) (fieldInfo, error) {
 	}
 
 	return fieldInfo{
-		Nth:            fieldName.FieldInfo.Nth,
-		IsVLEncoded:    fieldName.FieldInfo.IsVLEncoded,
-		IsSerialized:   fieldName.FieldInfo.IsSerialized,
-		IsSigningField: fieldName.FieldInfo.IsSigningField,
-		Type:           fieldName.FieldInfo.Type,
+		Nth:            fieldName.Nth,
+		IsVLEncoded:    fieldName.IsVLEncoded,
+		IsSerialized:   fieldName.IsSerialized,
+		IsSigningField: fieldName.IsSigningField,
+		Type:           fieldName.Type,
 	}, nil
 }
 
@@ -128,7 +124,7 @@ func (d *Definitions) GetFieldInstanceByFieldName(n string) (fieldInstance, erro
 
 	return fieldInstance{
 		FieldName:   n,
-		FieldInfo:   fieldInfo,
+		fieldInfo:   fieldInfo,
 		FieldHeader: fieldHeader,
 	}, nil
 }
@@ -211,7 +207,7 @@ func convertToFieldInstanceMap(m []interface{}) map[string]*fieldInstance {
 			fi, _ := castFieldInfo(v[1])
 			nm[k] = &fieldInstance{
 				FieldName: k,
-				FieldInfo: fi,
+				fieldInfo: fi,
 			}
 		}
 	}
@@ -233,12 +229,11 @@ func castFieldInfo(v interface{}) (fieldInfo, error) {
 
 func addFieldHeaders(typeMap map[string]int64, fieldInstances map[string]*fieldInstance) {
 	for k, _ := range fieldInstances {
-		t := typeMap[fieldInstances[k].FieldInfo.Type]
-		// log.Println(t)
+		t := typeMap[fieldInstances[k].Type]
 		if fi, ok := fieldInstances[k]; ok {
 			fi.FieldHeader = fieldHeader{
 				TypeCode:  byte(t),
-				FieldCode: byte(fieldInstances[k].FieldInfo.Nth),
+				FieldCode: byte(fieldInstances[k].Nth),
 			}
 		}
 	}
