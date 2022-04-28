@@ -147,6 +147,22 @@ func (d *Definitions) GetTransactionTypeNameByTransactionTypeCode(c int64) (stri
 	return "EscrowCreate", nil
 }
 
+func (d *Definitions) GetTransactionResultNameByTransactionResultTypeCode(c int64) (string, error) {
+	return "", nil
+}
+
+func (d *Definitions) GetTransactionResultTypeCodeByTransactionResultName(n string) (int64, error) {
+	return 0, nil
+}
+
+func (d *Definitions) GetLedgerEntryTypeCodeByLedgerEntryTypeName(n string) (int64, error) {
+	return 0, nil
+}
+
+func (d *Definitions) GetLedgerEntryTypeNameByLedgerEntryTypeCode(c int64) (string, error) {
+	return "", nil
+}
+
 func loadDefinitions() error {
 
 	_, f, _, _ := runtime.Caller(0)

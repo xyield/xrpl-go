@@ -413,3 +413,19 @@ func TestGetTransactionTypeNameByTransactionTypeCode(t *testing.T) {
 		})
 	}
 }
+
+func TestGetTransactionResultNameByTransactionResultTypeCode(t *testing.T) {
+
+}
+
+func TestGetTransactionResultTypeCodeByTransactionResultName(t *testing.T) {
+
+}
+
+func TestGetLedgerEntryTypeCodeByLedgerEntryTypeName(t *testing.T) {
+
+}
+
+func TestGetLedgerEntryTypeNameByLedgerEntryTypeCode(t *testing.T) {
+
+}
