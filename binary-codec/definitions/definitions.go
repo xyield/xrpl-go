@@ -1,12 +1,13 @@
 package definitions
 
 import (
-	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"log"
 	"path"
 	"runtime"
+
+	"github.com/ugorji/go/codec"
 )
 
 var definitions Definitions
@@ -18,11 +19,22 @@ func (tnf *TypeNotFoundError) Error() string {
 }
 
 type Definitions struct {
-	Types              map[string]int64          `json:"TYPES"`
-	LedgerEntryTypes   map[string]int64          `json:"LEDGER_ENTRY_TYPES"`
-	Fields             map[string]*fieldInstance `json:"FIELDS"`
-	TransactionResults map[string]int64          `json:"TRANSACTION_RESULTS"`
-	TransactionTypes   map[string]int64          `json:"TRANSACTION_TYPES"`
+	Types              map[string]int   `json:"TYPES"`
+	LedgerEntryTypes   map[string]int   `json:"LEDGER_ENTRY_TYPES"`
+	Fields             fieldInstanceMap `json:"FIELDS"`
+	TransactionResults map[string]int   `json:"TRANSACTION_RESULTS"`
+	TransactionTypes   map[string]int   `json:"TRANSACTION_TYPES"`
+}
+
+type fieldInstanceMap map[string]*fieldInstance
+
+func (fi *fieldInstanceMap) CodecEncodeSelf(e *codec.Encoder) {}
+
+func (fi *fieldInstanceMap) CodecDecodeSelf(d *codec.Decoder) {
+	var x [][]interface{}
+	d.MustDecode(&x)
+	y := convertToFieldInstanceMap(x)
+	*fi = y
 }
 
 func (d *Definitions) GetTypeNameByFieldName(n string) (string, error) {
@@ -38,7 +50,7 @@ func (d *Definitions) GetTypeNameByFieldName(n string) (string, error) {
 	return typeName, nil
 }
 
-func (d *Definitions) GetTypeCodeByTypeName(n string) (int64, error) {
+func (d *Definitions) GetTypeCodeByTypeName(n string) (int, error) {
 	typeCode, ok := d.Types[n]
 
 	if !ok {
@@ -47,7 +59,7 @@ func (d *Definitions) GetTypeCodeByTypeName(n string) (int64, error) {
 	return typeCode, nil
 }
 
-func (d *Definitions) GetTypeCodeByFieldName(n string) (int64, error) {
+func (d *Definitions) GetTypeCodeByFieldName(n string) (int, error) {
 	typeName, err := d.GetTypeNameByFieldName(n)
 
 	if err != nil {
@@ -64,7 +76,7 @@ func (d *Definitions) GetTypeCodeByFieldName(n string) (int64, error) {
 	return typeCode, nil
 }
 
-func (d *Definitions) GetFieldCodeByFieldName(n string) (int64, error) {
+func (d *Definitions) GetFieldCodeByFieldName(n string) (int, error) {
 
 	fieldName, ok := d.Fields[n]
 
@@ -129,7 +141,7 @@ func (d *Definitions) GetFieldInstanceByFieldName(n string) (fieldInstance, erro
 	}, nil
 }
 
-func (d *Definitions) GetTransactionTypeCodeByTransactionTypeName(n string) (int64, error) {
+func (d *Definitions) GetTransactionTypeCodeByTransactionTypeName(n string) (int, error) {
 	txTypeCode, ok := d.TransactionTypes[n]
 
 	if !ok {
@@ -139,23 +151,23 @@ func (d *Definitions) GetTransactionTypeCodeByTransactionTypeName(n string) (int
 	return txTypeCode, nil
 }
 
-func (d *Definitions) GetTransactionTypeNameByTransactionTypeCode(c int64) (string, error) {
+func (d *Definitions) GetTransactionTypeNameByTransactionTypeCode(c int) (string, error) {
 	return "EscrowCreate", nil
 }
 
-func (d *Definitions) GetTransactionResultNameByTransactionResultTypeCode(c int64) (string, error) {
+func (d *Definitions) GetTransactionResultNameByTransactionResultTypeCode(c int) (string, error) {
 	return "", nil
 }
 
-func (d *Definitions) GetTransactionResultTypeCodeByTransactionResultName(n string) (int64, error) {
+func (d *Definitions) GetTransactionResultTypeCodeByTransactionResultName(n string) (int, error) {
 	return 0, nil
 }
 
-func (d *Definitions) GetLedgerEntryTypeCodeByLedgerEntryTypeName(n string) (int64, error) {
+func (d *Definitions) GetLedgerEntryTypeCodeByLedgerEntryTypeName(n string) (int, error) {
 	return 0, nil
 }
 
-func (d *Definitions) GetLedgerEntryTypeNameByLedgerEntryTypeCode(c int64) (string, error) {
+func (d *Definitions) GetLedgerEntryTypeNameByLedgerEntryTypeCode(c int) (string, error) {
 	return "", nil
 }
 
@@ -168,72 +180,57 @@ func loadDefinitions() error {
 		return err
 	}
 
-	var jsonDoc AnyJson
-	err = json.Unmarshal(docBytes, &jsonDoc)
+	var jh codec.JsonHandle
+
+	jh.MapKeyAsString = true
+	jh.SignedInteger = true
+
+	dec := codec.NewDecoderBytes(docBytes, &jh)
+
+	err = dec.Decode(&definitions)
 	if err != nil {
 		return err
 	}
 
-	types := jsonDoc["TYPES"].(map[string]interface{})
-	ledgerEntryTypes := jsonDoc["LEDGER_ENTRY_TYPES"].(map[string]interface{})
-	transactionResults := jsonDoc["TRANSACTION_RESULTS"].(map[string]interface{})
-	transactionTypes := jsonDoc["TRANSACTION_TYPES"].(map[string]interface{})
-	fields := jsonDoc["FIELDS"].([]interface{})
-
-	definitions.Types = castMap(types)
-	definitions.LedgerEntryTypes = castMap(ledgerEntryTypes)
-	definitions.TransactionResults = castMap(transactionResults)
-	definitions.TransactionTypes = castMap(transactionTypes)
-	definitions.Fields = convertToFieldInstanceMap(fields)
-	addFieldHeaders(definitions.Types, definitions.Fields)
+	addFieldHeaders()
 
 	return nil
 }
 
-func castMap(m map[string]interface{}) map[string]int64 {
-	nm := make(map[string]int64)
-	for k, v := range m {
-		nm[k] = v.(int64)
-	}
-	return nm
-}
-
-func convertToFieldInstanceMap(m []interface{}) map[string]*fieldInstance {
+func convertToFieldInstanceMap(m [][]interface{}) map[string]*fieldInstance {
 	nm := make(map[string]*fieldInstance, len(m))
 
 	for _, j := range m {
-		if v, ok := j.([]interface{}); ok {
-			k := v[0].(string)
-			fi, _ := castFieldInfo(v[1])
-			nm[k] = &fieldInstance{
-				FieldName: k,
-				fieldInfo: fi,
-			}
+		k := j[0].(string)
+		fi, _ := castFieldInfo(j[1])
+		nm[k] = &fieldInstance{
+			FieldName: k,
+			fieldInfo: fi,
 		}
 	}
 	return nm
 }
 
 func castFieldInfo(v interface{}) (fieldInfo, error) {
-	if m, ok := v.(map[string]interface{}); ok {
+	if fi, ok := v.(map[string]interface{}); ok {
 		return fieldInfo{
-			Nth:            m["nth"].(int64),
-			IsVLEncoded:    m["isVLEncoded"].(bool),
-			IsSerialized:   m["isSerialized"].(bool),
-			IsSigningField: m["isSigningField"].(bool),
-			Type:           m["type"].(string),
+			Nth:            int(fi["nth"].(int64)),
+			IsVLEncoded:    fi["isVLEncoded"].(bool),
+			IsSerialized:   fi["isSerialized"].(bool),
+			IsSigningField: fi["isSigningField"].(bool),
+			Type:           fi["type"].(string),
 		}, nil
 	}
 	return fieldInfo{}, errors.New("unable to cast to field info")
 }
 
-func addFieldHeaders(typeMap map[string]int64, fieldInstances map[string]*fieldInstance) {
-	for k, _ := range fieldInstances {
-		t := typeMap[fieldInstances[k].Type]
-		if fi, ok := fieldInstances[k]; ok {
+func addFieldHeaders() {
+	for k, _ := range definitions.Fields {
+		t, _ := definitions.GetTypeCodeByTypeName(definitions.Fields[k].Type)
+		if fi, ok := definitions.Fields[k]; ok {
 			fi.FieldHeader = fieldHeader{
 				TypeCode:  byte(t),
-				FieldCode: byte(fieldInstances[k].Nth),
+				FieldCode: byte(definitions.Fields[k].Nth),
 			}
 		}
 	}

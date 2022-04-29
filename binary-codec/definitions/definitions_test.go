@@ -10,20 +10,19 @@ func TestLoadDefinitions(t *testing.T) {
 
 	err := loadDefinitions()
 	assert.NoError(t, err)
-	assert.Equal(t, int64(-1), definitions.Types["Done"])
-	assert.Equal(t, int64(4), definitions.Types["Hash128"])
-	assert.Equal(t, int64(-3), definitions.LedgerEntryTypes["Any"])
-	assert.Equal(t, int64(-399), definitions.TransactionResults["telLOCAL_ERROR"])
-	assert.Equal(t, int64(1), definitions.TransactionTypes["EscrowCreate"])
-	assert.Equal(t, fieldInfo{Nth: int64(0), IsVLEncoded: false, IsSerialized: false, IsSigningField: false, Type: "Unknown"}, definitions.Fields["Generic"].fieldInfo)
-	assert.Equal(t, fieldInfo{Nth: int64(28), IsVLEncoded: false, IsSerialized: true, IsSigningField: true, Type: "Hash256"}, definitions.Fields["NFTokenBuyOffer"].fieldInfo)
-	assert.Equal(t, fieldInfo{Nth: int64(16), IsVLEncoded: false, IsSerialized: true, IsSigningField: true, Type: "UInt8"}, definitions.Fields["TickSize"].fieldInfo)
+	assert.Equal(t, -1, definitions.Types["Done"])
+	assert.Equal(t, 4, definitions.Types["Hash128"])
+	assert.Equal(t, -3, definitions.LedgerEntryTypes["Any"])
+	assert.Equal(t, -399, definitions.TransactionResults["telLOCAL_ERROR"])
+	assert.Equal(t, 1, definitions.TransactionTypes["EscrowCreate"])
+	assert.Equal(t, fieldInfo{Nth: 0, IsVLEncoded: false, IsSerialized: false, IsSigningField: false, Type: "Unknown"}, definitions.Fields["Generic"].fieldInfo)
+	assert.Equal(t, fieldInfo{Nth: 28, IsVLEncoded: false, IsSerialized: true, IsSigningField: true, Type: "Hash256"}, definitions.Fields["NFTokenBuyOffer"].fieldInfo)
+	assert.Equal(t, fieldInfo{Nth: 16, IsVLEncoded: false, IsSerialized: true, IsSigningField: true, Type: "UInt8"}, definitions.Fields["TickSize"].fieldInfo)
 	assert.Equal(t, fieldHeader{TypeCode: 2, FieldCode: 4}, definitions.Fields["Sequence"].FieldHeader)
 	assert.Equal(t, fieldHeader{TypeCode: 18, FieldCode: 1}, definitions.Fields["Paths"].FieldHeader)
 	assert.Equal(t, fieldHeader{TypeCode: 2, FieldCode: 33}, definitions.Fields["SetFlag"].FieldHeader)
 	assert.Equal(t, fieldHeader{TypeCode: 16, FieldCode: 16}, definitions.Fields["TickSize"].FieldHeader)
-	assert.Equal(t, definitions.Types["Done"], int64(-1))
-	assert.Equal(t, "UInt32", definitions.Fields["TransferRate"].fieldInfo.Type)
+	assert.Equal(t, "UInt32", definitions.Fields["TransferRate"].Type)
 }
 
 func TestGetTypeNameByFieldName(t *testing.T) {
@@ -70,19 +69,19 @@ func TestGetTypeCodeByTypeName(t *testing.T) {
 	tt := []struct {
 		description   string
 		input         string
-		expected      int64
+		expected      int
 		expectedError error
 	}{
 		{
 			description:   "test that `Done` gives correct code",
 			input:         "Done",
-			expected:      int64(-1),
+			expected:      -1,
 			expectedError: nil,
 		},
 		{
 			description:   "test that `Hash128` gives correct code",
 			input:         "Hash128",
-			expected:      int64(4),
+			expected:      4,
 			expectedError: nil,
 		},
 		{
@@ -114,19 +113,19 @@ func TestGetTypeCodeByFieldName(t *testing.T) {
 	tt := []struct {
 		description   string
 		input         string
-		expected      int64
+		expected      int
 		expectedError error
 	}{
 		{
-			description:   "test that `TransferRate` gives `int64(2)`",
+			description:   "test that `TransferRate` gives 2",
 			input:         "TransferRate",
-			expected:      int64(2),
+			expected:      2,
 			expectedError: nil,
 		},
 		{
-			description:   "test that `OwnerNode` gives `int64(3)`",
+			description:   "test that `OwnerNode` gives 3",
 			input:         "OwnerNode",
-			expected:      int64(3),
+			expected:      3,
 			expectedError: nil,
 		},
 		{
@@ -157,13 +156,13 @@ func TestGetFieldCodeByFieldName(t *testing.T) {
 	tt := []struct {
 		description   string
 		input         string
-		expected      int64
+		expected      int
 		expectedError error
 	}{
 		{
 			description:   "correct FieldCode",
 			input:         "TransferRate",
-			expected:      int64(11),
+			expected:      11,
 			expectedError: nil,
 		},
 		{
@@ -322,13 +321,13 @@ func TestGetTransactionTypeCodeByTransactionTypeName(t *testing.T) {
 	tt := []struct {
 		description   string
 		input         string
-		expected      int64
+		expected      int
 		expectedError error
 	}{
 		{
 			description:   "correct TypeCode",
 			input:         "EscrowCreate",
-			expected:      int64(1),
+			expected:      1,
 			expectedError: nil,
 		},
 		{
@@ -356,13 +355,13 @@ func TestGetTransactionTypeCodeByTransactionTypeName(t *testing.T) {
 func TestGetTransactionTypeNameByTransactionTypeCode(t *testing.T) {
 	tt := []struct {
 		description   string
-		input         int64
+		input         int
 		expected      string
 		expectedError error
 	}{
 		{
 			description:   "correct TypeName",
-			input:         int64(1),
+			input:         1,
 			expected:      "EscrowCreate",
 			expectedError: nil,
 		},

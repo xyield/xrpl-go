@@ -7,7 +7,7 @@ type fieldInstance struct {
 }
 
 type fieldInfo struct {
-	Nth            int64
+	Nth            int
 	IsVLEncoded    bool
 	IsSerialized   bool
 	IsSigningField bool
