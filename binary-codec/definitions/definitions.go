@@ -2,8 +2,8 @@ package definitions
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
-	"log"
 	"path"
 	"runtime"
 
@@ -12,10 +12,22 @@ import (
 
 var definitions Definitions
 
-type TypeNotFoundError struct{}
+type NotFoundError struct {
+	Instance string
+	Input    string
+}
 
-func (tnf *TypeNotFoundError) Error() string {
-	return "Type not found"
+func (tnf *NotFoundError) Error() string {
+	return fmt.Sprintf("%v %v not found", tnf.Instance, tnf.Input)
+}
+
+type NotFoundErrorInt struct {
+	Instance string
+	Input    int
+}
+
+func (tnf *NotFoundErrorInt) Error() string {
+	return fmt.Sprintf("%v %v not found", tnf.Instance, tnf.Input)
 }
 
 type Definitions struct {
@@ -35,140 +47,6 @@ func (fi *fieldInstanceMap) CodecDecodeSelf(d *codec.Decoder) {
 	d.MustDecode(&x)
 	y := convertToFieldInstanceMap(x)
 	*fi = y
-}
-
-func (d *Definitions) GetTypeNameByFieldName(n string) (string, error) {
-
-	fieldName, ok := d.Fields[n]
-
-	if !ok {
-		return "", &TypeNotFoundError{}
-	}
-
-	typeName := fieldName.Type
-
-	return typeName, nil
-}
-
-func (d *Definitions) GetTypeCodeByTypeName(n string) (int, error) {
-	typeCode, ok := d.Types[n]
-
-	if !ok {
-		return 0, &TypeNotFoundError{}
-	}
-	return typeCode, nil
-}
-
-func (d *Definitions) GetTypeCodeByFieldName(n string) (int, error) {
-	typeName, err := d.GetTypeNameByFieldName(n)
-
-	if err != nil {
-		log.Println("TypeName not found from the FieldName provided.")
-		return 0, err
-	}
-
-	typeCode, ok := d.Types[typeName]
-
-	if !ok {
-		return 0, &TypeNotFoundError{}
-	}
-
-	return typeCode, nil
-}
-
-func (d *Definitions) GetFieldCodeByFieldName(n string) (int, error) {
-
-	fieldName, ok := d.Fields[n]
-
-	if !ok {
-		return 0, &TypeNotFoundError{}
-	}
-
-	return fieldName.Nth, nil
-}
-
-func (d *Definitions) GetFieldHeaderByFieldName(n string) (fieldHeader, error) {
-
-	fieldCode, err := d.GetFieldCodeByFieldName(n)
-
-	if err != nil {
-		return fieldHeader{}, &TypeNotFoundError{}
-	}
-
-	typeCode, _ := d.GetTypeCodeByFieldName(n)
-
-	return fieldHeader{
-		TypeCode:  byte(typeCode),
-		FieldCode: byte(fieldCode),
-	}, nil
-}
-
-func (d *Definitions) GetFieldInfoByFieldName(n string) (fieldInfo, error) {
-
-	fieldName, ok := d.Fields[n]
-
-	if !ok {
-		return fieldInfo{}, &TypeNotFoundError{}
-	}
-
-	return fieldInfo{
-		Nth:            fieldName.Nth,
-		IsVLEncoded:    fieldName.IsVLEncoded,
-		IsSerialized:   fieldName.IsSerialized,
-		IsSigningField: fieldName.IsSigningField,
-		Type:           fieldName.Type,
-	}, nil
-}
-
-func (d *Definitions) GetFieldInstanceByFieldName(n string) (fieldInstance, error) {
-
-	fieldHeader, err := d.GetFieldHeaderByFieldName(n)
-
-	if err != nil {
-		return fieldInstance{}, &TypeNotFoundError{}
-	}
-
-	fieldInfo, _ := d.GetFieldInfoByFieldName(n)
-
-	if err != nil {
-		return fieldInstance{}, &TypeNotFoundError{}
-	}
-
-	return fieldInstance{
-		FieldName:   n,
-		fieldInfo:   fieldInfo,
-		FieldHeader: fieldHeader,
-	}, nil
-}
-
-func (d *Definitions) GetTransactionTypeCodeByTransactionTypeName(n string) (int, error) {
-	txTypeCode, ok := d.TransactionTypes[n]
-
-	if !ok {
-		return 0, &TypeNotFoundError{}
-	}
-
-	return txTypeCode, nil
-}
-
-func (d *Definitions) GetTransactionTypeNameByTransactionTypeCode(c int) (string, error) {
-	return "EscrowCreate", nil
-}
-
-func (d *Definitions) GetTransactionResultNameByTransactionResultTypeCode(c int) (string, error) {
-	return "", nil
-}
-
-func (d *Definitions) GetTransactionResultTypeCodeByTransactionResultName(n string) (int, error) {
-	return 0, nil
-}
-
-func (d *Definitions) GetLedgerEntryTypeCodeByLedgerEntryTypeName(n string) (int, error) {
-	return 0, nil
-}
-
-func (d *Definitions) GetLedgerEntryTypeNameByLedgerEntryTypeCode(c int) (string, error) {
-	return "", nil
 }
 
 func loadDefinitions() error {
@@ -205,7 +83,7 @@ func convertToFieldInstanceMap(m [][]interface{}) map[string]*fieldInstance {
 		fi, _ := castFieldInfo(j[1])
 		nm[k] = &fieldInstance{
 			FieldName: k,
-			fieldInfo: fi,
+			fieldInfo: &fi,
 		}
 	}
 	return nm
@@ -228,7 +106,7 @@ func addFieldHeaders() {
 	for k, _ := range definitions.Fields {
 		t, _ := definitions.GetTypeCodeByTypeName(definitions.Fields[k].Type)
 		if fi, ok := definitions.Fields[k]; ok {
-			fi.FieldHeader = fieldHeader{
+			fi.FieldHeader = &fieldHeader{
 				TypeCode:  byte(t),
 				FieldCode: byte(definitions.Fields[k].Nth),
 			}

@@ -2,8 +2,8 @@ package definitions
 
 type fieldInstance struct {
 	FieldName string
-	fieldInfo
-	FieldHeader fieldHeader
+	*fieldInfo
+	FieldHeader *fieldHeader
 }
 
 type fieldInfo struct {
