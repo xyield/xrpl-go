@@ -1,0 +1,479 @@
+package definitions
+
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
+func TestGetTypeNameByFieldName(t *testing.T) {
+
+	tt := []struct {
+		description   string
+		input         string
+		expected      string
+		expectedError error
+	}{
+		{
+			description:   "test that `TransferRate` gives `UInt32`",
+			input:         "TransferRate",
+			expected:      "UInt32",
+			expectedError: nil,
+		},
+		{
+			description: "test that invalid value gives an error",
+			input:       "yurt",
+			expected:    "",
+			expectedError: &NotFoundError{
+				Instance: "FieldName",
+				Input:    "yurt",
+			},
+		},
+	}
+
+	for _, test := range tt {
+
+		t.Run(test.description, func(t *testing.T) {
+			got, err := definitions.GetTypeNameByFieldName(test.input)
+			if test.expectedError != nil {
+				assert.Error(t, test.expectedError, err.Error())
+				assert.Zero(t, got)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, got)
+			}
+		})
+
+	}
+
+}
+
+func TestGetTypeCodeByTypeName(t *testing.T) {
+
+	tt := []struct {
+		description   string
+		input         string
+		expected      int
+		expectedError error
+	}{
+		{
+			description:   "test that `Done` gives correct code",
+			input:         "Done",
+			expected:      -1,
+			expectedError: nil,
+		},
+		{
+			description:   "test that `Hash128` gives correct code",
+			input:         "Hash128",
+			expected:      4,
+			expectedError: nil,
+		},
+		{
+			description: "test that incorrect value gives an error",
+			input:       "yurt",
+			expected:    0,
+			expectedError: &NotFoundError{
+				Instance: "TypeName",
+				Input:    "yurt",
+			},
+		},
+	}
+
+	for _, test := range tt {
+
+		t.Run(test.description, func(t *testing.T) {
+			got, err := definitions.GetTypeCodeByTypeName(test.input)
+			if test.expectedError != nil {
+				assert.Error(t, test.expectedError, err.Error())
+				assert.Zero(t, got)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, got)
+			}
+		})
+
+	}
+
+}
+
+func TestGetTypeCodeByFieldName(t *testing.T) {
+	tt := []struct {
+		description   string
+		input         string
+		expected      int
+		expectedError error
+	}{
+		{
+			description:   "test that `TransferRate` gives 2",
+			input:         "TransferRate",
+			expected:      2,
+			expectedError: nil,
+		},
+		{
+			description:   "test that `OwnerNode` gives 3",
+			input:         "OwnerNode",
+			expected:      3,
+			expectedError: nil,
+		},
+		{
+			description: "test that non-existent value gives error",
+			input:       "yurt",
+			expected:    0,
+			expectedError: &NotFoundError{
+				Instance: "FieldName",
+				Input:    "yurt",
+			},
+		},
+	}
+
+	for _, test := range tt {
+
+		t.Run(test.description, func(t *testing.T) {
+			got, err := definitions.GetTypeCodeByFieldName(test.input)
+			if test.expectedError != nil {
+				assert.Error(t, test.expectedError, err.Error())
+				assert.Zero(t, got)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, got)
+			}
+		})
+	}
+}
+
+func TestGetFieldCodeByFieldName(t *testing.T) {
+
+	tt := []struct {
+		description   string
+		input         string
+		expected      int
+		expectedError error
+	}{
+		{
+			description:   "correct FieldCode",
+			input:         "TransferRate",
+			expected:      11,
+			expectedError: nil,
+		},
+		{
+			description: "Invalid FieldName",
+			input:       "yurt",
+			expected:    0,
+			expectedError: &NotFoundError{
+				Instance: "FieldName",
+				Input:    "yurt",
+			},
+		},
+	}
+
+	for _, test := range tt {
+
+		t.Run(test.description, func(t *testing.T) {
+			got, err := definitions.GetFieldCodeByFieldName(test.input)
+			if test.expectedError != nil {
+				assert.Error(t, test.expectedError, err.Error())
+				assert.Zero(t, got)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, got)
+			}
+		})
+	}
+}
+
+func TestGetFieldHeaderByFieldName(t *testing.T) {
+	tt := []struct {
+		description   string
+		input         string
+		expected      *fieldHeader
+		expectedError error
+	}{
+		{
+			description: "correct FieldHeader",
+			input:       "TransferRate",
+			expected: &fieldHeader{
+				TypeCode:  2,
+				FieldCode: 11,
+			},
+			expectedError: nil,
+		},
+		{
+			description: "Invalid FieldName",
+			input:       "yurt",
+			expected:    nil,
+			expectedError: &NotFoundError{
+				Instance: "FieldName",
+				Input:    "yurt",
+			},
+		},
+	}
+
+	for _, test := range tt {
+
+		t.Run(test.description, func(t *testing.T) {
+			got, err := definitions.GetFieldHeaderByFieldName(test.input)
+			if test.expectedError != nil {
+				assert.Error(t, test.expectedError, err.Error())
+				assert.Nil(t, got)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, got)
+			}
+		})
+	}
+}
+
+func TestGetFieldInfoByFieldName(t *testing.T) {
+	tt := []struct {
+		description   string
+		input         string
+		expected      *fieldInfo
+		expectedError error
+	}{
+		{
+			description: "correct FieldInfo",
+			input:       "TransferRate",
+			expected: &fieldInfo{
+				Nth:            11,
+				IsVLEncoded:    false,
+				IsSerialized:   true,
+				IsSigningField: true,
+				Type:           "UInt32",
+			},
+			expectedError: nil,
+		},
+		{
+			description: "invalid FieldInfo",
+			input:       "yurt",
+			expected:    nil,
+			expectedError: &NotFoundError{
+				Instance: "FieldName",
+				Input:    "yurt",
+			},
+		},
+	}
+
+	for _, test := range tt {
+		t.Run(test.description, func(t *testing.T) {
+			got, err := definitions.GetFieldInfoByFieldName(test.input)
+			if test.expectedError != nil {
+				assert.Error(t, test.expectedError, err.Error())
+				assert.Nil(t, got)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, got)
+			}
+
+		})
+	}
+}
+
+func TestGetFieldInstanceByFieldName(t *testing.T) {
+	tt := []struct {
+		description   string
+		input         string
+		expected      *fieldInstance
+		expectedError error
+	}{
+		{
+			description: "correct FieldInstance",
+			input:       "TransferRate",
+			expected: &fieldInstance{
+				FieldName: "TransferRate",
+				fieldInfo: &fieldInfo{
+					Nth:            11,
+					IsVLEncoded:    false,
+					IsSerialized:   true,
+					IsSigningField: true,
+					Type:           "UInt32",
+				},
+				FieldHeader: &fieldHeader{
+					TypeCode:  2,
+					FieldCode: 11,
+				},
+			},
+		},
+		{
+			description: "invalid FieldName",
+			input:       "yurt",
+			expected:    nil,
+			expectedError: &NotFoundError{
+				Instance: "FieldName",
+				Input:    "yurt",
+			},
+		},
+	}
+
+	for _, test := range tt {
+
+		t.Run(test.description, func(t *testing.T) {
+			got, err := definitions.GetFieldInstanceByFieldName(test.input)
+			if test.expectedError != nil {
+				assert.Error(t, test.expectedError, err.Error())
+				assert.Nil(t, got)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, got)
+			}
+		})
+	}
+}
+
+func TestGetTransactionTypeCodeByTransactionTypeName(t *testing.T) {
+	tt := []struct {
+		description   string
+		input         string
+		expected      int
+		expectedError error
+	}{
+		{
+			description:   "correct TransactionTypeCode",
+			input:         "EscrowCreate",
+			expected:      1,
+			expectedError: nil,
+		},
+		{
+			description: "invalid TransactionTypeName",
+			input:       "yurt",
+			expected:    0,
+			expectedError: &NotFoundError{
+				Instance: "TransactionTypeName",
+				Input:    "yurt",
+			},
+		},
+	}
+
+	for _, test := range tt {
+		t.Run(test.description, func(t *testing.T) {
+			got, err := definitions.GetTransactionTypeCodeByTransactionTypeName(test.input)
+			if test.expectedError != nil {
+				assert.Error(t, test.expectedError, err.Error())
+				assert.Zero(t, got)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, got)
+			}
+		})
+	}
+}
+
+func TestGetTransactionTypeNameByTransactionTypeCode(t *testing.T) {
+	tt := []struct {
+		description   string
+		input         int
+		expected      string
+		expectedError error
+	}{
+		{
+			description:   "correct TypeName",
+			input:         1,
+			expected:      "EscrowCreate",
+			expectedError: nil,
+		},
+	}
+
+	for _, test := range tt {
+		t.Run(test.description, func(t *testing.T) {
+			got, err := definitions.GetTransactionTypeNameByTransactionTypeCode(test.input)
+			if test.expectedError != nil {
+				assert.Error(t, test.expectedError, err.Error())
+				assert.Zero(t, got)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, got)
+			}
+		})
+	}
+}
+
+func TestGetTransactionResultNameByTransactionResultTypeCode(t *testing.T) {
+	tt := []struct {
+		description   string
+		input         int
+		expected      string
+		expectedError error
+	}{
+		{
+			description:   "correct TransactionResultName",
+			input:         100,
+			expected:      "tecCLAIM",
+			expectedError: nil,
+		},
+	}
+
+	for _, test := range tt {
+		t.Run(test.description, func(t *testing.T) {
+			got, err := definitions.GetTransactionResultNameByTransactionResultTypeCode(test.input)
+			if test.expectedError != nil {
+				assert.Error(t, test.expectedError, err.Error())
+				assert.Zero(t, got)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, got)
+			}
+		})
+	}
+}
+
+func TestGetTransactionResultTypeCodeByTransactionResultName(t *testing.T) {
+	tt := []struct {
+		description   string
+		input         string
+		expected      int
+		expectedError error
+	}{
+		{
+			description:   "correct TransactionResultTypeCode",
+			input:         "tecCLAIM",
+			expected:      100,
+			expectedError: nil,
+		},
+	}
+
+	for _, test := range tt {
+		t.Run(test.description, func(t *testing.T) {
+			got, err := definitions.GetTransactionResultTypeCodeByTransactionResultName(test.input)
+			if test.expectedError != nil {
+				assert.Error(t, test.expectedError, err.Error())
+				assert.Zero(t, got)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, got)
+			}
+		})
+	}
+}
+
+func TestGetLedgerEntryTypeCodeByLedgerEntryTypeName(t *testing.T) {
+	tt := []struct {
+		description   string
+		input         string
+		expected      int
+		expectedError error
+	}{
+		{
+			description:   "correct LedgerEntryTypeCode",
+			input:         "Any",
+			expected:      -3,
+			expectedError: nil,
+		},
+	}
+
+	for _, test := range tt {
+		t.Run(test.description, func(t *testing.T) {
+			got, err := definitions.GetLedgerEntryTypeCodeByLedgerEntryTypeName(test.input)
+			if test.expectedError != nil {
+				assert.Error(t, test.expectedError, err.Error())
+				assert.Zero(t, got)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, got)
+			}
+		})
+	}
+
+}
+
+func TestGetLedgerEntryTypeNameByLedgerEntryTypeCode(t *testing.T) {
+
+}
