@@ -1,10 +1,13 @@
 package definitions
 
+import "fmt"
+
 func (d *Definitions) GetTypeNameByFieldName(n string) (string, error) {
 
 	fi, ok := d.Fields[n]
 
 	if !ok {
+		fmt.Println("entered")
 		return "", &NotFoundError{
 			Instance: "FieldName",
 			Input:    n,
@@ -112,7 +115,7 @@ func (d *Definitions) GetTransactionTypeNameByTransactionTypeCode(c int) (string
 	}
 
 	return "", &NotFoundErrorInt{
-		Instance: "TransactionTypeName",
+		Instance: "TransactionTypeCode",
 		Input:    c,
 	}
 }
@@ -133,30 +136,41 @@ func (d *Definitions) GetTransactionResultNameByTransactionResultTypeCode(c int)
 
 func (d *Definitions) GetTransactionResultTypeCodeByTransactionResultName(n string) (int, error) {
 
-	txResultCode, ok := d.TransactionResults[n]
+	txResultTypeCode, ok := d.TransactionResults[n]
 
 	if !ok {
 		return 0, &NotFoundError{
-			Instance: "TransactionTypeName",
+			Instance: "TransactionResultName",
 			Input:    n,
 		}
 	}
-	return txResultCode, nil
+	return txResultTypeCode, nil
 }
 
 func (d *Definitions) GetLedgerEntryTypeCodeByLedgerEntryTypeName(n string) (int, error) {
 
-	ledgerEntryCode, ok := d.LedgerEntryTypes[n]
+	ledgerEntryTypeCode, ok := d.LedgerEntryTypes[n]
 
 	if !ok {
 		return 0, &NotFoundError{
-			Instance: "TransactionTypeName",
+			Instance: "LedgerEntryTypeName",
 			Input:    n,
 		}
 	}
-	return ledgerEntryCode, nil
+	return ledgerEntryTypeCode, nil
 }
 
 func (d *Definitions) GetLedgerEntryTypeNameByLedgerEntryTypeCode(c int) (string, error) {
-	return "", nil
+
+	for ledgerEntryTypeName, code := range d.LedgerEntryTypes {
+
+		if code == c {
+			return ledgerEntryTypeName, nil
+		}
+	}
+
+	return "", &NotFoundErrorInt{
+		Instance: "LedgerEntryTypeCode",
+		Input:    c,
+	}
 }

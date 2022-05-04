@@ -370,6 +370,15 @@ func TestGetTransactionTypeNameByTransactionTypeCode(t *testing.T) {
 			expected:      "EscrowCreate",
 			expectedError: nil,
 		},
+		{
+			description: "invalid TransactionTypeCode",
+			input:       999999999999,
+			expected:    "",
+			expectedError: &NotFoundErrorInt{
+				Instance: "TransactionTypeCode",
+				Input:    999999999999,
+			},
+		},
 	}
 
 	for _, test := range tt {
@@ -398,6 +407,15 @@ func TestGetTransactionResultNameByTransactionResultTypeCode(t *testing.T) {
 			input:         100,
 			expected:      "tecCLAIM",
 			expectedError: nil,
+		},
+		{
+			description: "invalid txResultTypeCode",
+			input:       999999999999999,
+			expected:    "",
+			expectedError: &NotFoundErrorInt{
+				Instance: "TransactionResultTypeCode",
+				Input:    999999999999999,
+			},
 		},
 	}
 
@@ -428,6 +446,15 @@ func TestGetTransactionResultTypeCodeByTransactionResultName(t *testing.T) {
 			expected:      100,
 			expectedError: nil,
 		},
+		{
+			description: "invalid TransactionResultName",
+			input:       "yurt",
+			expected:    0,
+			expectedError: &NotFoundError{
+				Instance: "TransactionResultName",
+				Input:    "yurt",
+			},
+		},
 	}
 
 	for _, test := range tt {
@@ -457,6 +484,15 @@ func TestGetLedgerEntryTypeCodeByLedgerEntryTypeName(t *testing.T) {
 			expected:      -3,
 			expectedError: nil,
 		},
+		{
+			description: "invalid LedgerEntryTypeName",
+			input:       "yurt",
+			expected:    0,
+			expectedError: &NotFoundError{
+				Instance: "LedgerEntryTypeName",
+				Input:    "yurt",
+			},
+		},
 	}
 
 	for _, test := range tt {
@@ -475,5 +511,39 @@ func TestGetLedgerEntryTypeCodeByLedgerEntryTypeName(t *testing.T) {
 }
 
 func TestGetLedgerEntryTypeNameByLedgerEntryTypeCode(t *testing.T) {
+	tt := []struct {
+		description   string
+		input         int
+		expected      string
+		expectedError error
+	}{
+		{
+			description:   "correct LedgerEntryTypeName",
+			input:         -3,
+			expected:      "Any",
+			expectedError: nil,
+		},
+		{
+			description: "invalid LedgerEntryTypeCode",
+			input:       999999999999,
+			expected:    "",
+			expectedError: &NotFoundErrorInt{
+				Instance: "LedgerEntryTypeCode",
+				Input:    999999999999,
+			},
+		},
+	}
 
+	for _, test := range tt {
+		t.Run(test.description, func(t *testing.T) {
+			got, err := definitions.GetLedgerEntryTypeNameByLedgerEntryTypeCode(test.input)
+			if test.expectedError != nil {
+				assert.Error(t, test.expectedError, err.Error())
+				assert.Zero(t, got)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, got)
+			}
+		})
+	}
 }
