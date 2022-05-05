@@ -12,6 +12,10 @@ import (
 
 var definitions Definitions
 
+func GetDefinitions() *Definitions {
+	return &definitions
+}
+
 type NotFoundError struct {
 	Instance string
 	Input    string
