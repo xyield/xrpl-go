@@ -24,3 +24,9 @@ func TestLoadDefinitions(t *testing.T) {
 	assert.Equal(t, &fieldHeader{TypeCode: 16, FieldCode: 16}, definitions.Fields["TickSize"].FieldHeader)
 	assert.Equal(t, "UInt32", definitions.Fields["TransferRate"].Type)
 }
+
+func BenchmarkLoadDefinitions(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		loadDefinitions()
+	}
+}

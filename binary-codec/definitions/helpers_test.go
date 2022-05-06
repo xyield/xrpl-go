@@ -48,6 +48,28 @@ func TestGetTypeNameByFieldName(t *testing.T) {
 
 }
 
+// func BenchmarkGetTypeNameByFieldName(b *testing.B) {
+
+// 	tt := []struct {
+// 		input string
+// 	}{
+// 		{
+// 			input: "Generic",
+// 		},
+// 		{
+// 			input: "yurt",
+// 		},
+// 	}
+
+// 	for _, test := range tt {
+// 		b.Run(fmt.Sprintf("input_name_%v", test.input), func(b *testing.B) {
+// 			for i := 0; i < b.N; i++ {
+// 				definitions.GetTypeNameByFieldName(test.input)
+// 			}
+// 		})
+// 	}
+// }
+
 func TestGetTypeCodeByTypeName(t *testing.T) {
 
 	tt := []struct {
@@ -96,6 +118,28 @@ func TestGetTypeCodeByTypeName(t *testing.T) {
 
 }
 
+// func BenchmarkGetTypeCodeByTypeName(b *testing.B) {
+
+// 	tt := []struct {
+// 		input string
+// 	}{
+// 		{
+// 			input: "Validation",
+// 		},
+// 		{
+// 			input: "yurt",
+// 		},
+// 	}
+
+// 	for _, test := range tt {
+// 		b.Run(fmt.Sprintf("input_name_%v", test.input), func(b *testing.B) {
+// 			for i := 0; i < b.N; i++ {
+// 				definitions.GetTypeCodeByTypeName(test.input)
+// 			}
+// 		})
+// 	}
+// }
+
 func TestGetTypeCodeByFieldName(t *testing.T) {
 	tt := []struct {
 		description   string
@@ -141,6 +185,26 @@ func TestGetTypeCodeByFieldName(t *testing.T) {
 	}
 }
 
+// func BenchmarkGetTypeCodeByFieldName(b *testing.B) {
+// 	tt := []struct {
+// 		input string
+// 	}{
+// 		{
+// 			input: "Generic",
+// 		},
+// 		{
+// 			input: "yurt",
+// 		},
+// 	}
+
+// 	for _, test := range tt {
+// 		b.Run(fmt.Sprintf("input_name_%v", test.input), func(b *testing.B) {
+// 			for i := 0; i < b.N; i++ {
+// 				definitions.GetTypeCodeByFieldName(test.input)
+// 			}
+// 		})
+// 	}
+// }
 func TestGetFieldCodeByFieldName(t *testing.T) {
 
 	tt := []struct {
@@ -181,6 +245,26 @@ func TestGetFieldCodeByFieldName(t *testing.T) {
 	}
 }
 
+// func BenchmarkGetFieldCodeByFieldName(b *testing.B) {
+// 	tt := []struct {
+// 		input string
+// 	}{
+// 		{
+// 			input: "Generic",
+// 		},
+// 		{
+// 			input: "yurt",
+// 		},
+// 	}
+
+// 	for _, test := range tt {
+// 		b.Run(fmt.Sprintf("input_name_%v", test.input), func(b *testing.B) {
+// 			for i := 0; i < b.N; i++ {
+// 				definitions.GetFieldCodeByFieldName(test.input)
+// 			}
+// 		})
+// 	}
+// }
 func TestGetFieldHeaderByFieldName(t *testing.T) {
 	tt := []struct {
 		description   string
@@ -223,6 +307,26 @@ func TestGetFieldHeaderByFieldName(t *testing.T) {
 	}
 }
 
+// func BenchmarkGetFieldHeaderByFieldName(b *testing.B) {
+// 	tt := []struct {
+// 		input string
+// 	}{
+// 		{
+// 			input: "Generic",
+// 		},
+// 		{
+// 			input: "yurt",
+// 		},
+// 	}
+
+// 	for _, test := range tt {
+// 		b.Run(fmt.Sprintf("input_name_%v", test.input), func(b *testing.B) {
+// 			for i := 0; i < b.N; i++ {
+// 				definitions.GetFieldHeaderByFieldName(test.input)
+// 			}
+// 		})
+// 	}
+// }
 func TestGetFieldInfoByFieldName(t *testing.T) {
 	tt := []struct {
 		description   string
@@ -268,6 +372,26 @@ func TestGetFieldInfoByFieldName(t *testing.T) {
 	}
 }
 
+// func BenchmarkGetFieldInfoByFieldName(b *testing.B) {
+// 	tt := []struct {
+// 		input string
+// 	}{
+// 		{
+// 			input: "Generic",
+// 		},
+// 		{
+// 			input: "yurt",
+// 		},
+// 	}
+
+// 	for _, test := range tt {
+// 		b.Run(fmt.Sprintf("input_name_%v", test.input), func(b *testing.B) {
+// 			for i := 0; i < b.N; i++ {
+// 				definitions.GetFieldInfoByFieldName(test.input)
+// 			}
+// 		})
+// 	}
+// }
 func TestGetFieldInstanceByFieldName(t *testing.T) {
 	tt := []struct {
 		description   string
@@ -319,6 +443,26 @@ func TestGetFieldInstanceByFieldName(t *testing.T) {
 	}
 }
 
+// func BenchmarkGetFieldInstanceByFieldName(b *testing.B) {
+// 	tt := []struct {
+// 		input string
+// 	}{
+// 		{
+// 			input: "Generic",
+// 		},
+// 		{
+// 			input: "yurt",
+// 		},
+// 	}
+
+// 	for _, test := range tt {
+// 		b.Run(fmt.Sprintf("input_name_%v", test.input), func(b *testing.B) {
+// 			for i := 0; i < b.N; i++ {
+// 				definitions.GetFieldInstanceByFieldName(test.input)
+// 			}
+// 		})
+// 	}
+// }
 func TestGetTransactionTypeCodeByTransactionTypeName(t *testing.T) {
 	tt := []struct {
 		description   string
@@ -357,6 +501,26 @@ func TestGetTransactionTypeCodeByTransactionTypeName(t *testing.T) {
 	}
 }
 
+// func BenchmarkGetTransactionTypeCodeByTransactionTypeName(b *testing.B) {
+// 	tt := []struct {
+// 		input string
+// 	}{
+// 		{
+// 			input: "Payment",
+// 		},
+// 		{
+// 			input: "yurt",
+// 		},
+// 	}
+
+// 	for _, test := range tt {
+// 		b.Run(fmt.Sprintf("input_name_%v", test.input), func(b *testing.B) {
+// 			for i := 0; i < b.N; i++ {
+// 				definitions.GetTransactionTypeCodeByTransactionTypeName(test.input)
+// 			}
+// 		})
+// 	}
+// }
 func TestGetTransactionTypeNameByTransactionTypeCode(t *testing.T) {
 	tt := []struct {
 		description   string
@@ -395,6 +559,26 @@ func TestGetTransactionTypeNameByTransactionTypeCode(t *testing.T) {
 	}
 }
 
+// func BenchmarkGetTransactionTypeNameByTransactionTypeCode(b *testing.B) {
+// 	tt := []struct {
+// 		input int
+// 	}{
+// 		{
+// 			input: 1,
+// 		},
+// 		{
+// 			input: 999999999999999999,
+// 		},
+// 	}
+
+// 	for _, test := range tt {
+// 		b.Run(fmt.Sprintf("input_code_%v", test.input), func(b *testing.B) {
+// 			for i := 0; i < b.N; i++ {
+// 				definitions.GetTransactionTypeNameByTransactionTypeCode(test.input)
+// 			}
+// 		})
+// 	}
+// }
 func TestGetTransactionResultNameByTransactionResultTypeCode(t *testing.T) {
 	tt := []struct {
 		description   string
@@ -433,6 +617,26 @@ func TestGetTransactionResultNameByTransactionResultTypeCode(t *testing.T) {
 	}
 }
 
+// func BenchmarkGetTransactionResultNameByTransactionResultTypeCode(b *testing.B) {
+// 	tt := []struct {
+// 		input int
+// 	}{
+// 		{
+// 			input: 100,
+// 		},
+// 		{
+// 			input: 999999999999999999,
+// 		},
+// 	}
+
+// 	for _, test := range tt {
+// 		b.Run(fmt.Sprintf("input_code_%v", test.input), func(b *testing.B) {
+// 			for i := 0; i < b.N; i++ {
+// 				definitions.GetTransactionResultNameByTransactionResultTypeCode(test.input)
+// 			}
+// 		})
+// 	}
+// }
 func TestGetTransactionResultTypeCodeByTransactionResultName(t *testing.T) {
 	tt := []struct {
 		description   string
@@ -471,6 +675,26 @@ func TestGetTransactionResultTypeCodeByTransactionResultName(t *testing.T) {
 	}
 }
 
+// func BenchmarkGetTransactionResultTypeCodeByTransactionResultName(b *testing.B) {
+// 	tt := []struct {
+// 		input string
+// 	}{
+// 		{
+// 			input: "tesSUCCESS",
+// 		},
+// 		{
+// 			input: "yurt",
+// 		},
+// 	}
+
+// 	for _, test := range tt {
+// 		b.Run(fmt.Sprintf("input_name_%v", test.input), func(b *testing.B) {
+// 			for i := 0; i < b.N; i++ {
+// 				definitions.GetTransactionResultTypeCodeByTransactionResultName(test.input)
+// 			}
+// 		})
+// 	}
+// }
 func TestGetLedgerEntryTypeCodeByLedgerEntryTypeName(t *testing.T) {
 	tt := []struct {
 		description   string
@@ -510,6 +734,26 @@ func TestGetLedgerEntryTypeCodeByLedgerEntryTypeName(t *testing.T) {
 
 }
 
+// func BenchmarkGetLedgerEntryTypeCodeByLedgerEntryTypeName(b *testing.B) {
+// 	tt := []struct {
+// 		input string
+// 	}{
+// 		{
+// 			input: "Any",
+// 		},
+// 		{
+// 			input: "yurt",
+// 		},
+// 	}
+
+// 	for _, test := range tt {
+// 		b.Run(fmt.Sprintf("input_name_%v", test.input), func(b *testing.B) {
+// 			for i := 0; i < b.N; i++ {
+// 				definitions.GetLedgerEntryTypeCodeByLedgerEntryTypeName(test.input)
+// 			}
+// 		})
+// 	}
+// }
 func TestGetLedgerEntryTypeNameByLedgerEntryTypeCode(t *testing.T) {
 	tt := []struct {
 		description   string
@@ -547,3 +791,24 @@ func TestGetLedgerEntryTypeNameByLedgerEntryTypeCode(t *testing.T) {
 		})
 	}
 }
+
+// func BenchmarkGetLedgerEntryTypeNameByLedgerEntryTypeCode(b *testing.B) {
+// 	tt := []struct {
+// 		input int
+// 	}{
+// 		{
+// 			input: 100,
+// 		},
+// 		{
+// 			input: 999999999999999999,
+// 		},
+// 	}
+
+// 	for _, test := range tt {
+// 		b.Run(fmt.Sprintf("input_code_%v", test.input), func(b *testing.B) {
+// 			for i := 0; i < b.N; i++ {
+// 				definitions.GetLedgerEntryTypeNameByLedgerEntryTypeCode(test.input)
+// 			}
+// 		})
+// 	}
+// }

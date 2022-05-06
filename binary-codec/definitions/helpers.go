@@ -1,13 +1,10 @@
 package definitions
 
-import "fmt"
-
 func (d *Definitions) GetTypeNameByFieldName(n string) (string, error) {
 
 	fi, ok := d.Fields[n]
 
 	if !ok {
-		fmt.Println("entered")
 		return "", &NotFoundError{
 			Instance: "FieldName",
 			Input:    n,
