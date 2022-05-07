@@ -10,10 +10,10 @@ import (
 	"github.com/ugorji/go/codec"
 )
 
-var definitions Definitions
+var definitions *Definitions
 
-func GetDefinitions() *Definitions {
-	return &definitions
+func Get() *Definitions {
+	return definitions
 }
 
 type NotFoundError struct {
@@ -35,6 +35,14 @@ func (tnf *NotFoundErrorInt) Error() string {
 }
 
 type Definitions struct {
+	Types              map[string]int
+	LedgerEntryTypes   map[string]int
+	Fields             fieldInstanceMap
+	TransactionResults map[string]int
+	TransactionTypes   map[string]int
+	FieldIdNameMap     map[fieldHeader]string
+}
+type definitionsDoc struct {
 	Types              map[string]int   `json:"TYPES"`
 	LedgerEntryTypes   map[string]int   `json:"LEDGER_ENTRY_TYPES"`
 	Fields             fieldInstanceMap `json:"FIELDS"`
@@ -68,13 +76,21 @@ func loadDefinitions() error {
 	jh.SignedInteger = true
 
 	dec := codec.NewDecoderBytes(docBytes, &jh)
-
-	err = dec.Decode(&definitions)
+	var data definitionsDoc
+	err = dec.Decode(&data)
 	if err != nil {
 		return err
 	}
+	definitions = &Definitions{
+		Types:              data.Types,
+		Fields:             data.Fields,
+		LedgerEntryTypes:   data.LedgerEntryTypes,
+		TransactionResults: data.TransactionResults,
+		TransactionTypes:   data.TransactionTypes,
+	}
 
 	addFieldHeaders()
+	createFieldIdNameMap()
 
 	return nil
 }
@@ -115,5 +131,13 @@ func addFieldHeaders() {
 				FieldCode: byte(definitions.Fields[k].Nth),
 			}
 		}
+	}
+}
+
+func createFieldIdNameMap() {
+	definitions.FieldIdNameMap = make(map[fieldHeader]string, len(definitions.Fields))
+	for k := range definitions.Fields {
+		fh, _ := definitions.GetFieldHeaderByFieldName(k)
+		definitions.FieldIdNameMap[*fh] = k
 	}
 }
