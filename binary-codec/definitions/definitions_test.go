@@ -23,6 +23,9 @@ func TestLoadDefinitions(t *testing.T) {
 	assert.Equal(t, &fieldHeader{TypeCode: 2, FieldCode: 33}, definitions.Fields["SetFlag"].FieldHeader)
 	assert.Equal(t, &fieldHeader{TypeCode: 16, FieldCode: 16}, definitions.Fields["TickSize"].FieldHeader)
 	assert.Equal(t, "UInt32", definitions.Fields["TransferRate"].Type)
+	assert.Equal(t, "Sequence", definitions.FieldIdNameMap[fieldHeader{TypeCode: 2, FieldCode: 4}])
+	assert.Equal(t, "OfferSequence", definitions.FieldIdNameMap[fieldHeader{TypeCode: 2, FieldCode: 25}])
+	assert.Equal(t, "NFTokenSellOffer", definitions.FieldIdNameMap[fieldHeader{TypeCode: 5, FieldCode: 29}])
 }
 
 func BenchmarkLoadDefinitions(b *testing.B) {
