@@ -34,6 +34,15 @@ func (tnf *NotFoundErrorInt) Error() string {
 	return fmt.Sprintf("%v %v not found", tnf.Instance, tnf.Input)
 }
 
+type NotFoundErrorFieldHeader struct {
+	Instance string
+	Input    fieldHeader
+}
+
+func (tnf *NotFoundErrorFieldHeader) Error() string {
+	return fmt.Sprintf("%v %v not found", tnf.Instance, tnf.Input)
+}
+
 type Definitions struct {
 	Types              map[string]int
 	LedgerEntryTypes   map[string]int

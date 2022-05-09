@@ -223,6 +223,62 @@ func TestGetFieldHeaderByFieldName(t *testing.T) {
 	}
 }
 
+func TestGetFieldNameByFieldHeader(t *testing.T) {
+	tt := []struct {
+		description   string
+		input         fieldHeader
+		expected      string
+		expectedError error
+	}{
+		{
+			description: "correct fieldName",
+			input: fieldHeader{
+				TypeCode:  1,
+				FieldCode: 1,
+			},
+			expected:      "LedgerEntryType",
+			expectedError: nil,
+		},
+		{
+			description: "correct fieldName 2",
+			input: fieldHeader{
+				TypeCode:  5,
+				FieldCode: 21,
+			},
+			expected:      "Digest",
+			expectedError: nil,
+		},
+		{
+			description: "invalid fieldHeader",
+			input: fieldHeader{
+				TypeCode:  0000000000000111,
+				FieldCode: 000000000000111,
+			},
+			expected: "",
+			expectedError: &NotFoundErrorFieldHeader{
+				Instance: "FieldHeader",
+				Input: fieldHeader{
+					TypeCode:  0000000000000111,
+					FieldCode: 000000000000111,
+				},
+			},
+		},
+	}
+
+	for _, test := range tt {
+		t.Run(test.description, func(t *testing.T) {
+			got, err := definitions.GetFieldNameByFieldHeader(test.input)
+			if test.expectedError != nil {
+				assert.Error(t, test.expectedError, err.Error())
+				assert.Zero(t, got)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, got)
+			}
+		})
+	}
+}
+
 func TestGetFieldInfoByFieldName(t *testing.T) {
 	tt := []struct {
 		description   string

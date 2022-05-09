@@ -112,6 +112,33 @@ func BenchmarkGetFieldHeaderByFieldName(b *testing.B) {
 	}
 }
 
+func BenchmarkGetFieldNameByFieldHeader(b *testing.B) {
+	tt := []struct {
+		input fieldHeader
+	}{
+		{
+			input: fieldHeader{
+				TypeCode:  1,
+				FieldCode: 1,
+			},
+		},
+		{
+			input: fieldHeader{
+				TypeCode:  0000000000000000111,
+				FieldCode: 00000000000000111,
+			},
+		},
+	}
+
+	for _, test := range tt {
+		b.Run(fmt.Sprintf("input_name_%v", test.input), func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				definitions.GetFieldNameByFieldHeader(test.input)
+			}
+		})
+	}
+}
+
 func BenchmarkGetFieldInfoByFieldName(b *testing.B) {
 	tt := []struct {
 		input string
