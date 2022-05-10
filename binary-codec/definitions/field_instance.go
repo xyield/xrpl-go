@@ -7,7 +7,7 @@ type fieldInstance struct {
 }
 
 type fieldInfo struct {
-	Nth            int
+	Nth            int32
 	IsVLEncoded    bool
 	IsSerialized   bool
 	IsSigningField bool
@@ -15,6 +15,13 @@ type fieldInfo struct {
 }
 
 type fieldHeader struct {
-	TypeCode  byte
-	FieldCode byte
+	TypeCode  int32
+	FieldCode int32
+}
+
+func CreateFieldHeader(tc, fc int32) fieldHeader {
+	return fieldHeader{
+		TypeCode:  tc,
+		FieldCode: fc,
+	}
 }

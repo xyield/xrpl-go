@@ -10,11 +10,11 @@ func TestLoadDefinitions(t *testing.T) {
 
 	err := loadDefinitions()
 	assert.NoError(t, err)
-	assert.Equal(t, -1, definitions.Types["Done"])
-	assert.Equal(t, 4, definitions.Types["Hash128"])
-	assert.Equal(t, -3, definitions.LedgerEntryTypes["Any"])
-	assert.Equal(t, -399, definitions.TransactionResults["telLOCAL_ERROR"])
-	assert.Equal(t, 1, definitions.TransactionTypes["EscrowCreate"])
+	assert.Equal(t, int32(-1), definitions.Types["Done"])
+	assert.Equal(t, int32(4), definitions.Types["Hash128"])
+	assert.Equal(t, int32(-3), definitions.LedgerEntryTypes["Any"])
+	assert.Equal(t, int32(-399), definitions.TransactionResults["telLOCAL_ERROR"])
+	assert.Equal(t, int32(1), definitions.TransactionTypes["EscrowCreate"])
 	assert.Equal(t, &fieldInfo{Nth: 0, IsVLEncoded: false, IsSerialized: false, IsSigningField: false, Type: "Unknown"}, definitions.Fields["Generic"].fieldInfo)
 	assert.Equal(t, &fieldInfo{Nth: 28, IsVLEncoded: false, IsSerialized: true, IsSigningField: true, Type: "Hash256"}, definitions.Fields["NFTokenBuyOffer"].fieldInfo)
 	assert.Equal(t, &fieldInfo{Nth: 16, IsVLEncoded: false, IsSerialized: true, IsSigningField: true, Type: "UInt8"}, definitions.Fields["TickSize"].fieldInfo)
@@ -31,5 +31,25 @@ func TestLoadDefinitions(t *testing.T) {
 func BenchmarkLoadDefinitions(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		loadDefinitions()
+	}
+}
+
+func TestConvertIntToBytes(t *testing.T) {
+	tt := []struct {
+		description string
+		input       int32
+		expected    []byte
+	}{
+		{
+			description: "Convert int < 256 to bytes",
+			input:       3,
+			expected:    []byte{3},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.description, func(t *testing.T) {
+			assert.Equal(t, tc.expected, convertIntToBytes(tc.input))
+		})
 	}
 }

@@ -14,7 +14,7 @@ func (d *Definitions) GetTypeNameByFieldName(n string) (string, error) {
 	return fi.Type, nil
 }
 
-func (d *Definitions) GetTypeCodeByTypeName(n string) (int, error) {
+func (d *Definitions) GetTypeCodeByTypeName(n string) (int32, error) {
 	typeCode, ok := d.Types[n]
 
 	if !ok {
@@ -26,7 +26,7 @@ func (d *Definitions) GetTypeCodeByTypeName(n string) (int, error) {
 	return typeCode, nil
 }
 
-func (d *Definitions) GetTypeCodeByFieldName(n string) (int, error) {
+func (d *Definitions) GetTypeCodeByFieldName(n string) (int32, error) {
 	typeName, err := d.GetTypeNameByFieldName(n)
 
 	if err != nil {
@@ -36,7 +36,7 @@ func (d *Definitions) GetTypeCodeByFieldName(n string) (int, error) {
 	return d.Types[typeName], nil
 }
 
-func (d *Definitions) GetFieldCodeByFieldName(n string) (int, error) {
+func (d *Definitions) GetFieldCodeByFieldName(n string) (int32, error) {
 
 	fi, ok := d.Fields[n]
 
@@ -104,7 +104,7 @@ func (d *Definitions) GetFieldInstanceByFieldName(n string) (*fieldInstance, err
 	return fi, nil
 }
 
-func (d *Definitions) GetTransactionTypeCodeByTransactionTypeName(n string) (int, error) {
+func (d *Definitions) GetTransactionTypeCodeByTransactionTypeName(n string) (int32, error) {
 	txTypeCode, ok := d.TransactionTypes[n]
 
 	if !ok {
@@ -116,7 +116,7 @@ func (d *Definitions) GetTransactionTypeCodeByTransactionTypeName(n string) (int
 	return txTypeCode, nil
 }
 
-func (d *Definitions) GetTransactionTypeNameByTransactionTypeCode(c int) (string, error) {
+func (d *Definitions) GetTransactionTypeNameByTransactionTypeCode(c int32) (string, error) {
 
 	for txTypeName, code := range d.TransactionTypes {
 		if code == c {
@@ -129,7 +129,7 @@ func (d *Definitions) GetTransactionTypeNameByTransactionTypeCode(c int) (string
 	}
 }
 
-func (d *Definitions) GetTransactionResultNameByTransactionResultTypeCode(c int) (string, error) {
+func (d *Definitions) GetTransactionResultNameByTransactionResultTypeCode(c int32) (string, error) {
 
 	for txResultName, code := range d.TransactionResults {
 		if code == c {
@@ -143,7 +143,7 @@ func (d *Definitions) GetTransactionResultNameByTransactionResultTypeCode(c int)
 	}
 }
 
-func (d *Definitions) GetTransactionResultTypeCodeByTransactionResultName(n string) (int, error) {
+func (d *Definitions) GetTransactionResultTypeCodeByTransactionResultName(n string) (int32, error) {
 
 	txResultTypeCode, ok := d.TransactionResults[n]
 
@@ -156,7 +156,7 @@ func (d *Definitions) GetTransactionResultTypeCodeByTransactionResultName(n stri
 	return txResultTypeCode, nil
 }
 
-func (d *Definitions) GetLedgerEntryTypeCodeByLedgerEntryTypeName(n string) (int, error) {
+func (d *Definitions) GetLedgerEntryTypeCodeByLedgerEntryTypeName(n string) (int32, error) {
 
 	ledgerEntryTypeCode, ok := d.LedgerEntryTypes[n]
 
@@ -169,7 +169,7 @@ func (d *Definitions) GetLedgerEntryTypeCodeByLedgerEntryTypeName(n string) (int
 	return ledgerEntryTypeCode, nil
 }
 
-func (d *Definitions) GetLedgerEntryTypeNameByLedgerEntryTypeCode(c int) (string, error) {
+func (d *Definitions) GetLedgerEntryTypeNameByLedgerEntryTypeCode(c int32) (string, error) {
 
 	for ledgerEntryTypeName, code := range d.LedgerEntryTypes {
 

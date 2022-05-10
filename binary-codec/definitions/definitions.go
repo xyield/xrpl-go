@@ -27,7 +27,7 @@ func (e *NotFoundError) Error() string {
 
 type NotFoundErrorInt struct {
 	Instance string
-	Input    int
+	Input    int32
 }
 
 func (e *NotFoundErrorInt) Error() string {
@@ -44,19 +44,19 @@ func (e *NotFoundErrorFieldHeader) Error() string {
 }
 
 type Definitions struct {
-	Types              map[string]int
-	LedgerEntryTypes   map[string]int
+	Types              map[string]int32
+	LedgerEntryTypes   map[string]int32
 	Fields             fieldInstanceMap
-	TransactionResults map[string]int
-	TransactionTypes   map[string]int
+	TransactionResults map[string]int32
+	TransactionTypes   map[string]int32
 	FieldIdNameMap     map[fieldHeader]string
 }
 type definitionsDoc struct {
-	Types              map[string]int   `json:"TYPES"`
-	LedgerEntryTypes   map[string]int   `json:"LEDGER_ENTRY_TYPES"`
+	Types              map[string]int32 `json:"TYPES"`
+	LedgerEntryTypes   map[string]int32 `json:"LEDGER_ENTRY_TYPES"`
 	Fields             fieldInstanceMap `json:"FIELDS"`
-	TransactionResults map[string]int   `json:"TRANSACTION_RESULTS"`
-	TransactionTypes   map[string]int   `json:"TRANSACTION_TYPES"`
+	TransactionResults map[string]int32 `json:"TRANSACTION_RESULTS"`
+	TransactionTypes   map[string]int32 `json:"TRANSACTION_TYPES"`
 }
 
 type fieldInstanceMap map[string]*fieldInstance
@@ -121,7 +121,7 @@ func convertToFieldInstanceMap(m [][]interface{}) map[string]*fieldInstance {
 func castFieldInfo(v interface{}) (fieldInfo, error) {
 	if fi, ok := v.(map[string]interface{}); ok {
 		return fieldInfo{
-			Nth:            int(fi["nth"].(int64)),
+			Nth:            int32(fi["nth"].(int64)),
 			IsVLEncoded:    fi["isVLEncoded"].(bool),
 			IsSerialized:   fi["isSerialized"].(bool),
 			IsSigningField: fi["isSigningField"].(bool),
@@ -136,8 +136,8 @@ func addFieldHeaders() {
 		t, _ := definitions.GetTypeCodeByTypeName(definitions.Fields[k].Type)
 		if fi, ok := definitions.Fields[k]; ok {
 			fi.FieldHeader = &fieldHeader{
-				TypeCode:  byte(t),
-				FieldCode: byte(definitions.Fields[k].Nth),
+				TypeCode:  t,
+				FieldCode: definitions.Fields[k].Nth,
 			}
 		}
 	}
@@ -149,4 +149,9 @@ func createFieldIdNameMap() {
 		fh, _ := definitions.GetFieldHeaderByFieldName(k)
 		definitions.FieldIdNameMap[*fh] = k
 	}
+}
+
+func convertIntToBytes(i int32) []byte {
+
+	return []byte{3}
 }

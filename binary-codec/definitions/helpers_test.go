@@ -53,7 +53,7 @@ func TestGetTypeCodeByTypeName(t *testing.T) {
 	tt := []struct {
 		description   string
 		input         string
-		expected      int
+		expected      int32
 		expectedError error
 	}{
 		{
@@ -100,7 +100,7 @@ func TestGetTypeCodeByFieldName(t *testing.T) {
 	tt := []struct {
 		description   string
 		input         string
-		expected      int
+		expected      int32
 		expectedError error
 	}{
 		{
@@ -146,7 +146,7 @@ func TestGetFieldCodeByFieldName(t *testing.T) {
 	tt := []struct {
 		description   string
 		input         string
-		expected      int
+		expected      int32
 		expectedError error
 	}{
 		{
@@ -379,7 +379,7 @@ func TestGetTransactionTypeCodeByTransactionTypeName(t *testing.T) {
 	tt := []struct {
 		description   string
 		input         string
-		expected      int
+		expected      int32
 		expectedError error
 	}{
 		{
@@ -416,7 +416,7 @@ func TestGetTransactionTypeCodeByTransactionTypeName(t *testing.T) {
 func TestGetTransactionTypeNameByTransactionTypeCode(t *testing.T) {
 	tt := []struct {
 		description   string
-		input         int
+		input         int32
 		expected      string
 		expectedError error
 	}{
@@ -428,11 +428,11 @@ func TestGetTransactionTypeNameByTransactionTypeCode(t *testing.T) {
 		},
 		{
 			description: "invalid TransactionTypeCode",
-			input:       999999999999,
+			input:       999999999,
 			expected:    "",
 			expectedError: &NotFoundErrorInt{
 				Instance: "TransactionTypeCode",
-				Input:    999999999999,
+				Input:    999999999,
 			},
 		},
 	}
@@ -454,7 +454,7 @@ func TestGetTransactionTypeNameByTransactionTypeCode(t *testing.T) {
 func TestGetTransactionResultNameByTransactionResultTypeCode(t *testing.T) {
 	tt := []struct {
 		description   string
-		input         int
+		input         int32
 		expected      string
 		expectedError error
 	}{
@@ -466,11 +466,11 @@ func TestGetTransactionResultNameByTransactionResultTypeCode(t *testing.T) {
 		},
 		{
 			description: "invalid txResultTypeCode",
-			input:       999999999999999,
+			input:       999999999,
 			expected:    "",
 			expectedError: &NotFoundErrorInt{
 				Instance: "TransactionResultTypeCode",
-				Input:    999999999999999,
+				Input:    999999999,
 			},
 		},
 	}
@@ -493,7 +493,7 @@ func TestGetTransactionResultTypeCodeByTransactionResultName(t *testing.T) {
 	tt := []struct {
 		description   string
 		input         string
-		expected      int
+		expected      int32
 		expectedError error
 	}{
 		{
@@ -531,7 +531,7 @@ func TestGetLedgerEntryTypeCodeByLedgerEntryTypeName(t *testing.T) {
 	tt := []struct {
 		description   string
 		input         string
-		expected      int
+		expected      int32
 		expectedError error
 	}{
 		{
@@ -569,7 +569,7 @@ func TestGetLedgerEntryTypeCodeByLedgerEntryTypeName(t *testing.T) {
 func TestGetLedgerEntryTypeNameByLedgerEntryTypeCode(t *testing.T) {
 	tt := []struct {
 		description   string
-		input         int
+		input         int32
 		expected      string
 		expectedError error
 	}{
@@ -581,11 +581,11 @@ func TestGetLedgerEntryTypeNameByLedgerEntryTypeCode(t *testing.T) {
 		},
 		{
 			description: "invalid LedgerEntryTypeCode",
-			input:       999999999999,
+			input:       999999999,
 			expected:    "",
 			expectedError: &NotFoundErrorInt{
 				Instance: "LedgerEntryTypeCode",
-				Input:    999999999999,
+				Input:    999999999,
 			},
 		},
 	}
