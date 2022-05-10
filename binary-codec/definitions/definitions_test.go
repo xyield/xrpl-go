@@ -27,3 +27,9 @@ func TestLoadDefinitions(t *testing.T) {
 	assert.Equal(t, "OfferSequence", definitions.FieldIdNameMap[fieldHeader{TypeCode: 2, FieldCode: 25}])
 	assert.Equal(t, "NFTokenSellOffer", definitions.FieldIdNameMap[fieldHeader{TypeCode: 5, FieldCode: 29}])
 }
+
+func BenchmarkLoadDefinitions(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		loadDefinitions()
+	}
+}

@@ -1,13 +1,10 @@
 package definitions
 
-import "fmt"
-
 func (d *Definitions) GetTypeNameByFieldName(n string) (string, error) {
 
 	fi, ok := d.Fields[n]
 
 	if !ok {
-		fmt.Println("entered")
 		return "", &NotFoundError{
 			Instance: "FieldName",
 			Input:    n,
@@ -67,6 +64,19 @@ func (d *Definitions) GetFieldHeaderByFieldName(n string) (*fieldHeader, error) 
 	return fi.FieldHeader, nil
 }
 
+func (d *Definitions) GetFieldNameByFieldHeader(fh fieldHeader) (string, error) {
+
+	fim, ok := definitions.FieldIdNameMap[fh]
+
+	if !ok {
+		return "", &NotFoundErrorFieldHeader{
+			Instance: "FieldHeader",
+			Input:    fh,
+		}
+	}
+	return fim, nil
+}
+
 func (d *Definitions) GetFieldInfoByFieldName(n string) (*fieldInfo, error) {
 
 	fi, ok := d.Fields[n]
@@ -113,7 +123,6 @@ func (d *Definitions) GetTransactionTypeNameByTransactionTypeCode(c int) (string
 			return txTypeName, nil
 		}
 	}
-
 	return "", &NotFoundErrorInt{
 		Instance: "TransactionTypeCode",
 		Input:    c,

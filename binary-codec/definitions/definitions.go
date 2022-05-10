@@ -21,8 +21,8 @@ type NotFoundError struct {
 	Input    string
 }
 
-func (tnf *NotFoundError) Error() string {
-	return fmt.Sprintf("%v %v not found", tnf.Instance, tnf.Input)
+func (e *NotFoundError) Error() string {
+	return fmt.Sprintf("%v %v not found", e.Instance, e.Input)
 }
 
 type NotFoundErrorInt struct {
@@ -30,8 +30,17 @@ type NotFoundErrorInt struct {
 	Input    int
 }
 
-func (tnf *NotFoundErrorInt) Error() string {
-	return fmt.Sprintf("%v %v not found", tnf.Instance, tnf.Input)
+func (e *NotFoundErrorInt) Error() string {
+	return fmt.Sprintf("%v %v not found", e.Instance, e.Input)
+}
+
+type NotFoundErrorFieldHeader struct {
+	Instance string
+	Input    fieldHeader
+}
+
+func (e *NotFoundErrorFieldHeader) Error() string {
+	return fmt.Sprintf("%v %v not found", e.Instance, e.Input)
 }
 
 type Definitions struct {
