@@ -1,5 +1,10 @@
 package definitions
 
+import (
+	"fmt"
+	"sort"
+)
+
 func (d *Definitions) GetTypeNameByFieldName(n string) (string, error) {
 
 	fi, ok := d.Fields[n]
@@ -182,4 +187,27 @@ func (d *Definitions) GetLedgerEntryTypeNameByLedgerEntryTypeCode(c int) (string
 		Instance: "LedgerEntryTypeCode",
 		Input:    c,
 	}
+}
+
+func (d *Definitions) SortMapByValue(vmap map[string]int) []string {
+
+	keys := make([]string, 0, len(vmap))
+
+	for key := range vmap {
+		keys = append(keys, key)
+	}
+
+	sort.SliceStable(keys, func(i, j int) bool {
+		return vmap[keys[i]] < vmap[keys[j]]
+	})
+
+	for _, k := range keys {
+		fmt.Println(vmap[k], k)
+	}
+
+	return keys
+}
+
+func BinarySearch(txTypeCode int, txTypeList []string) (txTypeName string) {
+	return ""
 }
