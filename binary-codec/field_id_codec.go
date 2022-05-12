@@ -33,14 +33,18 @@ func Decode(h string) (string, error) {
 		return "", err
 	}
 	if len(b) == 1 {
-		tc := int32(b[0] >> 4)
-		fc := int32(b[0] & byte(15))
-		return definitions.Get().GetFieldNameByFieldHeader(definitions.CreateFieldHeader(tc, fc))
+		return definitions.Get().GetFieldNameByFieldHeader(definitions.CreateFieldHeader(int32(b[0]>>4), int32(b[0]&byte(15))))
 	}
 	if len(b) == 2 {
-		tc := int32(b[1])
-		fc := int32(b[0])
-		return definitions.Get().GetFieldNameByFieldHeader(definitions.CreateFieldHeader(tc, fc))
+		firstByteHighBits := b[0] >> 4
+		firstByteLowBits := b[0] & byte(15)
+		if firstByteHighBits == 0 {
+			return definitions.Get().GetFieldNameByFieldHeader(definitions.CreateFieldHeader(int32(b[1]), int32(firstByteLowBits)))
+		}
+		return definitions.Get().GetFieldNameByFieldHeader(definitions.CreateFieldHeader(int32(firstByteHighBits), int32(b[1])))
+	}
+	if len(b) == 3 {
+		return definitions.Get().GetFieldNameByFieldHeader(definitions.CreateFieldHeader(int32(b[1]), int32(b[2])))
 	}
 	return "", nil
 }

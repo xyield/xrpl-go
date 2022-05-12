@@ -2,7 +2,6 @@ package binarycodec
 
 import (
 	"encoding/hex"
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -17,13 +16,13 @@ func TestEncode(t *testing.T) {
 		expectedErr error
 	}{
 		{
-			description: "Type and field code < 16",
+			description: "Type Code and Field Code < 16",
 			input:       "Sequence",
 			expected:    []byte{36},
 			expectedErr: nil,
 		},
 		{
-			description: "Additional type and field code < 16",
+			description: "Additional Type Code and Field Code < 16",
 			input:       "DestinationTag",
 			expected:    []byte{46},
 			expectedErr: nil,
@@ -35,7 +34,7 @@ func TestEncode(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
-			description: "Additional Type Code >=16 and Field code < 16",
+			description: "Additional Type Code >= 16 and Field Code < 16",
 			input:       "CloseResolution",
 			expected:    []byte{1, 16},
 			expectedErr: nil,
@@ -47,19 +46,19 @@ func TestEncode(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
-			description: "Additional Type Code < 16 and Field Code > = 16",
+			description: "Additional Type Code < 16 and Field Code >= 16",
 			input:       "Nickname",
 			expected:    []byte{80, 18},
 			expectedErr: nil,
 		},
 		{
-			description: "Type Code >= 16 and Field Code >=16",
+			description: "Type Code and Field Code >= 16",
 			input:       "TickSize",
 			expected:    []byte{0, 16, 16},
 			expectedErr: nil,
 		},
 		{
-			description: "Additional Type code and field code >= 16",
+			description: "Additional Type Code and Field Code >= 16",
 			input:       "UNLModifyDisabling",
 			expected:    []byte{0, 16, 17},
 			expectedErr: nil,
@@ -94,25 +93,68 @@ func TestDecode(t *testing.T) {
 		expected    string
 		expectedErr error
 	}{
-		// {
-		// 	description: "Decode Sequence fieldId",
-		// 	input:       []byte{36},
-		// 	expected:    "Sequence",
-		// 	expectedErr: nil,
-		// },
 		{
-			description: "Decode Paths fieldId",
+			description: "Decode Sequence fieldId (Type Code and Field Code < 16)",
+			input:       []byte{36},
+			expected:    "Sequence",
+			expectedErr: nil,
+		},
+		{
+			description: "Decode DestinationTag fieldId (Type Code and Field Code < 16)",
+			input:       []byte{46},
+			expected:    "DestinationTag",
+			expectedErr: nil,
+		},
+		{
+			description: "Decode Paths fieldId (Type Code >= 16 and Field Code < 16)",
 			input:       []byte{1, 18},
 			expected:    "Paths",
 			expectedErr: nil,
+		},
+		{
+			description: "Decode CloseResolution fieldId (Type Code >= 16 and Field Code < 16)",
+			input:       []byte{1, 16},
+			expected:    "CloseResolution",
+			expectedErr: nil,
+		},
+		{
+			description: "Decode SetFlag fieldId (Type Code < 16 and Field Code >= 16)",
+			input:       []byte{32, 33},
+			expected:    "SetFlag",
+			expectedErr: nil,
+		},
+		{
+			description: "Decode Nickname fieldId (Type Code < 16 and Field Code >= 16)",
+			input:       []byte{80, 18},
+			expected:    "Nickname",
+			expectedErr: nil,
+		},
+		{
+			description: "Decode TickSize fieldId (Type Code and Field Code >= 16)",
+			input:       []byte{0, 16, 16},
+			expected:    "TickSize",
+			expectedErr: nil,
+		},
+		{
+			description: "Decode UNLModifyDisabling fieldId (Type Code and Field Code >= 16)",
+			input:       []byte{0, 16, 17},
+			expected:    "UNLModifyDisabling",
+			expectedErr: nil,
+		},
+		{
+			description: "Non existent field name",
+			input:       []byte{255},
+			expected:    "",
+			expectedErr: &definitions.NotFoundErrorFieldHeader{Instance: "FieldHeader"},
 		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.description, func(t *testing.T) {
 			hex := hex.EncodeToString(tc.input)
-			fmt.Println("hex string:", hex)
+			// fmt.Println("hex string:", hex)
 			actual, err := Decode(hex)
+			// fmt.Println(actual)
 
 			if tc.expectedErr != nil {
 				assert.Error(t, err, tc.expectedErr.Error())
