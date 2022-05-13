@@ -306,3 +306,31 @@ func BenchmarkGetLedgerEntryTypeNameByLedgerEntryTypeCode(b *testing.B) {
 		})
 	}
 }
+
+func BenchmarkBinaryGetNameByCode(b *testing.B) {
+	tt := []struct {
+		inputCode int
+		inputMap  map[string]int
+	}{
+		{
+			inputCode: 1,
+			inputMap:  definitions.TransactionTypes,
+		},
+		{
+			inputCode: 100,
+			inputMap:  definitions.TransactionResults,
+		},
+		{
+			inputCode: 100,
+			inputMap:  definitions.LedgerEntryTypes,
+		},
+	}
+
+	for _, test := range tt {
+		b.Run(fmt.Sprintf("input_code_%v", test.inputCode), func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				definitions.BinaryGetNameByCode(test.inputCode, test.inputMap)
+			}
+		})
+	}
+}

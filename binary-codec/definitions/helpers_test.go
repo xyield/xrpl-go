@@ -606,14 +606,15 @@ func TestGetLedgerEntryTypeNameByLedgerEntryTypeCode(t *testing.T) {
 
 func TestSortMapByValue(t *testing.T) {
 	tt := []struct {
-		description string
-		input       map[string]int
-		expected    []string
+		description    string
+		input          map[string]int
+		expectedKeys   []string
+		expectedValues []int
 	}{
 		{
 			description: "LedgerEntryTypes sorted correctly",
 			input:       definitions.LedgerEntryTypes,
-			expected: []string{
+			expectedKeys: []string{
 				"Any",
 				"Child",
 				"Invalid",
@@ -636,11 +637,12 @@ func TestSortMapByValue(t *testing.T) {
 				"Escrow",
 				"PayChannel",
 			},
+			expectedValues: []int{-3, -2, -1, 55, 67, 78, 80, 83, 84, 97, 99, 100, 102, 104, 110, 111, 112, 114, 115, 117, 120},
 		},
 		{
 			description: "Types sorted correctly",
 			input:       definitions.Types,
-			expected: []string{
+			expectedKeys: []string{
 				"Unknown",
 				"Done",
 				"NotPresent",
@@ -662,11 +664,12 @@ func TestSortMapByValue(t *testing.T) {
 				"LedgerEntry",
 				"Validation",
 			},
+			expectedValues: []int{-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 14, 15, 16, 17, 18, 19, 10001, 10002, 10003},
 		},
 		{
 			description: "TransactionTypes sorted correctly",
 			input:       definitions.TransactionTypes,
-			expected: []string{
+			expectedKeys: []string{
 				"Invalid",
 				"Payment",
 				"EscrowCreate",
@@ -699,11 +702,12 @@ func TestSortMapByValue(t *testing.T) {
 				"SetFee",
 				"UNLModify",
 			},
+			expectedValues: []int{-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 25, 26, 27, 28, 29, 100, 101, 102},
 		},
 		{
 			description: "TransactionResults sorted correctly",
 			input:       definitions.TransactionResults,
-			expected: []string{
+			expectedKeys: []string{
 				"telLOCAL_ERROR",
 				"telBAD_DOMAIN",
 				"telBAD_PATH_COUNT",
@@ -832,15 +836,68 @@ func TestSortMapByValue(t *testing.T) {
 				"tecOBJECT_NOT_FOUND",
 				"tecINSUFFICIENT_PAYMENT",
 				"tecINCORRECT_ASSET",
-				"tecTOO_MANY"},
+				"tecTOO_MANY",
+			},
+			expectedValues: []int{-399, -398, -397, -396, -395, -394, -393, -392, -391, -390, -389, -388, -387, -299, -298, -297, -296, -295, -294, -293, -292, -291, -290, -289, -288, -287, -286, -285, -284, -283, -282, -281, -280, -279, -278, -277, -276, -275, -274, -273, -272, -271, -270, -269, -268, -267, -266, -265, -264, -263, -199, -198, -197, -196, -195, -194, -193, -192, -191, -190, -189, -188, -187, -186, -185, -184, -183, -182, -181, -180, -179, -99, -98, -97, -96, -95, -94, -93, -92, -91, -90, -89, -88, 0, 100, 101, 102, 103, 104, 105, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163},
 		},
 	}
 
 	for _, test := range tt {
 		t.Run(test.description, func(t *testing.T) {
-			got := definitions.SortMapByValue(test.input)
-			assert.Equal(t, test.expected, got)
+			keys, values := definitions.SortMapByValue(test.input)
+
+			assert.Equal(t, test.expectedKeys, keys)
+			assert.Equal(t, test.expectedValues, values)
 		})
 	}
 
+}
+
+func TestBinarySearch(t *testing.T) {
+	tt := []struct {
+		description string
+		inputCode   int
+		inputMap    map[string]int
+		expected    string
+	}{
+		{
+			description: "successfully found `NFTokenOffer` (LedgerEntryTypes)",
+			inputCode:   55,
+			inputMap:    definitions.LedgerEntryTypes,
+			expected:    "NFTokenOffer",
+		},
+		{
+			description: "successfully found `Amount` (Types)",
+			inputCode:   6,
+			inputMap:    definitions.Types,
+			expected:    "Amount",
+		},
+		{
+			description: "successfully found `Contract` (TransactionTypes)",
+			inputCode:   9,
+			inputMap:    definitions.TransactionTypes,
+			expected:    "Contract",
+		},
+		{
+			description: "successfully found `tecINSUFFICIENT_PAYMENT` (TransactionResults)",
+			inputCode:   161,
+			inputMap:    definitions.TransactionResults,
+			expected:    "tecINSUFFICIENT_PAYMENT",
+		},
+		// {
+		// 	description: "non-existent type code ",
+		// 	inputCode:   6666,
+		// 	inputMap:    definitions.LedgerEntryTypes,
+		// 	expected:    "",
+		// },
+	}
+
+	for _, test := range tt {
+		t.Run(test.description, func(t *testing.T) {
+			keys, err := definitions.BinaryGetNameByCode(test.inputCode, test.inputMap)
+			assert.NoError(t, err)
+			assert.Equal(t, test.expected, keys)
+			// NEED TO ADD ERROR HANDLING
+		})
+	}
 }

@@ -1,7 +1,6 @@
 package definitions
 
 import (
-	"fmt"
 	"sort"
 )
 
@@ -189,7 +188,17 @@ func (d *Definitions) GetLedgerEntryTypeNameByLedgerEntryTypeCode(c int) (string
 	}
 }
 
-func (d *Definitions) SortMapByValue(vmap map[string]int) []string {
+func (d *Definitions) BinaryGetNameByCode(c int, vmap map[string]int) (string, error) {
+
+	k, tc := definitions.SortMapByValue(vmap)
+	i := definitions.BinarySearch(tc, 0, len(tc)-1, c)
+
+	// NEED TO ADD ERROR HANDLING
+
+	return k[i], nil
+}
+
+func (d *Definitions) SortMapByValue(vmap map[string]int) (sortedKeys []string, sortedValues []int) {
 
 	keys := make([]string, 0, len(vmap))
 
@@ -197,17 +206,44 @@ func (d *Definitions) SortMapByValue(vmap map[string]int) []string {
 		keys = append(keys, key)
 	}
 
+	// fmt.Println("KEYS (Before Sorting):", keys)
+
 	sort.SliceStable(keys, func(i, j int) bool {
 		return vmap[keys[i]] < vmap[keys[j]]
 	})
 
-	for _, k := range keys {
-		fmt.Println(vmap[k], k)
+	// fmt.Println("KEYS (After Sorting)", keys)
+
+	values := make([]int, 0, len(vmap))
+
+	for _, value := range vmap {
+		values = append(values, value)
 	}
 
-	return keys
+	// fmt.Println("VALUES (Before Sorting:)", values)
+
+	sort.Slice(values, func(i, j int) bool {
+		return values[i] < values[j]
+	})
+	// fmt.Println("VALUES (After Sorting:)", values)
+
+	return keys, values
 }
 
-func BinarySearch(txTypeCode int, txTypeList []string) (txTypeName string) {
-	return ""
+func (d *Definitions) BinarySearch(numbers []int, leftBound, rightBound, numberToFind int) int {
+	for leftBound <= rightBound {
+		midPoint := leftBound + (rightBound-leftBound)/2
+
+		if numbers[midPoint] == numberToFind {
+			return midPoint
+		}
+
+		if numbers[midPoint] > numberToFind {
+			rightBound = midPoint - 1
+		} else {
+			leftBound = midPoint + 1
+		}
+	}
+
+	return -1
 }
