@@ -1,6 +1,7 @@
 package definitions
 
 import (
+	"fmt"
 	"sort"
 )
 
@@ -194,6 +195,8 @@ func (d *Definitions) BinaryGetNameByCode(c int, vmap map[string]int) (string, e
 	i := definitions.BinarySearch(tc, 0, len(tc)-1, c)
 
 	// NEED TO ADD ERROR HANDLING
+
+	fmt.Printf("Found Name: `%v` from Code: %v ", k[i], c)
 
 	return k[i], nil
 }
