@@ -191,17 +191,23 @@ func (d *Definitions) GetLedgerEntryTypeNameByLedgerEntryTypeCode(c int) (string
 
 func (d *Definitions) BinaryGetNameByCode(c int, vmap map[string]int) (string, error) {
 
-	k, tc := definitions.SortMapByValue(vmap)
+	k, tc, _ := definitions.SortMapByValue(vmap)
+
 	i := definitions.BinarySearch(tc, 0, len(tc)-1, c)
 
-	// NEED TO ADD ERROR HANDLING
+	if !d.contains(tc, c) {
+		return "", &NotFoundErrorMapInt{
+			Instance: vmap,
+			Input:    c,
+		}
+	}
 
 	fmt.Printf("Found Name: `%v` from Code: %v ", k[i], c)
 
 	return k[i], nil
 }
 
-func (d *Definitions) SortMapByValue(vmap map[string]int) (sortedKeys []string, sortedValues []int) {
+func (d *Definitions) SortMapByValue(vmap map[string]int) (sortedKeys []string, sortedValues []int, err error) {
 
 	keys := make([]string, 0, len(vmap))
 
@@ -209,13 +215,9 @@ func (d *Definitions) SortMapByValue(vmap map[string]int) (sortedKeys []string, 
 		keys = append(keys, key)
 	}
 
-	// fmt.Println("KEYS (Before Sorting):", keys)
-
 	sort.SliceStable(keys, func(i, j int) bool {
 		return vmap[keys[i]] < vmap[keys[j]]
 	})
-
-	// fmt.Println("KEYS (After Sorting)", keys)
 
 	values := make([]int, 0, len(vmap))
 
@@ -223,14 +225,11 @@ func (d *Definitions) SortMapByValue(vmap map[string]int) (sortedKeys []string, 
 		values = append(values, value)
 	}
 
-	// fmt.Println("VALUES (Before Sorting:)", values)
-
 	sort.Slice(values, func(i, j int) bool {
 		return values[i] < values[j]
 	})
-	// fmt.Println("VALUES (After Sorting:)", values)
 
-	return keys, values
+	return keys, values, nil
 }
 
 func (d *Definitions) BinarySearch(numbers []int, leftBound, rightBound, numberToFind int) int {
@@ -249,4 +248,13 @@ func (d *Definitions) BinarySearch(numbers []int, leftBound, rightBound, numberT
 	}
 
 	return -1
+}
+
+func (d *Definitions) contains(valSlice []int, val int) bool {
+	for _, v := range valSlice {
+		if v == val {
+			return true
+		}
+	}
+	return false
 }

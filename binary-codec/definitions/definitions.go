@@ -34,6 +34,15 @@ func (e *NotFoundErrorInt) Error() string {
 	return fmt.Sprintf("%v %v not found", e.Instance, e.Input)
 }
 
+type NotFoundErrorMapInt struct {
+	Instance map[string]int
+	Input    int
+}
+
+func (e *NotFoundErrorMapInt) Error() string {
+	return fmt.Sprintf("%v %v not found", e.Instance, e.Input)
+}
+
 type NotFoundErrorFieldHeader struct {
 	Instance string
 	Input    fieldHeader

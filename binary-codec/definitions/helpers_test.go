@@ -844,8 +844,9 @@ func TestSortMapByValue(t *testing.T) {
 
 	for _, test := range tt {
 		t.Run(test.description, func(t *testing.T) {
-			keys, values := definitions.SortMapByValue(test.input)
+			keys, values, err := definitions.SortMapByValue(test.input)
 
+			assert.NoError(t, err)
 			assert.Equal(t, test.expectedKeys, keys)
 			assert.Equal(t, test.expectedValues, values)
 		})
@@ -855,10 +856,11 @@ func TestSortMapByValue(t *testing.T) {
 
 func TestBinarySearch(t *testing.T) {
 	tt := []struct {
-		description string
-		inputCode   int
-		inputMap    map[string]int
-		expected    string
+		description   string
+		inputCode     int
+		inputMap      map[string]int
+		expected      string
+		expectedError error
 	}{
 		{
 			description: "successfully found `NFTokenOffer` (LedgerEntryTypes)",
@@ -884,20 +886,58 @@ func TestBinarySearch(t *testing.T) {
 			inputMap:    definitions.TransactionResults,
 			expected:    "tecINSUFFICIENT_PAYMENT",
 		},
-		// {
-		// 	description: "non-existent type code ",
-		// 	inputCode:   6666,
-		// 	inputMap:    definitions.LedgerEntryTypes,
-		// 	expected:    "",
-		// },
+		{
+			description: "non-existent ledger entry type code ",
+			inputCode:   2,
+			inputMap:    definitions.LedgerEntryTypes,
+			expected:    "",
+			expectedError: &NotFoundErrorMapInt{
+				Instance: definitions.LedgerEntryTypes,
+				Input:    2,
+			},
+		},
+		{
+			description: "non-existent transaction type code",
+			inputCode:   30,
+			inputMap:    definitions.TransactionTypes,
+			expected:    "",
+			expectedError: &NotFoundErrorMapInt{
+				Instance: definitions.TransactionTypes,
+				Input:    30,
+			},
+		},
+		{
+			description: "non-existent transaction result code",
+			inputCode:   -400,
+			inputMap:    definitions.TransactionResults,
+			expected:    "",
+			expectedError: &NotFoundErrorMapInt{
+				Instance: definitions.TransactionResults,
+				Input:    -400,
+			},
+		},
+		{
+			description: "non-existent type code",
+			inputCode:   28,
+			inputMap:    definitions.Types,
+			expected:    "",
+			expectedError: &NotFoundErrorMapInt{
+				Instance: definitions.Types,
+				Input:    -400,
+			},
+		},
 	}
 
 	for _, test := range tt {
 		t.Run(test.description, func(t *testing.T) {
 			keys, err := definitions.BinaryGetNameByCode(test.inputCode, test.inputMap)
-			assert.NoError(t, err)
-			assert.Equal(t, test.expected, keys)
-			// NEED TO ADD ERROR HANDLING
+			if test.expectedError != nil {
+				assert.Error(t, err, test.expectedError.Error())
+				assert.Zero(t, keys)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, keys)
+			}
 		})
 	}
 }
