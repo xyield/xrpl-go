@@ -215,9 +215,13 @@ func (d *Definitions) SortMapByValue(vmap map[string]int) (sortedKeys []string, 
 		keys = append(keys, key)
 	}
 
+	fmt.Println("Before Sorting", keys)
+
 	sort.SliceStable(keys, func(i, j int) bool {
 		return vmap[keys[i]] < vmap[keys[j]]
 	})
+
+	fmt.Println("After Sorting", keys)
 
 	values := make([]int, 0, len(vmap))
 
@@ -225,9 +229,13 @@ func (d *Definitions) SortMapByValue(vmap map[string]int) (sortedKeys []string, 
 		values = append(values, value)
 	}
 
-	sort.Slice(values, func(i, j int) bool {
+	fmt.Println("Before Sorting", values)
+
+	sort.SliceStable(values, func(i, j int) bool {
 		return values[i] < values[j]
 	})
+
+	fmt.Println("After Sorting", values)
 
 	return keys, values, nil
 }
