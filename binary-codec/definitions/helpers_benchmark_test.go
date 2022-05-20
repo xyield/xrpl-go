@@ -112,32 +112,32 @@ func BenchmarkGetFieldHeaderByFieldName(b *testing.B) {
 	}
 }
 
-func BenchmarkGetFieldNameByFieldHeader(b *testing.B) {
-	tt := []struct {
-		input fieldHeader
-	}{
-		{
-			input: fieldHeader{
-				TypeCode:  1,
-				FieldCode: 1,
-			},
-		},
-		{
-			input: fieldHeader{
-				TypeCode:  0000000000000000111,
-				FieldCode: 00000000000000111,
-			},
-		},
-	}
+// func BenchmarkGetFieldNameByFieldHeader(b *testing.B) {
+// 	tt := []struct {
+// 		input fieldHeader
+// 	}{
+// 		{
+// 			input: fieldHeader{
+// 				TypeCode:  []byte{1},
+// 				FieldCode: []byte{1},
+// 			},
+// 		},
+// 		{
+// 			input: fieldHeader{
+// 				TypeCode: []byte() 0000000000111,
+// 				FieldCode: 00000000000000111,
+// 			},
+// 		},
+// 	}
 
-	for _, test := range tt {
-		b.Run(fmt.Sprintf("input_name_%v", test.input), func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				definitions.GetFieldNameByFieldHeader(test.input)
-			}
-		})
-	}
-}
+// 	for _, test := range tt {
+// 		b.Run(fmt.Sprintf("input_name_%v", test.input), func(b *testing.B) {
+// 			for i := 0; i < b.N; i++ {
+// 				definitions.GetFieldNameByFieldHeader(test.input)
+// 			}
+// 		})
+// 	}
+// }
 
 func BenchmarkGetFieldInfoByFieldName(b *testing.B) {
 	tt := []struct {
@@ -204,13 +204,13 @@ func BenchmarkGetTransactionTypeCodeByTransactionTypeName(b *testing.B) {
 
 func BenchmarkGetTransactionTypeNameByTransactionTypeCode(b *testing.B) {
 	tt := []struct {
-		input int
+		input int32
 	}{
 		{
 			input: 1,
 		},
 		{
-			input: 999999999999999999,
+			input: 999999999,
 		},
 	}
 
@@ -225,13 +225,13 @@ func BenchmarkGetTransactionTypeNameByTransactionTypeCode(b *testing.B) {
 
 func BenchmarkGetTransactionResultNameByTransactionResultTypeCode(b *testing.B) {
 	tt := []struct {
-		input int
+		input int32
 	}{
 		{
 			input: 100,
 		},
 		{
-			input: 999999999999999999,
+			input: 999999999,
 		},
 	}
 
@@ -288,13 +288,13 @@ func BenchmarkGetLedgerEntryTypeCodeByLedgerEntryTypeName(b *testing.B) {
 
 func BenchmarkGetLedgerEntryTypeNameByLedgerEntryTypeCode(b *testing.B) {
 	tt := []struct {
-		input int
+		input int32
 	}{
 		{
 			input: 100,
 		},
 		{
-			input: 999999999999999999,
+			input: 999999999,
 		},
 	}
 
