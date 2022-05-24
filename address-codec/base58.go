@@ -8,7 +8,8 @@ const (
 	xrpalphabet = "rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz"
 	btcalphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
 
-	alphabetIdx0 = 1
+	// xrpAlphabetIdx0 = "r"
+	btcalphabetIdx0 = 1
 )
 
 var bigRadix = [...]*big.Int{
@@ -42,13 +43,13 @@ func EncodeBase58(d []byte) string {
 		if bn.Sign() == 0 {
 			m := mod.Int64()
 			for m > 0 {
-				answer = append(answer, xrpalphabet[m%58])
+				answer = append(answer, btcalphabet[m%58])
 				m /= 58
 			}
 		} else {
 			m := mod.Int64()
 			for i := 0; i < 10; i++ {
-				answer = append(answer, xrpalphabet[m%58])
+				answer = append(answer, btcalphabet[m%58])
 				m /= 58
 			}
 		}
@@ -58,7 +59,7 @@ func EncodeBase58(d []byte) string {
 		if i != 0 {
 			break
 		}
-		answer = append(answer, alphabetIdx0)
+		answer = append(answer, btcalphabetIdx0)
 	}
 
 	alen := len(answer)
