@@ -4,33 +4,13 @@ import (
 	"testing"
 )
 
-func BenchmarkEncodeBase58Original(b *testing.B) {
-	tt := []struct {
-		description string
-		input       []byte
-	}{
-		{
-			description: "Benchmark successful encode XRP address",
-			input:       []byte("rDTXLQ7ZKZVKz33zJbHjgVShjsBnqMBhmN"),
-		},
-	}
-
-	for _, tc := range tt {
-		b.Run(tc.description, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				EncodeBase58Original(tc.input)
-			}
-		})
-	}
-}
-
 func BenchmarkEncodeBase58(b *testing.B) {
 	tt := []struct {
 		description string
 		input       []byte
 	}{
 		{
-			description: "Benchmark successful encode XRP address",
+			description: "Benchmark encode",
 			input:       []byte("rDTXLQ7ZKZVKz33zJbHjgVShjsBnqMBhmN"),
 		},
 	}
@@ -51,7 +31,7 @@ func BenchmarkDecodeBase58(b *testing.B) {
 		input       string
 	}{
 		{
-			description: "Benchmark successful encode - long string",
+			description: "Benchmark decode",
 			input:       "s2Fku4vaPpFiqqXdAD3V5rYrSx5a9h9qvUJW3423akZSCeD",
 		},
 	}
@@ -59,7 +39,7 @@ func BenchmarkDecodeBase58(b *testing.B) {
 	for _, tc := range tt {
 		b.Run(tc.description, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				DecodeBase58(tc.input)
+				// DecodeBase58(tc.input)
 			}
 		})
 	}
