@@ -4,14 +4,6 @@ import (
 	"math/big"
 )
 
-const (
-	xrpalphabet = "rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz"
-	btcalphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
-
-	// xrpAlphabetIdx0 = "r"
-	btcalphabetIdx0 = 1
-)
-
 var bigRadix = [...]*big.Int{
 	big.NewInt(0),
 	big.NewInt(58),
@@ -30,26 +22,26 @@ var bigRadix10 = big.NewInt(58 * 58 * 58 * 58 * 58 * 58 * 58 * 58 * 58 * 58)
 
 func EncodeBase58(d []byte) string {
 
-	bn := new(big.Int)
-	bn.SetBytes(d)
+	x := new(big.Int)
+	x.SetBytes(d)
 
 	maxlen := int(float64(len(d))*1.365658237309761) + 1
 	answer := make([]byte, 0, maxlen)
 	mod := new(big.Int)
 
-	for bn.Sign() > 0 {
-		bn.DivMod(bn, bigRadix10, mod)
+	for x.Sign() > 0 {
+		x.DivMod(x, bigRadix10, mod)
 
-		if bn.Sign() == 0 {
+		if x.Sign() == 0 {
 			m := mod.Int64()
 			for m > 0 {
-				answer = append(answer, btcalphabet[m%58])
+				answer = append(answer, xrpAlphabet[m%58])
 				m /= 58
 			}
 		} else {
 			m := mod.Int64()
 			for i := 0; i < 10; i++ {
-				answer = append(answer, btcalphabet[m%58])
+				answer = append(answer, xrpAlphabet[m%58])
 				m /= 58
 			}
 		}
@@ -59,7 +51,7 @@ func EncodeBase58(d []byte) string {
 		if i != 0 {
 			break
 		}
-		answer = append(answer, btcalphabetIdx0)
+		answer = append(answer, alphabetIdx0)
 	}
 
 	alen := len(answer)
@@ -69,4 +61,45 @@ func EncodeBase58(d []byte) string {
 
 	return string(answer)
 
+}
+
+func DecodeBase58(b string) []byte {
+	answer := big.NewInt(0)
+	scratch := new(big.Int)
+
+	for t := b; len(t) > 0; {
+		n := len(t)
+		if n > 10 {
+			n = 10
+		}
+
+		total := uint64(0)
+		for _, v := range t[:n] {
+			tmp := b58[v]
+			if tmp == 255 {
+				return []byte("")
+			}
+			total = total*58 + uint64(tmp)
+		}
+
+		answer.Mul(answer, bigRadix[n])
+		scratch.SetUint64(total)
+		answer.Add(answer, scratch)
+
+		t = t[n:]
+	}
+
+	tmpval := answer.Bytes()
+
+	var numZeros int
+	for numZeros = 0; numZeros < len(b); numZeros++ {
+		if b[numZeros] != alphabetIdx0 {
+			break
+		}
+	}
+	flen := numZeros + len(tmpval)
+	val := make([]byte, flen)
+	copy(val[numZeros:], tmpval)
+
+	return val
 }

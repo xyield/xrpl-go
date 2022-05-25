@@ -10,7 +10,7 @@ func BenchmarkEncodeBase58(b *testing.B) {
 		input       []byte
 	}{
 		{
-			description: "Benchmark encode",
+			description: "Benchmark XRP encode",
 			input:       []byte("rDTXLQ7ZKZVKz33zJbHjgVShjsBnqMBhmN"),
 		},
 	}
@@ -31,7 +31,7 @@ func BenchmarkDecodeBase58(b *testing.B) {
 		input       string
 	}{
 		{
-			description: "Benchmark decode",
+			description: "Benchmark XRP decode",
 			input:       "s2Fku4vaPpFiqqXdAD3V5rYrSx5a9h9qvUJW3423akZSCeD",
 		},
 	}
@@ -39,7 +39,7 @@ func BenchmarkDecodeBase58(b *testing.B) {
 	for _, tc := range tt {
 		b.Run(tc.description, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				// DecodeBase58(tc.input)
+				DecodeBase58(tc.input)
 			}
 		})
 	}
