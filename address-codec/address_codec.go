@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"hash"
 
 	"golang.org/x/crypto/ripemd160"
 )
@@ -35,27 +36,6 @@ func (e *EncodeLengthError) Error() string {
 var (
 	ED25519PrefixByteSlice, _ = hex.DecodeString(ED25519PrefixHexString)
 )
-
-func Sha256RipeMD160(b []byte) []byte {
-	sha256 := sha256.New()
-	sha256.Write(b)
-
-	ripemd160 := ripemd160.New()
-	ripemd160.Write(sha256.Sum(nil))
-
-	return ripemd160.Sum(nil)
-}
-
-func CreateCheckSum(b []byte) []byte {
-	sha256 := sha256.New()
-	sha256.Write(b)
-
-	sha256sha256 := sha256.Sum(nil)
-	sha256.Reset()
-	sha256.Write(sha256sha256)
-
-	return sha256.Sum(nil)
-}
 
 func EncodeAddressFromPublicKeyHex(pubkeyhex string, typePrefix []byte) (string, error) {
 
@@ -90,4 +70,33 @@ func EncodeAddressFromPublicKeyHex(pubkeyhex string, typePrefix []byte) (string,
 	}
 
 	return address, nil
+}
+
+func EncodeSeed(entropy string, versionType hash.Hash) (string, error) {
+	return "", nil
+}
+
+func DecodeSeed(seed string) (string, error) {
+	return "", nil
+}
+
+func Sha256RipeMD160(b []byte) []byte {
+	sha256 := sha256.New()
+	sha256.Write(b)
+
+	ripemd160 := ripemd160.New()
+	ripemd160.Write(sha256.Sum(nil))
+
+	return ripemd160.Sum(nil)
+}
+
+func CreateCheckSum(b []byte) []byte {
+	sha256 := sha256.New()
+	sha256.Write(b)
+
+	sha256sha256 := sha256.Sum(nil)
+	sha256.Reset()
+	sha256.Write(sha256sha256)
+
+	return sha256.Sum(nil)
 }
