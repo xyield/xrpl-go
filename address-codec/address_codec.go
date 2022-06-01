@@ -34,10 +34,6 @@ func (e *EncodeLengthError) Error() string {
 	return fmt.Sprintf("%v length should be %v", e.Instance, e.Input)
 }
 
-var (
-	ED25519PrefixByteSlice, _ = hex.DecodeString(ED25519PrefixHexString)
-)
-
 func EncodeClassicAddressFromPublicKeyHex(pubkeyhex string, typePrefix []byte) (string, error) {
 
 	pubkey, _ := hex.DecodeString(pubkeyhex)
@@ -46,7 +42,7 @@ func EncodeClassicAddressFromPublicKeyHex(pubkeyhex string, typePrefix []byte) (
 		return "", &EncodeLengthError{Instance: "PublicKey", Input: AccountPublicKeyLength}
 	}
 
-	accountID := Sha256RipeMD160(pubkey)
+	accountID := sha256RipeMD160(pubkey)
 
 	if len(accountID) != AccountAddressLength {
 		return "", &EncodeLengthError{Instance: "AccountID", Input: AccountAddressLength}
@@ -58,7 +54,7 @@ func EncodeClassicAddressFromPublicKeyHex(pubkeyhex string, typePrefix []byte) (
 		return "", &EncodeLengthError{Instance: "Payload", Input: 21}
 	}
 
-	checkSum := CreateCheckSum(payload)[:4]
+	checkSum := createCheckSum(payload)[:4]
 
 	if len(checkSum) != 4 {
 		return "", &EncodeLengthError{Instance: "CheckSum", Input: 4}
@@ -99,7 +95,7 @@ func DecodeSeed(seed string) (string, error) {
 	return "", nil
 }
 
-func Sha256RipeMD160(b []byte) []byte {
+func sha256RipeMD160(b []byte) []byte {
 	sha256 := sha256.New()
 	sha256.Write(b)
 
@@ -109,7 +105,7 @@ func Sha256RipeMD160(b []byte) []byte {
 	return ripemd160.Sum(nil)
 }
 
-func CreateCheckSum(b []byte) []byte {
+func createCheckSum(b []byte) []byte {
 	sha256 := sha256.New()
 	sha256.Write(b)
 
