@@ -93,11 +93,8 @@ func DecodeClassicAddressToAccountID(cAddress string) (typePrefix, accountID []b
 
 func IsValidClassicAddress(cAddress string) bool {
 	_, _, c := DecodeClassicAddressToAccountID(cAddress)
-	if c != nil {
-		return false
-	} else {
-		return true
-	}
+
+	return c == nil
 }
 
 func EncodeNodePublicKey(pubkeyhex string, typePrefix []byte) (string, error) {
