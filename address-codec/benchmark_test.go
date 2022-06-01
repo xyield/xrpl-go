@@ -44,3 +44,27 @@ func BenchmarkDecodeBase58(b *testing.B) {
 		})
 	}
 }
+
+func BenchmarkEncodeClassicAddressFromPublicKeyHex(b *testing.B) {
+
+	tt := []struct {
+		description string
+		input       string
+		prefix      []byte
+	}{
+		{
+			description: "Benchmark encode classic address",
+			input:       "rDTXLQ7ZKZVKz33zJbHjgVShjsBnqMBhmN",
+			prefix:      []byte{AccountAddressPrefix},
+		},
+	}
+
+	for _, tc := range tt {
+		b.Run(tc.description, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				EncodeClassicAddressFromPublicKeyHex(tc.input, tc.prefix)
+			}
+		})
+	}
+
+}

@@ -28,46 +28,54 @@ const (
 type EncodeLengthError struct {
 	Instance string
 	Input    int
+	Expected int
 }
 
 func (e *EncodeLengthError) Error() string {
-	return fmt.Sprintf("%v length should be %v", e.Instance, e.Input)
+	return fmt.Sprintf("`%v` length should be %v not %v", e.Instance, e.Expected, e.Input)
+}
+
+type InvalidClassicAddressError struct {
+	Input string
+}
+
+func (e *InvalidClassicAddressError) Error() string {
+	return fmt.Sprintf("`%v` is an invalid classic address", e.Input)
 }
 
 func EncodeClassicAddressFromPublicKeyHex(pubkeyhex string, typePrefix []byte) (string, error) {
 
-	pubkey, _ := hex.DecodeString(pubkeyhex)
+	if len(typePrefix) != 1 {
+		return "", &EncodeLengthError{Instance: "TypePrefix", Expected: 1, Input: len(typePrefix)}
+	}
 
-	if len(pubkey) != AccountPublicKeyLength {
-		return "", &EncodeLengthError{Instance: "PublicKey", Input: AccountPublicKeyLength}
+	pubkey, err := hex.DecodeString(pubkeyhex)
+
+	if err != nil {
+		return "", &EncodeLengthError{Instance: "PublicKey", Expected: AccountPublicKeyLength, Input: len(pubkey)}
 	}
 
 	accountID := sha256RipeMD160(pubkey)
 
 	if len(accountID) != AccountAddressLength {
-		return "", &EncodeLengthError{Instance: "AccountID", Input: AccountAddressLength}
+		return "", &EncodeLengthError{Instance: "AccountID", Expected: AccountAddressLength, Input: len(accountID)}
+	}
+
+	checkSum := createCheckSum(append(typePrefix, accountID...))[:4]
+
+	if len(checkSum) != 4 {
+		return "", &EncodeLengthError{Instance: "CheckSum", Expected: 4, Input: len(checkSum)}
 	}
 
 	payload := append(typePrefix, accountID...)
-
-	if len(payload) != 21 {
-		return "", &EncodeLengthError{Instance: "Payload", Input: 21}
-	}
-
-	checkSum := createCheckSum(payload)[:4]
-
-	if len(checkSum) != 4 {
-		return "", &EncodeLengthError{Instance: "CheckSum", Input: 4}
-	}
-
 	address := EncodeBase58((append(payload, checkSum...)))
 
-	if len(address) != 34 { //can they be different lengths?
-		return "", &EncodeLengthError{Instance: "Address", Input: 34}
+	if !IsValidClassicAddress(address) {
+		return "", &InvalidClassicAddressError{Input: address}
 	}
 
 	if !bytes.Equal(accountID, DecodeBase58(address)[1:21]) {
-		return "", &EncodeLengthError{Instance: "DecodedAddress", Input: 20}
+		return "", &EncodeLengthError{Instance: "DecodedAddress", Expected: 20, Input: len(address)}
 	}
 
 	return address, nil
@@ -75,12 +83,21 @@ func EncodeClassicAddressFromPublicKeyHex(pubkeyhex string, typePrefix []byte) (
 
 func DecodeClassicAddressToAccountID(cAddress string) (typePrefix, accountID []byte, err error) {
 
-	if len(DecodeBase58(cAddress)[1:21]) != AccountAddressLength {
-		return nil, nil, &EncodeLengthError{Instance: "DecodedAddress", Input: 20}
+	if len(DecodeBase58(cAddress)) != 25 {
+		return nil, nil, &InvalidClassicAddressError{Input: cAddress}
 	}
 
 	return DecodeBase58(cAddress)[:1], DecodeBase58(cAddress)[1:21], nil
 
+}
+
+func IsValidClassicAddress(cAddress string) bool {
+	_, _, c := DecodeClassicAddressToAccountID(cAddress)
+	if c != nil {
+		return false
+	} else {
+		return true
+	}
 }
 
 func EncodeNodePublicKey(pubkeyhex string, typePrefix []byte) (string, error) {
