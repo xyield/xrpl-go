@@ -1,6 +1,7 @@
 package addresscodec
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
@@ -37,7 +38,7 @@ var (
 	ED25519PrefixByteSlice, _ = hex.DecodeString(ED25519PrefixHexString)
 )
 
-func EncodeAddressFromPublicKeyHex(pubkeyhex string, typePrefix []byte) (string, error) {
+func EncodeClassicAddressFromPublicKeyHex(pubkeyhex string, typePrefix []byte) (string, error) {
 
 	pubkey, _ := hex.DecodeString(pubkeyhex)
 
@@ -69,7 +70,25 @@ func EncodeAddressFromPublicKeyHex(pubkeyhex string, typePrefix []byte) (string,
 		return "", &EncodeLengthError{Instance: "Address", Input: 34}
 	}
 
+	if !bytes.Equal(accountID, DecodeBase58(address)[1:21]) {
+		return "", &EncodeLengthError{Instance: "DecodedAddress", Input: 20}
+	}
+
 	return address, nil
+}
+
+func DecodeClassicAddressToAccountID(cAddress string) (typePrefix, accountID []byte, err error) {
+
+	if len(DecodeBase58(cAddress)[1:21]) != AccountAddressLength {
+		return nil, nil, &EncodeLengthError{Instance: "DecodedAddress", Input: 20}
+	}
+
+	return DecodeBase58(cAddress)[:1], DecodeBase58(cAddress)[1:21], nil
+
+}
+
+func EncodeNodePublicKey(pubkeyhex string, typePrefix []byte) (string, error) {
+	return "", nil
 }
 
 func EncodeSeed(entropy string, versionType hash.Hash) (string, error) {
