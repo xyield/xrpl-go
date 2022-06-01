@@ -47,7 +47,6 @@ func TestEncodeClassicAddressFromPublicKeyHex(t *testing.T) {
 			expectedErrorType:   &EncodeLengthError{},
 			expectedErrorString: "`TypePrefix` length should be 1 not 2",
 		},
-		// More test cases
 	}
 
 	for _, tc := range tt {
