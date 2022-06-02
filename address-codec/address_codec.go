@@ -1,7 +1,6 @@
 package addresscodec
 
 import (
-	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
@@ -22,7 +21,7 @@ const (
 	NodePublicKeyPrefix    = 0x1C
 
 	ED25519Prefix          = 0xED
-	ED25519PrefixHexString = "ED" //hex prefix for 32 byte ED25519 hex strings, to make length 33 bytes after decoding
+	ED25519PrefixHexString = "ED"
 )
 
 type EncodeLengthError struct {
@@ -72,10 +71,6 @@ func EncodeClassicAddressFromPublicKeyHex(pubkeyhex string, typePrefix []byte) (
 
 	if !IsValidClassicAddress(address) {
 		return "", &InvalidClassicAddressError{Input: address}
-	}
-
-	if !bytes.Equal(accountID, DecodeBase58(address)[1:21]) {
-		return "", &EncodeLengthError{Instance: "DecodedAddress", Expected: 20, Input: len(address)}
 	}
 
 	return address, nil
