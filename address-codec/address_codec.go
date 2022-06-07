@@ -1,10 +1,11 @@
 package addresscodec
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
-	"hash"
 
 	"golang.org/x/crypto/ripemd160"
 )
@@ -20,9 +21,26 @@ const (
 	FamilySeedPrefix       = 0x21
 	NodePublicKeyPrefix    = 0x1C
 
-	ED25519Prefix          = 0xED
-	ED25519PrefixHexString = "ED"
+	ED25519Prefix = 0xED
 )
+
+type CryptoAlgorithm uint32
+
+const (
+	Undefined CryptoAlgorithm = iota
+	ED25519
+	SECP256K1
+)
+
+func (c CryptoAlgorithm) String() string {
+	switch c {
+	case ED25519:
+		return "ed25519"
+	case SECP256K1:
+		return "secp256k1"
+	}
+	return "unknown"
+}
 
 type EncodeLengthError struct {
 	Instance string
@@ -42,6 +60,28 @@ func (e *InvalidClassicAddressError) Error() string {
 	return fmt.Sprintf("`%v` is an invalid classic address", e.Input)
 }
 
+func Encode(b []byte, typePrefix []byte, expectedLength int) string {
+
+	if len(b) != expectedLength {
+		return ""
+	}
+
+	payload := append(typePrefix, b...)
+
+	return EncodeBase58(payload)
+}
+
+func Decode(b58string string, typePrefix []byte) []byte {
+
+	prefixLength := len(typePrefix)
+
+	if !bytes.Equal(DecodeBase58(b58string)[:prefixLength], typePrefix) {
+		return nil
+	}
+
+	return DecodeBase58(b58string)[prefixLength:]
+}
+
 func EncodeClassicAddressFromPublicKeyHex(pubkeyhex string, typePrefix []byte) (string, error) {
 
 	if len(typePrefix) != 1 {
@@ -49,6 +89,10 @@ func EncodeClassicAddressFromPublicKeyHex(pubkeyhex string, typePrefix []byte) (
 	}
 
 	pubkey, err := hex.DecodeString(pubkeyhex)
+
+	if len(pubkey) != AccountPublicKeyLength {
+		pubkey = append([]byte{ED25519Prefix}, pubkey...)
+	}
 
 	if err != nil {
 		return "", &EncodeLengthError{Instance: "PublicKey", Expected: AccountPublicKeyLength, Input: len(pubkey)}
@@ -96,12 +140,30 @@ func EncodeNodePublicKey(pubkeyhex string, typePrefix []byte) (string, error) {
 	return "", nil
 }
 
-func EncodeSeed(entropy string, versionType hash.Hash) (string, error) {
-	return "", nil
+func EncodeSeed(entropy []byte, encodingType CryptoAlgorithm) (string, error) {
+
+	if len(entropy) != FamilySeedLength {
+		return "", &EncodeLengthError{Instance: "Entropy", Input: len(entropy), Expected: FamilySeedLength}
+	}
+
+	switch encodingType {
+	case ED25519:
+		prefix := []byte{ED25519Prefix}
+		return Encode(entropy, prefix, FamilySeedLength), nil
+	case SECP256K1:
+		prefix := []byte{FamilySeedLength}
+		return Encode(entropy, prefix, FamilySeedLength), nil
+	default:
+		return "", errors.New("encoding type must be `ed25519` or `secp256k1`")
+	}
+
 }
 
-func DecodeSeed(seed string) (string, error) {
-	return "", nil
+func DecodeSeed(seed string) ([]byte, CryptoAlgorithm, error) {
+
+	decodedResult := Decode(seed, []byte{ED25519Prefix})
+
+	return decodedResult, ED25519, nil
 }
 
 func sha256RipeMD160(b []byte) []byte {

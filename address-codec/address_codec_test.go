@@ -1,10 +1,70 @@
 package addresscodec
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+func TestEncode(t *testing.T) {
+	tt := []struct {
+		description    string
+		input          []byte
+		inputPrefix    []byte
+		inputLength    int
+		expectedOutput string
+		expectedErr    error
+	}{
+		{
+			description:    "Successful encode",
+			input:          []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			inputPrefix:    []byte{AccountAddressPrefix},
+			inputLength:    16,
+			expectedOutput: "rrrrrrrrrrrrrrrrr",
+			expectedErr:    nil,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.description, func(t *testing.T) {
+
+			assert.Equal(t, tc.expectedOutput, Encode(tc.input, tc.inputPrefix, tc.inputLength))
+
+		})
+	}
+}
+
+func TestDecode(t *testing.T) {
+	tt := []struct {
+		description    string
+		input          string
+		inputPrefix    []byte
+		expectedOutput []byte
+		expectedErr    error
+	}{
+		{
+			description:    "successful decode",
+			input:          "rrrrrrrrrrrrrrrrr",
+			inputPrefix:    []byte{AccountAddressPrefix},
+			expectedOutput: []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			expectedErr:    nil,
+		},
+		{
+			description:    "successful decode",
+			input:          "rrrrrrrrrrrrrrrrr",
+			inputPrefix:    []byte{AccountAddressPrefix},
+			expectedOutput: []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			expectedErr:    nil,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.description, func(t *testing.T) {
+			assert.Equal(t, tc.expectedOutput, Decode(tc.input, tc.inputPrefix))
+		})
+	}
+}
 
 func TestEncodeClassicAddressFromPublicKeyHex(t *testing.T) {
 	tt := []struct {
@@ -15,14 +75,21 @@ func TestEncodeClassicAddressFromPublicKeyHex(t *testing.T) {
 		expectedErr    error
 	}{
 		{
-			description:    "Successfully generate classic address from public key hex string",
+			description:    "Successfully generate address from a 32-byte ED25519 public key hex string WITH prefix",
 			input:          "ED9434799226374926EDA3B54B1B461B4ABF7237962EAE18528FEA67595397FA32",
 			inputPrefix:    []byte{AccountAddressPrefix},
 			expectedOutput: "rDTXLQ7ZKZVKz33zJbHjgVShjsBnqMBhmN",
 			expectedErr:    nil,
 		},
 		{
-			description:    "Successfully generate classic address from randomly generated hex string",
+			description:    "Successfully generate address from a 32-byte ED25519 public key hex string WITHOUT prefix",
+			input:          "9434799226374926EDA3B54B1B461B4ABF7237962EAE18528FEA67595397FA32",
+			inputPrefix:    []byte{AccountAddressPrefix},
+			expectedOutput: "rDTXLQ7ZKZVKz33zJbHjgVShjsBnqMBhmN",
+			expectedErr:    nil,
+		},
+		{
+			description:    "Successfully generate address from randomly generated 33-byte hex string",
 			input:          "42e04f55c9f92d0d2ece7a028f88fd37b740ea2086f136d9ed1ac842e5a0226125",
 			inputPrefix:    []byte{AccountAddressPrefix},
 			expectedOutput: "rJKhsipKHooQbtS3v5Jro6N5Q7TMNPkoAs",
@@ -33,10 +100,10 @@ func TestEncodeClassicAddressFromPublicKeyHex(t *testing.T) {
 			input:          "yurt",
 			inputPrefix:    []byte{AccountAddressPrefix},
 			expectedOutput: "",
-			expectedErr:    &EncodeLengthError{Instance: "PublicKey", Input: 0, Expected: 33},
+			expectedErr:    &EncodeLengthError{Instance: "PublicKey", Input: 1, Expected: 33},
 		},
 		{
-			description:    "Valid Public Key, invalid Type Prefix",
+			description:    "Valid Public Key, invalid Type Prefix length",
 			input:          "ED9434799226374926EDA3B54B1B461B4ABF7237962EAE18528FEA67595397FA32",
 			inputPrefix:    []byte{0x00, 0x00},
 			expectedOutput: "",
@@ -50,9 +117,10 @@ func TestEncodeClassicAddressFromPublicKeyHex(t *testing.T) {
 			got, err := EncodeClassicAddressFromPublicKeyHex(tc.input, tc.inputPrefix)
 
 			if tc.expectedErr != nil {
-				assert.EqualError(t, tc.expectedErr, err.Error())
+				assert.EqualError(t, err, tc.expectedErr.Error())
 			} else {
-				if assert.NoError(t, tc.expectedErr, err) {
+				if assert.NoError(t, err) {
+					assert.NoError(t, err)
 					assert.Equal(t, tc.expectedOutput, got)
 				}
 			}
@@ -62,6 +130,97 @@ func TestEncodeClassicAddressFromPublicKeyHex(t *testing.T) {
 
 func TestEncodeNodePublicKey(t *testing.T) {
 
+}
+
+func TestEncodeSeed(t *testing.T) {
+	tt := []struct {
+		description       string
+		input             []byte
+		inputEncodingType CryptoAlgorithm
+		expectedOutput    string
+		expectedErr       error
+	}{
+		{
+			description:       "successful encode - ED25519",
+			input:             []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			inputEncodingType: ED25519,
+			expectedOutput:    "sNBswUo4PJCN9MBsP6L6uDSC",
+			expectedErr:       nil,
+		},
+		{
+			description:       "successful encode - SECP256K1",
+			input:             []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			inputEncodingType: SECP256K1,
+			expectedOutput:    "958uk4yWQTotxStJv1XwtVu",
+			expectedErr:       nil,
+		},
+		{
+			description:       "unsuccessful encode - invalid entropy length",
+			input:             []byte{0x00},
+			inputEncodingType: ED25519,
+			expectedOutput:    "",
+			expectedErr:       &EncodeLengthError{Instance: "Entropy", Input: len([]byte{0x00}), Expected: FamilySeedLength},
+		},
+		{
+			description:       "unsuccessful encode - invalid encoding type",
+			input:             []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			inputEncodingType: Undefined,
+			expectedOutput:    "",
+			expectedErr:       errors.New("encoding type must be `ed25519` or `secp256k1`"),
+		},
+		{
+			description:       "invalid CryptoAlgorithm Uint type returns err",
+			input:             []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			inputEncodingType: CryptoAlgorithm(255),
+			expectedOutput:    "",
+			expectedErr:       errors.New("encoding type must be `ed25519` or `secp256k1`"),
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.description, func(t *testing.T) {
+			got, err := EncodeSeed(tc.input, tc.inputEncodingType)
+
+			if tc.expectedErr != nil {
+				assert.EqualError(t, err, tc.expectedErr.Error())
+			} else {
+				assert.Equal(t, tc.expectedOutput, got)
+			}
+		})
+	}
+}
+
+func TestDecodeSeed(t *testing.T) {
+	tt := []struct {
+		description       string
+		input             string
+		expectedOutput    []byte
+		expectedAlgorithm CryptoAlgorithm
+		expectedErr       error
+	}{
+		{
+			description:       "successful decode",
+			input:             "sNBswUo4PJCN9MBsP6L6uDSC",
+			expectedOutput:    []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			expectedAlgorithm: ED25519,
+			expectedErr:       nil,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.description, func(t *testing.T) {
+
+			got, algorithm, err := DecodeSeed(tc.input)
+
+			if tc.expectedErr != nil {
+				assert.EqualError(t, err, tc.expectedErr.Error())
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tc.expectedOutput, got)
+				assert.Equal(t, tc.expectedAlgorithm, algorithm)
+			}
+		})
+	}
 }
 
 func TestDecodeAddressToAccountID(t *testing.T) {
@@ -108,10 +267,11 @@ func TestDecodeAddressToAccountID(t *testing.T) {
 			typePrefix, accountID, err := DecodeClassicAddressToAccountID(tc.input)
 
 			if tc.expectedErr != nil {
-				assert.EqualError(t, tc.expectedErr, err.Error())
+				assert.EqualError(t, err, tc.expectedErr.Error())
 				assert.Nil(t, tc.expectedPrefix, typePrefix)
 				assert.Nil(t, tc.expectedAccountID, accountID)
 			} else {
+				assert.NoError(t, err)
 				assert.Equal(t, tc.expectedPrefix, typePrefix)
 				assert.Equal(t, tc.expectedAccountID, accountID)
 			}
@@ -140,9 +300,9 @@ func TestIsValidClassicAddress(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.description, func(t *testing.T) {
 			if tc.expected != true {
-				assert.False(t, tc.expected, IsValidClassicAddress(tc.input))
+				assert.False(t, IsValidClassicAddress(tc.input))
 			} else {
-				assert.True(t, tc.expected, IsValidClassicAddress(tc.input))
+				assert.True(t, IsValidClassicAddress(tc.input))
 			}
 		})
 	}
