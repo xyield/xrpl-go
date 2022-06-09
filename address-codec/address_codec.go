@@ -66,9 +66,7 @@ func Encode(b []byte, typePrefix []byte, expectedLength int) string {
 		return ""
 	}
 
-	payload := append(typePrefix, b...)
-
-	return EncodeBase58(payload)
+	return CheckEncode(b, typePrefix[0])
 }
 
 func Decode(b58string string, typePrefix []byte) []byte {
@@ -104,14 +102,7 @@ func EncodeClassicAddressFromPublicKeyHex(pubkeyhex string, typePrefix []byte) (
 		return "", &EncodeLengthError{Instance: "AccountID", Expected: AccountAddressLength, Input: len(accountID)}
 	}
 
-	checkSum := createCheckSum(append(typePrefix, accountID...))[:4]
-
-	if len(checkSum) != 4 {
-		return "", &EncodeLengthError{Instance: "CheckSum", Expected: 4, Input: len(checkSum)}
-	}
-
-	payload := append(typePrefix, accountID...)
-	address := EncodeBase58((append(payload, checkSum...)))
+	address := CheckEncode(accountID, AccountAddressPrefix)
 
 	if !IsValidClassicAddress(address) {
 		return "", &InvalidClassicAddressError{Input: address}

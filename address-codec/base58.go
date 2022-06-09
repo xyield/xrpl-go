@@ -20,12 +20,12 @@ var bigRadix = [...]*big.Int{
 
 var bigRadix10 = big.NewInt(58 * 58 * 58 * 58 * 58 * 58 * 58 * 58 * 58 * 58)
 
-func EncodeBase58(d []byte) string {
+func EncodeBase58(b []byte) string {
 
 	x := new(big.Int)
-	x.SetBytes(d)
+	x.SetBytes(b)
 
-	maxlen := int(float64(len(d))*1.365658237309761) + 1
+	maxlen := int(float64(len(b))*1.365658237309761) + 1
 	answer := make([]byte, 0, maxlen)
 	mod := new(big.Int)
 
@@ -47,7 +47,7 @@ func EncodeBase58(d []byte) string {
 		}
 	}
 
-	for _, i := range d {
+	for _, i := range b {
 		if i != 0 {
 			break
 		}

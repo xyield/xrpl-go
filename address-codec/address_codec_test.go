@@ -17,11 +17,11 @@ func TestEncode(t *testing.T) {
 		expectedErr    error
 	}{
 		{
-			description:    "Successful encode",
+			description:    "Successful encode - 1",
 			input:          []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 			inputPrefix:    []byte{AccountAddressPrefix},
 			inputLength:    16,
-			expectedOutput: "rrrrrrrrrrrrrrrrr",
+			expectedOutput: "rrrrrrrrrrrrrrrrrp9U13b",
 			expectedErr:    nil,
 		},
 	}
@@ -44,17 +44,17 @@ func TestDecode(t *testing.T) {
 		expectedErr    error
 	}{
 		{
-			description:    "successful decode",
+			description:    "successful decode - 1",
 			input:          "rrrrrrrrrrrrrrrrr",
 			inputPrefix:    []byte{AccountAddressPrefix},
 			expectedOutput: []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 			expectedErr:    nil,
 		},
 		{
-			description:    "successful decode",
-			input:          "rrrrrrrrrrrrrrrrr",
+			description:    "successful decode - 2",
+			input:          "rrrrrrrrrrrrrrrrrp9U13b",
 			inputPrefix:    []byte{AccountAddressPrefix},
-			expectedOutput: []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			expectedOutput: []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2c, 0xa7, 0xf0, 0x98},
 			expectedErr:    nil,
 		},
 	}
@@ -144,14 +144,14 @@ func TestEncodeSeed(t *testing.T) {
 			description:       "successful encode - ED25519",
 			input:             []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 			inputEncodingType: ED25519,
-			expectedOutput:    "sNBswUo4PJCN9MBsP6L6uDSC",
+			expectedOutput:    "E2GEWzC8MMH3E2wKHAGWdVrTbtcWC",
 			expectedErr:       nil,
 		},
 		{
 			description:       "successful encode - SECP256K1",
 			input:             []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 			inputEncodingType: SECP256K1,
-			expectedOutput:    "958uk4yWQTotxStJv1XwtVu",
+			expectedOutput:    "zh5iEuYTaHW4JwgCadsVQRmsfzUB",
 			expectedErr:       nil,
 		},
 		{
@@ -200,8 +200,8 @@ func TestDecodeSeed(t *testing.T) {
 	}{
 		{
 			description:       "successful decode",
-			input:             "sNBswUo4PJCN9MBsP6L6uDSC",
-			expectedOutput:    []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			input:             "E2GEWzC8MMH3E2wKHAGWdVrTbtcWC",
+			expectedOutput:    []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xcc, 0xf9, 0x3e, 0xfc},
 			expectedAlgorithm: ED25519,
 			expectedErr:       nil,
 		},
