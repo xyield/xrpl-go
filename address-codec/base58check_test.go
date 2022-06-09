@@ -17,7 +17,7 @@ func TestCheckEncode(t *testing.T) {
 
 	for x, tc := range tt {
 		// test encoding
-		if res := CheckEncode([]byte(tc.in), tc.prefix); res != tc.out {
+		if res := Base58CheckEncode([]byte(tc.in), tc.prefix); res != tc.out {
 			t.Errorf("CheckEncode test #%d failed: got %s, want: %s", x, res, tc.out)
 		}
 	}
@@ -27,7 +27,7 @@ func TestCheckDecode(t *testing.T) {
 
 	for x, tc := range tt {
 
-		res, version, err := CheckDecode(tc.out)
+		res, version, err := Base58CheckDecode(tc.out)
 		switch {
 		case err != nil:
 			t.Errorf("CheckDecode test #%d failed with err: %v", x, err)
@@ -41,7 +41,7 @@ func TestCheckDecode(t *testing.T) {
 
 		// test the two decoding failure cases
 		// case 1: checksum error
-		_, _, err = CheckDecode("3MNQE1Y")
+		_, _, err = Base58CheckDecode("3MNQE1Y")
 		if err != ErrChecksum {
 			t.Error("Checkdecode test failed, expected ErrChecksum")
 		}
@@ -50,7 +50,7 @@ func TestCheckDecode(t *testing.T) {
 		testString := ""
 		for len := 0; len < 4; len++ {
 			testString += "x"
-			_, _, err = CheckDecode(testString)
+			_, _, err = Base58CheckDecode(testString)
 			if err != ErrInvalidFormat {
 				t.Error("Checkdecode test failed, expected ErrInvalidFormat")
 			}

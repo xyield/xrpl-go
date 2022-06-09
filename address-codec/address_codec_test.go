@@ -114,18 +114,44 @@ func TestEncodeClassicAddressFromPublicKeyHex(t *testing.T) {
 			if tc.expectedErr != nil {
 				assert.EqualError(t, err, tc.expectedErr.Error())
 			} else {
-				if assert.NoError(t, err) {
-					assert.NoError(t, err)
-					assert.Equal(t, tc.expectedOutput, got)
-				}
+				assert.NoError(t, err)
+				assert.NoError(t, err)
+				assert.Equal(t, tc.expectedOutput, got)
 			}
 		})
 	}
 }
 
-func TestEncodeNodePublicKey(t *testing.T) {
+// func TestEncodeNodePublicKey(t *testing.T) {
+// 	tt := []struct {
+// 		description    string
+// 		input          []byte
+// 		inputPrefix    []byte
+// 		expectedOutput string
+// 		expectedErr    error
+// 	}{
+// 		{
+// 			description:    "successful encode",
+// 			input:          []byte{},
+// 			inputPrefix:    []byte{},
+// 			expectedOutput: "",
+// 			expectedErr:    nil,
+// 		},
+// 	}
 
-}
+// 	for _, tc := range tt {
+// 		t.Run(tc.description, func(t *testing.T) {
+// 			res, err := EncodeNodePublicKey(tc.input, tc.inputPrefix)
+
+// 			if tc.expectedErr != nil {
+// 				assert.EqualError(t, err, tc.expectedErr.Error())
+// 			} else {
+// 				assert.NoError(t, err)
+// 				assert.Equal(t, tc.expectedOutput, res)
+// 			}
+// 		})
+// 	}
+// }
 
 func TestEncodeSeed(t *testing.T) {
 	tt := []struct {
@@ -223,6 +249,7 @@ func TestDecodeSeed(t *testing.T) {
 
 			if tc.expectedErr != nil {
 				assert.EqualError(t, err, tc.expectedErr.Error())
+				assert.Nil(t, tc.expectedOutput)
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.expectedOutput, got)

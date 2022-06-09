@@ -24,7 +24,7 @@ const (
 	ED25519Prefix = 0xED
 )
 
-type CryptoAlgorithm uint32
+type CryptoAlgorithm uint8
 
 const (
 	Undefined CryptoAlgorithm = iota
@@ -66,7 +66,7 @@ func Encode(b []byte, typePrefix []byte, expectedLength int) string {
 		return ""
 	}
 
-	return CheckEncode(b, typePrefix[0])
+	return Base58CheckEncode(b, typePrefix[0])
 }
 
 func Decode(b58string string, typePrefix []byte) ([]byte, byte, error) {
@@ -77,7 +77,7 @@ func Decode(b58string string, typePrefix []byte) ([]byte, byte, error) {
 		return nil, 0, errors.New("b58string prefix and typeprefix not equal")
 	}
 
-	return CheckDecode(b58string)
+	return Base58CheckDecode(b58string)
 }
 
 func EncodeClassicAddressFromPublicKeyHex(pubkeyhex string, typePrefix []byte) (string, error) {
@@ -102,7 +102,7 @@ func EncodeClassicAddressFromPublicKeyHex(pubkeyhex string, typePrefix []byte) (
 		return "", &EncodeLengthError{Instance: "AccountID", Expected: AccountAddressLength, Input: len(accountID)}
 	}
 
-	address := CheckEncode(accountID, AccountAddressPrefix)
+	address := Base58CheckEncode(accountID, AccountAddressPrefix)
 
 	if !IsValidClassicAddress(address) {
 		return "", &InvalidClassicAddressError{Input: address}
@@ -127,9 +127,10 @@ func IsValidClassicAddress(cAddress string) bool {
 	return c == nil
 }
 
-func EncodeNodePublicKey(pubkeyhex string, typePrefix []byte) (string, error) {
-	return "", nil
-}
+// func EncodeNodePublicKey(b []byte, typePrefix []byte) (string, error) {
+
+// 	return "", nil
+// }
 
 func EncodeSeed(entropy []byte, encodingType CryptoAlgorithm) (string, error) {
 
@@ -152,19 +153,17 @@ func EncodeSeed(entropy []byte, encodingType CryptoAlgorithm) (string, error) {
 
 func DecodeSeed(seed string) ([]byte, CryptoAlgorithm, error) {
 
-	decodedResult, prefix, err := CheckDecode(seed)
+	entropy, prefix, err := Base58CheckDecode(seed)
 
 	switch prefix {
 
 	case ED25519:
-
 		if err == nil {
-			return decodedResult, ED25519, nil
+			return entropy, ED25519, nil
 		}
 	case SECP256K1:
-
 		if err == nil {
-			return decodedResult, SECP256K1, nil
+			return entropy, SECP256K1, nil
 		}
 	}
 	return nil, 0, errors.New("invalid seed; could not determine encoding algorithm")
@@ -178,15 +177,4 @@ func sha256RipeMD160(b []byte) []byte {
 	ripemd160.Write(sha256.Sum(nil))
 
 	return ripemd160.Sum(nil)
-}
-
-func createCheckSum(b []byte) []byte {
-	sha256 := sha256.New()
-	sha256.Write(b)
-
-	sha256sha256 := sha256.Sum(nil)
-	sha256.Reset()
-	sha256.Write(sha256sha256)
-
-	return sha256.Sum(nil)
 }

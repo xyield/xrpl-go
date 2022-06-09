@@ -17,7 +17,7 @@ func checksum(input []byte) (cksum [4]byte) {
 	return cksum
 }
 
-func CheckEncode(input []byte, prefix byte) string {
+func Base58CheckEncode(input []byte, prefix byte) string {
 	b := make([]byte, 0, 1+len(input)+4)
 	b = append(b, prefix)
 	b = append(b, input...)
@@ -27,7 +27,7 @@ func CheckEncode(input []byte, prefix byte) string {
 	return EncodeBase58(b)
 }
 
-func CheckDecode(input string) (result []byte, prefix byte, err error) {
+func Base58CheckDecode(input string) (result []byte, prefix byte, err error) {
 	decoded := DecodeBase58(input)
 	if len(decoded) < 5 {
 		return nil, 0, ErrInvalidFormat
