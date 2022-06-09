@@ -28,8 +28,8 @@ type CryptoAlgorithm uint32
 
 const (
 	Undefined CryptoAlgorithm = iota
-	ED25519
-	SECP256K1
+	ED25519                   = ED25519Prefix
+	SECP256K1                 = FamilySeedPrefix
 )
 
 func (c CryptoAlgorithm) String() string {
@@ -69,15 +69,15 @@ func Encode(b []byte, typePrefix []byte, expectedLength int) string {
 	return CheckEncode(b, typePrefix[0])
 }
 
-func Decode(b58string string, typePrefix []byte) []byte {
+func Decode(b58string string, typePrefix []byte) ([]byte, byte, error) {
 
 	prefixLength := len(typePrefix)
 
 	if !bytes.Equal(DecodeBase58(b58string)[:prefixLength], typePrefix) {
-		return nil
+		return nil, 0, errors.New("b58string prefix and typeprefix not equal")
 	}
 
-	return DecodeBase58(b58string)[prefixLength:]
+	return CheckDecode(b58string)
 }
 
 func EncodeClassicAddressFromPublicKeyHex(pubkeyhex string, typePrefix []byte) (string, error) {
@@ -152,9 +152,21 @@ func EncodeSeed(entropy []byte, encodingType CryptoAlgorithm) (string, error) {
 
 func DecodeSeed(seed string) ([]byte, CryptoAlgorithm, error) {
 
-	decodedResult := Decode(seed, []byte{ED25519Prefix})
+	decodedResult, _, _ := CheckDecode(seed)
 
-	return decodedResult, ED25519, nil
+	switch seed[0] {
+	case 122:
+
+		if decodedResult != nil {
+			return decodedResult, SECP256K1, nil
+		}
+	case 69:
+
+		if decodedResult != nil {
+			return decodedResult, ED25519, nil
+		}
+	}
+	return nil, 0, errors.New("invalid seed; could not determine encoding algorithm")
 }
 
 func sha256RipeMD160(b []byte) []byte {

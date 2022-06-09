@@ -45,23 +45,18 @@ func TestDecode(t *testing.T) {
 	}{
 		{
 			description:    "successful decode - 1",
-			input:          "rrrrrrrrrrrrrrrrr",
-			inputPrefix:    []byte{AccountAddressPrefix},
-			expectedOutput: []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-			expectedErr:    nil,
-		},
-		{
-			description:    "successful decode - 2",
 			input:          "rrrrrrrrrrrrrrrrrp9U13b",
 			inputPrefix:    []byte{AccountAddressPrefix},
-			expectedOutput: []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2c, 0xa7, 0xf0, 0x98},
+			expectedOutput: []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 			expectedErr:    nil,
 		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.description, func(t *testing.T) {
-			assert.Equal(t, tc.expectedOutput, Decode(tc.input, tc.inputPrefix))
+
+			res, _, _ := Decode(tc.input, tc.inputPrefix)
+			assert.Equal(t, tc.expectedOutput, res)
 		})
 	}
 }
@@ -199,11 +194,25 @@ func TestDecodeSeed(t *testing.T) {
 		expectedErr       error
 	}{
 		{
-			description:       "successful decode",
+			description:       "successful decode - ED25519",
 			input:             "E2GEWzC8MMH3E2wKHAGWdVrTbtcWC",
-			expectedOutput:    []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xcc, 0xf9, 0x3e, 0xfc},
+			expectedOutput:    []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 			expectedAlgorithm: ED25519,
 			expectedErr:       nil,
+		},
+		{
+			description:       "successful decode - SECP256K1",
+			input:             "zh5iEuYTaHW4JwgCadsVQRmsfzUB",
+			expectedOutput:    []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			expectedAlgorithm: SECP256K1,
+			expectedErr:       nil,
+		},
+		{
+			description:       "unsuccessful decode - invalid seed",
+			input:             "yurt",
+			expectedOutput:    nil,
+			expectedAlgorithm: 0,
+			expectedErr:       errors.New("invalid seed; could not determine encoding algorithm"),
 		},
 	}
 
