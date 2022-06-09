@@ -139,10 +139,10 @@ func EncodeSeed(entropy []byte, encodingType CryptoAlgorithm) (string, error) {
 
 	switch encodingType {
 	case ED25519:
-		prefix := []byte{ED25519Prefix}
+		prefix := []byte{ED25519}
 		return Encode(entropy, prefix, FamilySeedLength), nil
 	case SECP256K1:
-		prefix := []byte{FamilySeedLength}
+		prefix := []byte{SECP256K1}
 		return Encode(entropy, prefix, FamilySeedLength), nil
 	default:
 		return "", errors.New("encoding type must be `ed25519` or `secp256k1`")
@@ -152,18 +152,19 @@ func EncodeSeed(entropy []byte, encodingType CryptoAlgorithm) (string, error) {
 
 func DecodeSeed(seed string) ([]byte, CryptoAlgorithm, error) {
 
-	decodedResult, _, _ := CheckDecode(seed)
+	decodedResult, prefix, err := CheckDecode(seed)
 
-	switch seed[0] {
-	case 122:
+	switch prefix {
 
-		if decodedResult != nil {
-			return decodedResult, SECP256K1, nil
-		}
-	case 69:
+	case ED25519:
 
-		if decodedResult != nil {
+		if err == nil {
 			return decodedResult, ED25519, nil
+		}
+	case SECP256K1:
+
+		if err == nil {
+			return decodedResult, SECP256K1, nil
 		}
 	}
 	return nil, 0, errors.New("invalid seed; could not determine encoding algorithm")
