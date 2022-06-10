@@ -122,37 +122,6 @@ func TestEncodeClassicAddressFromPublicKeyHex(t *testing.T) {
 	}
 }
 
-// func TestEncodeNodePublicKey(t *testing.T) {
-// 	tt := []struct {
-// 		description    string
-// 		input          []byte
-// 		inputPrefix    []byte
-// 		expectedOutput string
-// 		expectedErr    error
-// 	}{
-// 		{
-// 			description:    "successful encode",
-// 			input:          []byte{},
-// 			inputPrefix:    []byte{},
-// 			expectedOutput: "",
-// 			expectedErr:    nil,
-// 		},
-// 	}
-
-// 	for _, tc := range tt {
-// 		t.Run(tc.description, func(t *testing.T) {
-// 			res, err := EncodeNodePublicKey(tc.input, tc.inputPrefix)
-
-// 			if tc.expectedErr != nil {
-// 				assert.EqualError(t, err, tc.expectedErr.Error())
-// 			} else {
-// 				assert.NoError(t, err)
-// 				assert.Equal(t, tc.expectedOutput, res)
-// 			}
-// 		})
-// 	}
-// }
-
 func TestEncodeSeed(t *testing.T) {
 	tt := []struct {
 		description       string
@@ -339,6 +308,79 @@ func TestIsValidClassicAddress(t *testing.T) {
 				assert.False(t, IsValidClassicAddress(tc.input))
 			} else {
 				assert.True(t, IsValidClassicAddress(tc.input))
+			}
+		})
+	}
+}
+
+func TestEncodeNodePublicKey(t *testing.T) {
+	tt := []struct {
+		description     string
+		input           []byte
+		inputTypePrefix []byte
+		expectedOutput  string
+		expectedErr     error
+	}{
+		{
+			description: "successful encode",
+			input:       []byte{0x3, 0x5f, 0x6d, 0xdb, 0xd6, 0xaf, 0xc5, 0xf2, 0xcb, 0x3d, 0x7d, 0x8, 0x0, 0x55, 0x77, 0x58, 0xdc, 0xc9, 0x2a, 0xc5, 0x29, 0x2d, 0x5d, 0x4f, 0x36, 0x68, 0x31, 0x52, 0x69, 0x19, 0x3e, 0x59, 0xea},
+			// inputTypePrefix: []byte{NodePublicKeyPrefix},
+			expectedOutput: "n9MDGCfimuyCmKXUAMcR12rv39PE6PY5YfFpNs75ZjtY3UWt31td",
+			expectedErr:    nil,
+		},
+		{
+			description:     "length error",
+			input:           []byte{0x00},
+			inputTypePrefix: []byte{0x00},
+			expectedOutput:  "",
+			expectedErr:     &EncodeLengthError{Instance: "NodePublicKey", Expected: NodePublicKeyLength, Input: 1},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.description, func(t *testing.T) {
+			res, err := EncodeNodePublicKey(tc.input)
+
+			if tc.expectedErr != nil {
+				assert.EqualError(t, err, tc.expectedErr.Error())
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tc.expectedOutput, res)
+			}
+		})
+	}
+}
+
+func TestDecodeNodePublicKey(t *testing.T) {
+	tt := []struct {
+		description    string
+		input          string
+		expectedOutput []byte
+		expectedErr    error
+	}{
+		{
+			description:    "successful decode",
+			input:          "n9MDGCfimuyCmKXUAMcR12rv39PE6PY5YfFpNs75ZjtY3UWt31td",
+			expectedOutput: []byte{0x3, 0x5f, 0x6d, 0xdb, 0xd6, 0xaf, 0xc5, 0xf2, 0xcb, 0x3d, 0x7d, 0x8, 0x0, 0x55, 0x77, 0x58, 0xdc, 0xc9, 0x2a, 0xc5, 0x29, 0x2d, 0x5d, 0x4f, 0x36, 0x68, 0x31, 0x52, 0x69, 0x19, 0x3e, 0x59, 0xea},
+			expectedErr:    nil,
+		},
+		{
+			description:    "length error",
+			input:          "rfZG9pC1cKF7q96TNZR264H9ykzKCxMyk44ZK8hFL8cNv1G3c8J",
+			expectedOutput: nil,
+			expectedErr:    errors.New("b58string prefix and typeprefix not equal"),
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.description, func(t *testing.T) {
+			res, err := DecodeNodePublicKey(tc.input)
+
+			if tc.expectedErr != nil {
+				assert.EqualError(t, err, tc.expectedErr.Error())
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tc.expectedOutput, res)
 			}
 		})
 	}

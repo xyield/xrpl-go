@@ -163,17 +163,6 @@ func IsValidClassicAddress(cAddress string) bool {
 	return c == nil
 }
 
-// Returns the node public key encoding of the byte slice as a base58 string.
-// Arguments:
-//      b: Byte slice to be encoded.
-//
-// Returns:
-//      The node public key encoding of the byte slice as a base58 string.
-func EncodeNodePublicKey(b []byte) (string, error) {
-
-	return "", nil
-}
-
 // Returns a base58 encoding of a seed.
 // Arguments:
 //      entropy: Entropy bytes of FamilySeedLength.
@@ -236,4 +225,37 @@ func sha256RipeMD160(b []byte) []byte {
 	ripemd160.Write(sha256.Sum(nil))
 
 	return ripemd160.Sum(nil)
+}
+
+// Returns the node public key encoding of the byte slice as a base58 string.
+// Arguments:
+//      b: Byte slice to be encoded.
+//
+// Returns:
+//      The node public key encoding of the byte slice as a base58 string.
+func EncodeNodePublicKey(b []byte) (string, error) {
+
+	if len(b) != NodePublicKeyLength {
+		return "", &EncodeLengthError{Instance: "NodePublicKey", Expected: NodePublicKeyLength, Input: len(b)}
+	}
+
+	pk := Base58CheckEncode(b, NodePublicKeyPrefix)
+
+	return pk, nil
+}
+
+// Returns the decoded node public key encoding as a byte slice from a base58 string.
+// Arguments:
+//      key: base58 string to be decoded.
+//
+// Returns:
+//      The byte slice decoded node public key.
+func DecodeNodePublicKey(key string) ([]byte, error) {
+
+	decodedKey, _, err := Decode(key, []byte{NodePublicKeyPrefix})
+	if err != nil {
+		return nil, err
+	}
+
+	return decodedKey, nil
 }
