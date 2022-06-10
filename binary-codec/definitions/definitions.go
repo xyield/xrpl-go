@@ -70,6 +70,10 @@ func (fi *fieldInstanceMap) CodecDecodeSelf(d *codec.Decoder) {
 	*fi = y
 }
 
+// Loads JSON from the definitions file and converts it to a preferred format.
+// The definitions file contains information required for the XRP Ledger's
+// canonical binary serialization format:
+// `Serialization <https://xrpl.org/serialization.html>`_
 func loadDefinitions() error {
 
 	_, f, _, _ := runtime.Caller(0)
