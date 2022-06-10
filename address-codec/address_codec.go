@@ -239,9 +239,9 @@ func EncodeNodePublicKey(b []byte) (string, error) {
 		return "", &EncodeLengthError{Instance: "NodePublicKey", Expected: NodePublicKeyLength, Input: len(b)}
 	}
 
-	pk := Base58CheckEncode(b, NodePublicKeyPrefix)
+	npk := Base58CheckEncode(b, NodePublicKeyPrefix)
 
-	return pk, nil
+	return npk, nil
 }
 
 // Returns the decoded node public key encoding as a byte slice from a base58 string.
@@ -252,10 +252,43 @@ func EncodeNodePublicKey(b []byte) (string, error) {
 //      The byte slice decoded node public key.
 func DecodeNodePublicKey(key string) ([]byte, error) {
 
-	decodedKey, _, err := Decode(key, []byte{NodePublicKeyPrefix})
+	decodedNodeKey, _, err := Decode(key, []byte{NodePublicKeyPrefix})
 	if err != nil {
 		return nil, err
 	}
 
-	return decodedKey, nil
+	return decodedNodeKey, nil
+}
+
+// Returns the account public key encoding of the byte slice as a base58 string.
+// Arguments:
+//      b: Byte slice to be encoded.
+//
+// Returns:
+//      The account public key encoding of the byte slice as a base58 string.
+func EncodeAccountPublicKey(b []byte) (string, error) {
+
+	if len(b) != AccountPublicKeyLength {
+		return "", &EncodeLengthError{Instance: "AccountPublicKey", Expected: AccountPublicKeyLength, Input: len(b)}
+	}
+
+	apk := Base58CheckEncode(b, AccountPublicKeyPrefix)
+
+	return apk, nil
+}
+
+// Returns the decoded account public key encoding as a byte slice from a base58 string.
+// Arguments:
+//      key: base58 string to be decoded.
+//
+// Returns:
+//      The byte slice decoded account public key.
+func DecodeAccountPublicKey(key string) ([]byte, error) {
+
+	decodedAccountKey, _, err := Decode(key, []byte{AccountPublicKeyPrefix})
+	if err != nil {
+		return nil, err
+	}
+
+	return decodedAccountKey, nil
 }
