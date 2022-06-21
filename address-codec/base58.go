@@ -1,5 +1,3 @@
-// Huge thanks to the btcsuite developers for creating this code, which we adapted for our use in compliance with the Copyfree Initiative.
-// btcsuite base58 repo: https://github.com/btcsuite/btcd/tree/master/btcutil/base58
 package addresscodec
 
 import (
