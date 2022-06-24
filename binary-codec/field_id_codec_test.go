@@ -73,7 +73,7 @@ func TestEncode(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.description, func(t *testing.T) {
-			got, err := Encode(tc.input)
+			got, err := EncodeFieldID(tc.input)
 
 			if tc.expectedErr != nil {
 				assert.EqualError(t, err, tc.expectedErr.Error())
@@ -153,7 +153,7 @@ func TestDecode(t *testing.T) {
 		t.Run(tc.description, func(t *testing.T) {
 			hex := hex.EncodeToString(tc.input)
 			// fmt.Println("hex string:", hex)
-			actual, err := Decode(hex)
+			actual, err := DecodeFieldID(hex)
 			// fmt.Println(actual)
 
 			if tc.expectedErr != nil {

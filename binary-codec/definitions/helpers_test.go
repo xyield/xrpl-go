@@ -328,13 +328,13 @@ func TestGetFieldInstanceByFieldName(t *testing.T) {
 	tt := []struct {
 		description   string
 		input         string
-		expected      *fieldInstance
+		expected      *FieldInstance
 		expectedError error
 	}{
 		{
 			description: "correct FieldInstance",
 			input:       "TransferRate",
-			expected: &fieldInstance{
+			expected: &FieldInstance{
 				FieldName: "TransferRate",
 				fieldInfo: &fieldInfo{
 					Nth:            11,
@@ -347,6 +347,7 @@ func TestGetFieldInstanceByFieldName(t *testing.T) {
 					TypeCode:  2,
 					FieldCode: 11,
 				},
+				Ordinal: 131083,
 			},
 		},
 		{

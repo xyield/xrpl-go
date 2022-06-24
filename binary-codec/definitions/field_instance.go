@@ -1,9 +1,10 @@
 package definitions
 
-type fieldInstance struct {
+type FieldInstance struct {
 	FieldName string
 	*fieldInfo
 	FieldHeader *fieldHeader
+	Ordinal     int32
 }
 
 type fieldInfo struct {
