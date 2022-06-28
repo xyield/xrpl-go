@@ -30,8 +30,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: securego/gosec@master
-    with:
-      args: ./...
+      with:
+        args: ./...
   release:
     needs: [golang-ci, unit-tests, code-quality, security-scanning]
     runs-on: ubuntu-latest
