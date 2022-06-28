@@ -1,0 +1,48 @@
+name: main
+
+on: [push, pull_request]
+jobs:
+  golang-ci:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: golangci-lint
+      uses: golangci/golangci-lint-action@v2
+      with:
+        version: v1.43
+unit-tests:
+  runs-on: ubuntu-latest
+  steps:
+  - uses: actions/checkout@v2
+  - uses: actions/setup-go@v2
+    with:
+      go-version: '1.16'
+  - run: go test ./... -tags=unit
+code-quality:
+  runs-on: ubuntu-latest
+  steps:
+  - uses: actions/checkout@v1
+  - uses: dominikh/staticcheck-action@v1.2.0
+    with:
+      version: "2022.1"
+security-scanning:
+  runs-on: ubuntu-latest
+  steps:
+  - uses: actions/checkout@v2
+  - uses: securego/gosec@master
+  with:
+    args: ./...
+release:
+  needs: [golang-ci, unit-tests, code-quality, security-scanning]
+  runs-on: ubuntu-latest
+  if: ${{github.ref_name == 'main'}}
+  steps:
+  - uses: actions/checkout@master
+  - uses: cycjimmy/semantic-release-action@v3
+    with:
+      semantic_version: 19
+      branch: main
+      extra_plugins: |
+        @semantic-release/changelog
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
