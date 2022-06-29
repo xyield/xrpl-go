@@ -7,7 +7,8 @@ import (
 	"errors"
 	"fmt"
 
-	"golang.org/x/crypto/ripemd160" //lint:ignore SA1019 // ignore this for now //nolint
+	//nolint
+	"golang.org/x/crypto/ripemd160" //lint:ignore SA1019 // ignore this for now
 )
 
 const (
