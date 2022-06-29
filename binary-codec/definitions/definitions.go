@@ -137,8 +137,13 @@ func castFieldInfo(v interface{}) (fieldInfo, error) {
 }
 
 func addFieldHeadersAndOrdinals() {
-	for k, _ := range definitions.Fields {
+	for k := range definitions.Fields {
 		t, _ := definitions.GetTypeCodeByTypeName(definitions.Fields[k].Type)
+
+		// if err != nil {
+		// 	return
+		// }
+
 		if fi, ok := definitions.Fields[k]; ok {
 			fi.FieldHeader = &fieldHeader{
 				TypeCode:  t,
@@ -153,6 +158,11 @@ func createFieldIdNameMap() {
 	definitions.FieldIdNameMap = make(map[fieldHeader]string, len(definitions.Fields))
 	for k := range definitions.Fields {
 		fh, _ := definitions.GetFieldHeaderByFieldName(k)
+
+		// if err != nil {
+		// 	return
+		// }
+
 		definitions.FieldIdNameMap[*fh] = k
 	}
 }

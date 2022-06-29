@@ -36,7 +36,7 @@ func TestGetTypeNameByFieldName(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			got, err := definitions.GetTypeNameByFieldName(test.input)
 			if test.expectedError != nil {
-				assert.Error(t, err, test.expectedError.Error())
+				assert.EqualError(t, err, test.expectedError.Error())
 				assert.Zero(t, got)
 			} else {
 				assert.NoError(t, err)
@@ -84,7 +84,7 @@ func TestGetTypeCodeByTypeName(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			got, err := definitions.GetTypeCodeByTypeName(test.input)
 			if test.expectedError != nil {
-				assert.Error(t, err, test.expectedError.Error())
+				assert.EqualError(t, err, test.expectedError.Error())
 				assert.Zero(t, got)
 			} else {
 				assert.NoError(t, err)
@@ -131,7 +131,7 @@ func TestGetTypeCodeByFieldName(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			got, err := definitions.GetTypeCodeByFieldName(test.input)
 			if test.expectedError != nil {
-				assert.Error(t, err, test.expectedError.Error())
+				assert.EqualError(t, err, test.expectedError.Error())
 				assert.Zero(t, got)
 			} else {
 				assert.NoError(t, err)
@@ -171,7 +171,7 @@ func TestGetFieldCodeByFieldName(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			got, err := definitions.GetFieldCodeByFieldName(test.input)
 			if test.expectedError != nil {
-				assert.Error(t, err, test.expectedError.Error())
+				assert.EqualError(t, err, test.expectedError.Error())
 				assert.Zero(t, got)
 			} else {
 				assert.NoError(t, err)
@@ -213,7 +213,7 @@ func TestGetFieldHeaderByFieldName(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			got, err := definitions.GetFieldHeaderByFieldName(test.input)
 			if test.expectedError != nil {
-				assert.Error(t, err, test.expectedError.Error())
+				assert.EqualError(t, err, test.expectedError.Error())
 				assert.Nil(t, got)
 			} else {
 				assert.NoError(t, err)
@@ -313,7 +313,7 @@ func TestGetFieldInfoByFieldName(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			got, err := definitions.GetFieldInfoByFieldName(test.input)
 			if test.expectedError != nil {
-				assert.Error(t, err, test.expectedError.Error())
+				assert.EqualError(t, err, test.expectedError.Error())
 				assert.Nil(t, got)
 			} else {
 				assert.NoError(t, err)
@@ -366,7 +366,7 @@ func TestGetFieldInstanceByFieldName(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			got, err := definitions.GetFieldInstanceByFieldName(test.input)
 			if test.expectedError != nil {
-				assert.Error(t, err, test.expectedError.Error())
+				assert.EqualError(t, err, test.expectedError.Error())
 				assert.Nil(t, got)
 			} else {
 				assert.NoError(t, err)
@@ -404,7 +404,7 @@ func TestGetTransactionTypeCodeByTransactionTypeName(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			got, err := definitions.GetTransactionTypeCodeByTransactionTypeName(test.input)
 			if test.expectedError != nil {
-				assert.Error(t, err, test.expectedError.Error())
+				assert.EqualError(t, err, test.expectedError.Error())
 				assert.Zero(t, got)
 			} else {
 				assert.NoError(t, err)
@@ -442,7 +442,7 @@ func TestGetTransactionTypeNameByTransactionTypeCode(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			got, err := definitions.GetTransactionTypeNameByTransactionTypeCode(test.input)
 			if test.expectedError != nil {
-				assert.Error(t, err, test.expectedError.Error())
+				assert.EqualError(t, err, test.expectedError.Error())
 				assert.Zero(t, got)
 			} else {
 				assert.NoError(t, err)
@@ -480,7 +480,7 @@ func TestGetTransactionResultNameByTransactionResultTypeCode(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			got, err := definitions.GetTransactionResultNameByTransactionResultTypeCode(test.input)
 			if test.expectedError != nil {
-				assert.Error(t, err, test.expectedError.Error())
+				assert.EqualError(t, err, test.expectedError.Error())
 				assert.Zero(t, got)
 			} else {
 				assert.NoError(t, err)
@@ -518,7 +518,7 @@ func TestGetTransactionResultTypeCodeByTransactionResultName(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			got, err := definitions.GetTransactionResultTypeCodeByTransactionResultName(test.input)
 			if test.expectedError != nil {
-				assert.Error(t, err, test.expectedError.Error())
+				assert.EqualError(t, err, test.expectedError.Error())
 				assert.Zero(t, got)
 			} else {
 				assert.NoError(t, err)
@@ -556,7 +556,7 @@ func TestGetLedgerEntryTypeCodeByLedgerEntryTypeName(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			got, err := definitions.GetLedgerEntryTypeCodeByLedgerEntryTypeName(test.input)
 			if test.expectedError != nil {
-				assert.Error(t, err, test.expectedError.Error())
+				assert.EqualError(t, err, test.expectedError.Error())
 				assert.Zero(t, got)
 			} else {
 				assert.NoError(t, err)
@@ -595,7 +595,7 @@ func TestGetLedgerEntryTypeNameByLedgerEntryTypeCode(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			got, err := definitions.GetLedgerEntryTypeNameByLedgerEntryTypeCode(test.input)
 			if test.expectedError != nil {
-				assert.Error(t, err, test.expectedError.Error())
+				assert.EqualError(t, err, test.expectedError.Error())
 				assert.Zero(t, got)
 			} else {
 				assert.NoError(t, err)
