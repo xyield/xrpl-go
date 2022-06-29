@@ -4,97 +4,179 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
-	"hash"
 
 	"golang.org/x/crypto/ripemd160"
 )
 
 const (
+	// Lengths in bytes
 	AccountAddressLength   = 20
 	AccountPublicKeyLength = 33
 	FamilySeedLength       = 16
 	NodePublicKeyLength    = 33
 
-	AccountAddressPrefix   = 0x00
+	// Account/classic address prefix - value is 0
+	AccountAddressPrefix = 0x00
+	// Account public key prefix - value is 35
 	AccountPublicKeyPrefix = 0x23
-	FamilySeedPrefix       = 0x21
-	NodePublicKeyPrefix    = 0x1C
-
-	ED25519Prefix          = 0xED
-	ED25519PrefixHexString = "ED" //hex prefix for 32 byte ED25519 hex strings, to make length 33 bytes after decoding
+	// Family seed prefix - value is 33
+	FamilySeedPrefix = 0x21
+	// Node/validation public key prefix - value is 28
+	NodePublicKeyPrefix = 0x1C
+	// ED25519 prefix - value is 237
+	ED25519Prefix = 0xED
 )
+
+type CryptoAlgorithm uint8
+
+const (
+	Undefined CryptoAlgorithm = iota
+	ED25519                   = ED25519Prefix
+	SECP256K1                 = FamilySeedPrefix
+)
+
+func (c CryptoAlgorithm) String() string {
+	switch c {
+	case ED25519:
+		return "ed25519"
+	case SECP256K1:
+		return "secp256k1"
+	}
+	return "unknown"
+}
 
 type EncodeLengthError struct {
 	Instance string
 	Input    int
+	Expected int
 }
 
 func (e *EncodeLengthError) Error() string {
-	return fmt.Sprintf("%v length should be %v", e.Instance, e.Input)
+	return fmt.Sprintf("`%v` length should be %v not %v", e.Instance, e.Expected, e.Input)
 }
 
+type InvalidClassicAddressError struct {
+	Input string
+}
+
+func (e *InvalidClassicAddressError) Error() string {
+	return fmt.Sprintf("`%v` is an invalid classic address", e.Input)
+}
+
+// Returns the base58 encoding of byte slice, with the given type prefix, whilst ensuring that the byte slice is the expected length.
+func Encode(b []byte, typePrefix []byte, expectedLength int) string {
+
+	if len(b) != expectedLength {
+		return ""
+	}
+
+	return Base58CheckEncode(b, typePrefix[0])
+}
+
+// Returns the byte slice decoding of the base58-encoded string and prefix.
+func Decode(b58string string, typePrefix []byte) ([]byte, byte, error) {
+
+	prefixLength := len(typePrefix)
+
+	if !bytes.Equal(DecodeBase58(b58string)[:prefixLength], typePrefix) {
+		return nil, 0, errors.New("b58string prefix and typeprefix not equal")
+	}
+
+	return Base58CheckDecode(b58string)
+}
+
+// Returns the classic address from public key hex string.
 func EncodeClassicAddressFromPublicKeyHex(pubkeyhex string, typePrefix []byte) (string, error) {
 
-	pubkey, _ := hex.DecodeString(pubkeyhex)
+	if len(typePrefix) != 1 {
+		return "", &EncodeLengthError{Instance: "TypePrefix", Expected: 1, Input: len(typePrefix)}
+	}
+
+	pubkey, err := hex.DecodeString(pubkeyhex)
 
 	if len(pubkey) != AccountPublicKeyLength {
-		return "", &EncodeLengthError{Instance: "PublicKey", Input: AccountPublicKeyLength}
+		pubkey = append([]byte{ED25519Prefix}, pubkey...)
+	}
+
+	if err != nil {
+		return "", &EncodeLengthError{Instance: "PublicKey", Expected: AccountPublicKeyLength, Input: len(pubkey)}
 	}
 
 	accountID := sha256RipeMD160(pubkey)
 
 	if len(accountID) != AccountAddressLength {
-		return "", &EncodeLengthError{Instance: "AccountID", Input: AccountAddressLength}
+		return "", &EncodeLengthError{Instance: "AccountID", Expected: AccountAddressLength, Input: len(accountID)}
 	}
 
-	payload := append(typePrefix, accountID...)
+	address := Base58CheckEncode(accountID, AccountAddressPrefix)
 
-	if len(payload) != 21 {
-		return "", &EncodeLengthError{Instance: "Payload", Input: 21}
-	}
-
-	checkSum := createCheckSum(payload)[:4]
-
-	if len(checkSum) != 4 {
-		return "", &EncodeLengthError{Instance: "CheckSum", Input: 4}
-	}
-
-	address := EncodeBase58((append(payload, checkSum...)))
-
-	if len(address) != 34 { //can they be different lengths?
-		return "", &EncodeLengthError{Instance: "Address", Input: 34}
-	}
-
-	if !bytes.Equal(accountID, DecodeBase58(address)[1:21]) {
-		return "", &EncodeLengthError{Instance: "DecodedAddress", Input: 20}
+	if !IsValidClassicAddress(address) {
+		return "", &InvalidClassicAddressError{Input: address}
 	}
 
 	return address, nil
 }
 
+// Returns the decoded 'accountID' byte slice of the classic address.
 func DecodeClassicAddressToAccountID(cAddress string) (typePrefix, accountID []byte, err error) {
 
-	if len(DecodeBase58(cAddress)[1:21]) != AccountAddressLength {
-		return nil, nil, &EncodeLengthError{Instance: "DecodedAddress", Input: 20}
+	if len(DecodeBase58(cAddress)) != 25 {
+		return nil, nil, &InvalidClassicAddressError{Input: cAddress}
 	}
 
 	return DecodeBase58(cAddress)[:1], DecodeBase58(cAddress)[1:21], nil
 
 }
 
-func EncodeNodePublicKey(pubkeyhex string, typePrefix []byte) (string, error) {
-	return "", nil
+func IsValidClassicAddress(cAddress string) bool {
+	_, _, c := DecodeClassicAddressToAccountID(cAddress)
+
+	return c == nil
 }
 
-func EncodeSeed(entropy string, versionType hash.Hash) (string, error) {
-	return "", nil
+// Returns a base58 encoding of a seed.
+func EncodeSeed(entropy []byte, encodingType CryptoAlgorithm) (string, error) {
+
+	if len(entropy) != FamilySeedLength {
+		return "", &EncodeLengthError{Instance: "Entropy", Input: len(entropy), Expected: FamilySeedLength}
+	}
+
+	switch encodingType {
+	case ED25519:
+		prefix := []byte{ED25519}
+		return Encode(entropy, prefix, FamilySeedLength), nil
+	case SECP256K1:
+		prefix := []byte{SECP256K1}
+		return Encode(entropy, prefix, FamilySeedLength), nil
+	default:
+		return "", errors.New("encoding type must be `ed25519` or `secp256k1`")
+	}
+
 }
 
-func DecodeSeed(seed string) (string, error) {
-	return "", nil
+// Returns decoded seed and its algorithm.
+func DecodeSeed(seed string) ([]byte, CryptoAlgorithm, error) {
+
+	entropy, prefix, err := Base58CheckDecode(seed)
+
+	switch prefix {
+
+	case ED25519:
+		if err == nil {
+			return entropy, ED25519, nil
+		}
+	case SECP256K1:
+		if err == nil {
+			return entropy, SECP256K1, nil
+		}
+	}
+	return nil, 0, errors.New("invalid seed; could not determine encoding algorithm")
 }
 
+// Returns byte slice of a double hashed given byte slice.
+// The given byte slice is SHA256 hashed, then the result is RIPEMD160 hashed.
 func sha256RipeMD160(b []byte) []byte {
 	sha256 := sha256.New()
 	sha256.Write(b)
@@ -105,13 +187,48 @@ func sha256RipeMD160(b []byte) []byte {
 	return ripemd160.Sum(nil)
 }
 
-func createCheckSum(b []byte) []byte {
-	sha256 := sha256.New()
-	sha256.Write(b)
+// Returns the node public key encoding of the byte slice as a base58 string.
+func EncodeNodePublicKey(b []byte) (string, error) {
 
-	sha256sha256 := sha256.Sum(nil)
-	sha256.Reset()
-	sha256.Write(sha256sha256)
+	if len(b) != NodePublicKeyLength {
+		return "", &EncodeLengthError{Instance: "NodePublicKey", Expected: NodePublicKeyLength, Input: len(b)}
+	}
 
-	return sha256.Sum(nil)
+	npk := Base58CheckEncode(b, NodePublicKeyPrefix)
+
+	return npk, nil
+}
+
+// Returns the decoded node public key encoding as a byte slice from a base58 string.
+func DecodeNodePublicKey(key string) ([]byte, error) {
+
+	decodedNodeKey, _, err := Decode(key, []byte{NodePublicKeyPrefix})
+	if err != nil {
+		return nil, err
+	}
+
+	return decodedNodeKey, nil
+}
+
+// Returns the account public key encoding of the byte slice as a base58 string.
+func EncodeAccountPublicKey(b []byte) (string, error) {
+
+	if len(b) != AccountPublicKeyLength {
+		return "", &EncodeLengthError{Instance: "AccountPublicKey", Expected: AccountPublicKeyLength, Input: len(b)}
+	}
+
+	apk := Base58CheckEncode(b, AccountPublicKeyPrefix)
+
+	return apk, nil
+}
+
+// Returns the decoded account public key encoding as a byte slice from a base58 string.
+func DecodeAccountPublicKey(key string) ([]byte, error) {
+
+	decodedAccountKey, _, err := Decode(key, []byte{AccountPublicKeyPrefix})
+	if err != nil {
+		return nil, err
+	}
+
+	return decodedAccountKey, nil
 }

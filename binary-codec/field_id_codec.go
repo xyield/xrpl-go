@@ -6,6 +6,9 @@ import (
 	"github.com/xyield/xrpl-go/binary-codec/definitions"
 )
 
+// Returns the unique field ID for a given field name.
+// This field ID consists of the type code and field code, in 1 to 3 bytes
+// depending on whether those values are "common" (<16) or "uncommon" (>16).
 func Encode(fieldName string) ([]byte, error) {
 	fh, err := definitions.Get().GetFieldHeaderByFieldName(fieldName)
 	if err != nil {
@@ -27,6 +30,7 @@ func Encode(fieldName string) ([]byte, error) {
 	return nil, nil
 }
 
+// Returns the field name represented by the given field ID in hex string form.
 func Decode(h string) (string, error) {
 	b, err := hex.DecodeString(h)
 	if err != nil {
