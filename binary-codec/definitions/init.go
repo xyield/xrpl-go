@@ -1,5 +1,8 @@
 package definitions
 
 func init() {
-	loadDefinitions()
+	err := loadDefinitions()
+	if err != nil {
+		return
+	}
 }
