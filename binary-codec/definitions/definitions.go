@@ -78,7 +78,7 @@ func loadDefinitions() error {
 
 	_, f, _, _ := runtime.Caller(0)
 	wd := path.Dir(f)
-	docBytes, err := ioutil.ReadFile(wd + "/definitions.json")
+	docBytes, err := ioutil.ReadFile(wd + "/definitions.json") // #nosec G402
 	if err != nil {
 		return err
 	}
