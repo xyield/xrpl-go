@@ -11,7 +11,7 @@ import (
 	"github.com/xyield/xrpl-go/binary-codec/definitions"
 )
 
-func TestEncode(t *testing.T) {
+func TestEncodeFieldID(t *testing.T) {
 	tt := []struct {
 		description string
 		input       string
@@ -22,6 +22,12 @@ func TestEncode(t *testing.T) {
 			description: "Type Code and Field Code < 16",
 			input:       "Sequence",
 			expected:    []byte{36},
+			expectedErr: nil,
+		},
+		{
+			description: "Additional Type Code and Field Code < 16",
+			input:       "Flags",
+			expected:    []byte{34},
 			expectedErr: nil,
 		},
 		{
@@ -89,7 +95,7 @@ func TestEncode(t *testing.T) {
 	}
 }
 
-func TestDecode(t *testing.T) {
+func TestDecodeFieldID(t *testing.T) {
 	tt := []struct {
 		description string
 		input       []byte
