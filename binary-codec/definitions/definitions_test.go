@@ -52,11 +52,11 @@ func TestLoadDefinitions(t *testing.T) {
 // 		})
 // 	}
 // }
-func BenchmarkLoadDefinitions(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		loadDefinitions()
-	}
-}
+// func BenchmarkLoadDefinitions(b *testing.B) {
+// 	for i := 0; i < b.N; i++ {
+// 		loadDefinitions()
+// 	}
+// }
 
 func TestConvertIntToBytes(t *testing.T) {
 	tt := []struct {
