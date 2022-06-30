@@ -10,7 +10,7 @@ import (
 	"github.com/xyield/xrpl-go/binary-codec/definitions"
 )
 
-func Encode(json map[string]any) (string, error) {
+func Encode(json map[string]interface{}) (string, error) {
 
 	fimap, err := createFieldInstanceMapFromJson(json)
 
@@ -66,9 +66,9 @@ func Encode(json map[string]any) (string, error) {
 
 //lint:ignore U1000 // ignore this for now
 //nolint
-func createFieldInstanceMapFromJson(json map[string]any) (map[definitions.FieldInstance]any, error) {
+func createFieldInstanceMapFromJson(json map[string]interface{}) (map[definitions.FieldInstance]any, error) {
 
-	m := make(map[definitions.FieldInstance]any, len(json))
+	m := make(map[definitions.FieldInstance]interface{}, len(json))
 
 	for k, v := range json {
 		fi, err := definitions.Get().GetFieldInstanceByFieldName(k)
@@ -86,7 +86,7 @@ func createFieldInstanceMapFromJson(json map[string]any) (map[definitions.FieldI
 
 //lint:ignore U1000 // ignore this for now
 //nolint
-func getSortedKeys(m map[definitions.FieldInstance]any) []definitions.FieldInstance {
+func getSortedKeys(m map[definitions.FieldInstance]interface{}) []definitions.FieldInstance {
 	keys := make([]definitions.FieldInstance, 0, len(m))
 
 	for k := range m {
