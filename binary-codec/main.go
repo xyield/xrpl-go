@@ -66,7 +66,7 @@ func Encode(json map[string]interface{}) (string, error) {
 
 //lint:ignore U1000 // ignore this for now
 //nolint
-func createFieldInstanceMapFromJson(json map[string]interface{}) (map[definitions.FieldInstance]any, error) {
+func createFieldInstanceMapFromJson(json map[string]interface{}) (map[definitions.FieldInstance]interface{}, error) {
 
 	m := make(map[definitions.FieldInstance]interface{}, len(json))
 
