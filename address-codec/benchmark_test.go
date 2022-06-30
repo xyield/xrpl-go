@@ -2,6 +2,7 @@ package addresscodec
 
 import "testing"
 
+//nolint
 func BenchmarkEncodeBase58(b *testing.B) {
 	tt := []struct {
 		description string
@@ -22,6 +23,7 @@ func BenchmarkEncodeBase58(b *testing.B) {
 	}
 }
 
+//nolint
 func BenchmarkDecodeBase58(b *testing.B) {
 
 	tt := []struct {
@@ -43,6 +45,7 @@ func BenchmarkDecodeBase58(b *testing.B) {
 	}
 }
 
+//nolint
 func BenchmarkEncodeClassicAddressFromPublicKeyHex(b *testing.B) {
 
 	tt := []struct {
@@ -77,6 +80,7 @@ func BenchmarkEncodeClassicAddressFromPublicKeyHex(b *testing.B) {
 
 }
 
+//nolint
 func BenchmarkDecodeClassicAddressToAccountID(b *testing.B) {
 	tt := []struct {
 		description string

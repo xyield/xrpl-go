@@ -1,3 +1,6 @@
+//go:build unit
+// +build unit
+
 package binarycodec
 
 import (
@@ -8,7 +11,7 @@ import (
 	"github.com/xyield/xrpl-go/binary-codec/definitions"
 )
 
-func TestEncode(t *testing.T) {
+func TestEncodeFieldID(t *testing.T) {
 	tt := []struct {
 		description string
 		input       string
@@ -19,6 +22,12 @@ func TestEncode(t *testing.T) {
 			description: "Type Code and Field Code < 16",
 			input:       "Sequence",
 			expected:    []byte{36},
+			expectedErr: nil,
+		},
+		{
+			description: "Additional Type Code and Field Code < 16",
+			input:       "Flags",
+			expected:    []byte{34},
 			expectedErr: nil,
 		},
 		{
@@ -73,7 +82,7 @@ func TestEncode(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.description, func(t *testing.T) {
-			got, err := Encode(tc.input)
+			got, err := EncodeFieldID(tc.input)
 
 			if tc.expectedErr != nil {
 				assert.EqualError(t, err, tc.expectedErr.Error())
@@ -86,7 +95,7 @@ func TestEncode(t *testing.T) {
 	}
 }
 
-func TestDecode(t *testing.T) {
+func TestDecodeFieldID(t *testing.T) {
 	tt := []struct {
 		description string
 		input       []byte
@@ -153,7 +162,7 @@ func TestDecode(t *testing.T) {
 		t.Run(tc.description, func(t *testing.T) {
 			hex := hex.EncodeToString(tc.input)
 			// fmt.Println("hex string:", hex)
-			actual, err := Decode(hex)
+			actual, err := DecodeFieldID(hex)
 			// fmt.Println(actual)
 
 			if tc.expectedErr != nil {

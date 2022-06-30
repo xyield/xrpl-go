@@ -99,7 +99,7 @@ func (d *Definitions) GetFieldInfoByFieldName(n string) (*fieldInfo, error) {
 }
 
 // Returns the field instance struct associated with the given field name.
-func (d *Definitions) GetFieldInstanceByFieldName(n string) (*fieldInstance, error) {
+func (d *Definitions) GetFieldInstanceByFieldName(n string) (*FieldInstance, error) {
 
 	fi, ok := d.Fields[n]
 

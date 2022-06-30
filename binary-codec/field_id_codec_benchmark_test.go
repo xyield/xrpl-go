@@ -6,6 +6,7 @@ import (
 	"testing"
 )
 
+//nolint
 func BenchmarkEncode(b *testing.B) {
 
 	tt := []struct {
@@ -22,12 +23,13 @@ func BenchmarkEncode(b *testing.B) {
 	for _, test := range tt {
 		b.Run(fmt.Sprintf("input_name_%v", test.input), func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				Encode(test.input)
+				EncodeFieldID(test.input)
 			}
 		})
 	}
 }
 
+//nolint
 func BenchmarkDecode(b *testing.B) {
 
 	tt := []struct {
@@ -45,7 +47,7 @@ func BenchmarkDecode(b *testing.B) {
 		b.Run(fmt.Sprintf("input_name_%v", test.input), func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				hex := hex.EncodeToString(test.input)
-				Decode(hex)
+				DecodeFieldID(hex)
 			}
 		})
 	}

@@ -1,16 +1,17 @@
 package definitions
 
 import (
+	_ "embed"
 	"errors"
 	"fmt"
-	"io/ioutil"
-	"path"
-	"runtime"
 
 	"github.com/ugorji/go/codec"
 )
 
 var definitions *Definitions
+
+//go:embed definitions.json
+var docBytes []byte
 
 func Get() *Definitions {
 	return definitions
@@ -59,7 +60,7 @@ type definitionsDoc struct {
 	TransactionTypes   map[string]int32 `json:"TRANSACTION_TYPES"`
 }
 
-type fieldInstanceMap map[string]*fieldInstance
+type fieldInstanceMap map[string]*FieldInstance
 
 func (fi *fieldInstanceMap) CodecEncodeSelf(e *codec.Encoder) {}
 
@@ -76,13 +77,6 @@ func (fi *fieldInstanceMap) CodecDecodeSelf(d *codec.Decoder) {
 // `Serialization <https://xrpl.org/serialization.html>`_
 func loadDefinitions() error {
 
-	_, f, _, _ := runtime.Caller(0)
-	wd := path.Dir(f)
-	docBytes, err := ioutil.ReadFile(wd + "/definitions.json")
-	if err != nil {
-		return err
-	}
-
 	var jh codec.JsonHandle
 
 	jh.MapKeyAsString = true
@@ -90,7 +84,7 @@ func loadDefinitions() error {
 
 	dec := codec.NewDecoderBytes(docBytes, &jh)
 	var data definitionsDoc
-	err = dec.Decode(&data)
+	err := dec.Decode(&data)
 	if err != nil {
 		return err
 	}
@@ -102,21 +96,22 @@ func loadDefinitions() error {
 		TransactionTypes:   data.TransactionTypes,
 	}
 
-	addFieldHeaders()
+	addFieldHeadersAndOrdinals()
 	createFieldIdNameMap()
 
 	return nil
 }
 
-func convertToFieldInstanceMap(m [][]interface{}) map[string]*fieldInstance {
-	nm := make(map[string]*fieldInstance, len(m))
+func convertToFieldInstanceMap(m [][]interface{}) map[string]*FieldInstance {
+	nm := make(map[string]*FieldInstance, len(m))
 
 	for _, j := range m {
 		k := j[0].(string)
 		fi, _ := castFieldInfo(j[1])
-		nm[k] = &fieldInstance{
+		nm[k] = &FieldInstance{
 			FieldName: k,
 			fieldInfo: &fi,
+			Ordinal:   fi.Nth,
 		}
 	}
 	return nm
@@ -135,14 +130,16 @@ func castFieldInfo(v interface{}) (fieldInfo, error) {
 	return fieldInfo{}, errors.New("unable to cast to field info")
 }
 
-func addFieldHeaders() {
-	for k, _ := range definitions.Fields {
+func addFieldHeadersAndOrdinals() {
+	for k := range definitions.Fields {
 		t, _ := definitions.GetTypeCodeByTypeName(definitions.Fields[k].Type)
+
 		if fi, ok := definitions.Fields[k]; ok {
 			fi.FieldHeader = &fieldHeader{
 				TypeCode:  t,
 				FieldCode: definitions.Fields[k].Nth,
 			}
+			fi.Ordinal = (t<<16 | definitions.Fields[k].Nth)
 		}
 	}
 }
@@ -151,6 +148,7 @@ func createFieldIdNameMap() {
 	definitions.FieldIdNameMap = make(map[fieldHeader]string, len(definitions.Fields))
 	for k := range definitions.Fields {
 		fh, _ := definitions.GetFieldHeaderByFieldName(k)
+
 		definitions.FieldIdNameMap[*fh] = k
 	}
 }

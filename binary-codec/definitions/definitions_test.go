@@ -26,8 +26,34 @@ func TestLoadDefinitions(t *testing.T) {
 	assert.Equal(t, "Sequence", definitions.FieldIdNameMap[fieldHeader{TypeCode: 2, FieldCode: 4}])
 	assert.Equal(t, "OfferSequence", definitions.FieldIdNameMap[fieldHeader{TypeCode: 2, FieldCode: 25}])
 	assert.Equal(t, "NFTokenSellOffer", definitions.FieldIdNameMap[fieldHeader{TypeCode: 5, FieldCode: 29}])
+	assert.Equal(t, int32(131076), definitions.Fields["Sequence"].Ordinal)
+	assert.Equal(t, int32(131097), definitions.Fields["OfferSequence"].Ordinal)
 }
 
+// Helper functions to create and test ordinals.
+// func CreateOrdinal(fh fieldHeader) int32 {
+// 	return fh.TypeCode<<16 | fh.FieldCode
+// }
+
+// func TestCreateOrdinal(t *testing.T) {
+// 	tt := []struct {
+// 		description string
+// 		input       fieldHeader
+// 	}{
+// 		{
+// 			description: "test ordinal creation",
+// 			input:       fieldHeader{TypeCode: 2, FieldCode: 25},
+// 		},
+// 	}
+
+// 	for _, tc := range tt {
+// 		t.Run(tc.description, func(t *testing.T) {
+// 			fmt.Println("Ordinal:", CreateOrdinal(tc.input))
+// 		})
+// 	}
+// }
+
+//nolint
 func BenchmarkLoadDefinitions(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		loadDefinitions()
