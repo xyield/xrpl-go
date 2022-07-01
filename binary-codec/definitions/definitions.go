@@ -1,16 +1,17 @@
 package definitions
 
 import (
+	_ "embed"
 	"errors"
 	"fmt"
-	"io/ioutil"
-	"path"
-	"runtime"
 
 	"github.com/ugorji/go/codec"
 )
 
 var definitions *Definitions
+
+//go:embed definitions.json
+var docBytes []byte
 
 func Get() *Definitions {
 	return definitions
@@ -76,13 +77,6 @@ func (fi *fieldInstanceMap) CodecDecodeSelf(d *codec.Decoder) {
 // `Serialization <https://xrpl.org/serialization.html>`_
 func loadDefinitions() error {
 
-	_, f, _, _ := runtime.Caller(0)
-	wd := path.Dir(f)
-	docBytes, err := ioutil.ReadFile(wd + "/definitions.json") // #nosec G304
-	if err != nil {
-		return err
-	}
-
 	var jh codec.JsonHandle
 
 	jh.MapKeyAsString = true
@@ -90,7 +84,7 @@ func loadDefinitions() error {
 
 	dec := codec.NewDecoderBytes(docBytes, &jh)
 	var data definitionsDoc
-	err = dec.Decode(&data)
+	err := dec.Decode(&data)
 	if err != nil {
 		return err
 	}
