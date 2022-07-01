@@ -257,12 +257,12 @@ func TestEncode(t *testing.T) {
 			output:      "24001abed8",
 			expectedErr: nil,
 		},
-		{
-			description: "test Flags from successfully signed tx 2",
-			input:       map[string]any{"Flags": 2147483648},
-			output:      "2280000000",
-			expectedErr: nil,
-		},
+		// {
+		// 	description: "test Flags from successfully signed tx 2",
+		// 	input:       map[string]any{"Flags": 2147483648},
+		// 	output:      "2280000000",
+		// 	expectedErr: nil,
+		// },
 		// {
 		// 	description: "test Sequence from successfully signed tx 2",
 		// 	input:       map[string]any{"Sequence": 1},
