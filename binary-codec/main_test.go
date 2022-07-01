@@ -119,6 +119,7 @@ func TestGetSortedKeys(t *testing.T) {
 func TestEncode(t *testing.T) {
 	tt := []struct {
 		description string
+		fromTx      string
 		input       map[string]any
 		output      string
 		expectedErr error
@@ -234,65 +235,75 @@ func TestEncode(t *testing.T) {
 		// 	expectedErr: nil,
 		// },
 		{
-			description: "test Flags from successfully signed tx 1",
+			description: "serialize Flags from successfully signed tx 1",
+			fromTx:      Tx1,
 			input:       map[string]any{"Flags": 524288},
 			output:      "2200080000",
 			expectedErr: nil,
 		},
 		{
-			description: "test Expiration from successfully signed tx 1",
+			description: "serialize Expiration from successfully signed tx 1",
+			fromTx:      Tx1,
 			input:       map[string]any{"Expiration": 595640108},
 			output:      "2a2380bf2c",
 			expectedErr: nil,
 		},
 		{
-			description: "test OfferSequence from successfully signed tx 1",
+			description: "serialize OfferSequence from successfully signed tx 1",
+			fromTx:      Tx1,
 			input:       map[string]any{"OfferSequence": 1752791},
 			output:      "2019001abed7",
 			expectedErr: nil,
 		},
 		{
-			description: "test Sequence from successfully signed tx 1",
+			description: "serialize Sequence from successfully signed tx 1",
+			fromTx:      Tx1,
 			input:       map[string]any{"Sequence": 1752792},
 			output:      "24001abed8",
 			expectedErr: nil,
 		},
-		// {
-		// 	description: "test Flags from successfully signed tx 2",
-		// 	input:       map[string]any{"Flags": 2147483648},
-		// 	output:      "2280000000",
-		// 	expectedErr: nil,
-		// },
-		// {
-		// 	description: "test Sequence from successfully signed tx 2",
-		// 	input:       map[string]any{"Sequence": 1},
-		// 	output:      "2400000001",
-		// 	expectedErr: nil,
-		// },
-		// {
-		// 	description: "test OfferSequence from successfully signed tx 2",
-		// 	input:       map[string]any{"OfferSequence": 11},
-		// 	output:      "20190000000b",
-		// 	expectedErr: nil,
-		// },
-		// {
-		// 	description: "test Flags from successfully signed tx 3",
-		// 	input:       map[string]any{"Flags": 0},
-		// 	output:      "2200000000",
-		// 	expectedErr: nil,
-		// },
-		// {
-		// 	description: "test LastLedgerSequence from successfully signed tx 3",
-		// 	input:       map[string]any{"LastLedgerSequence": 9902014},
-		// 	output:      "201b009717be",
-		// 	expectedErr: nil,
-		// },
-		// {
-		// 	description: "test Sequence from successfully signed tx 3",
-		// 	input:       map[string]any{"Sequence": 842},
-		// 	output:      "240000034a",
-		// 	expectedErr: nil,
-		// },
+		{
+			description: "serialize Flags from successfully signed tx 2",
+			fromTx:      Tx2,
+			input:       map[string]any{"Flags": 2147483648},
+			output:      "2280000000",
+			expectedErr: nil,
+		},
+		{
+			description: "serialize Sequence from successfully signed tx 2",
+			fromTx:      Tx2,
+			input:       map[string]any{"Sequence": 1},
+			output:      "2400000001",
+			expectedErr: nil,
+		},
+		{
+			description: "serialize OfferSequence from successfully signed tx 2",
+			fromTx:      Tx2,
+			input:       map[string]any{"OfferSequence": 11},
+			output:      "20190000000b",
+			expectedErr: nil,
+		},
+		{
+			description: "serialize Flags from successfully signed tx 3",
+			fromTx:      Tx3,
+			input:       map[string]any{"Flags": 0},
+			output:      "2200000000",
+			expectedErr: nil,
+		},
+		{
+			description: "serialize LastLedgerSequence from successfully signed tx 3",
+			fromTx:      Tx3,
+			input:       map[string]any{"LastLedgerSequence": 9902014},
+			output:      "201b009717be",
+			expectedErr: nil,
+		},
+		{
+			description: "serialize Sequence from successfully signed tx 3",
+			fromTx:      Tx3,
+			input:       map[string]any{"Sequence": 842},
+			output:      "240000034a",
+			expectedErr: nil,
+		},
 	}
 
 	for _, tc := range tt {
@@ -305,10 +316,16 @@ func TestEncode(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.output, got)
-				if !assert.Contains(t, Tx1, strings.ToUpper(got)) {
-					assert.Contains(t, Tx2, strings.ToUpper(got))
+			}
 
-				}
+			// checks if serialized elements from example transactions Json are present in full transaction binary result
+			switch tc.fromTx {
+			case Tx1:
+				assert.Contains(t, Tx1, strings.ToUpper(got))
+			case Tx2:
+				assert.Contains(t, Tx2, strings.ToUpper(got))
+			default:
+				assert.Contains(t, Tx3, strings.ToUpper(got))
 			}
 		})
 	}
