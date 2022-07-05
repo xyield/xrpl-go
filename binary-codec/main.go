@@ -1,12 +1,11 @@
 package binarycodec
 
 import (
-	"bytes"
-	"encoding/binary"
 	"encoding/hex"
 	"sort"
 
 	"github.com/xyield/xrpl-go/binary-codec/definitions"
+	"github.com/xyield/xrpl-go/binary-codec/types"
 )
 
 func Encode(json map[string]interface{}) (string, error) {
@@ -34,15 +33,14 @@ func Encode(json map[string]interface{}) (string, error) {
 
 		// need to write bytes to new buffers
 		// amount, uint, hash all big endian
-		buf := new(bytes.Buffer)
-		err = binary.Write(buf, binary.BigEndian, uint32(fimap[v].(int)))
-
+		st := types.GetSerializedType(v.Type)
+		b, err := st.SerializeJson(fimap[v])
 		if err != nil {
 			return "", err
 		}
 
 		// fmt.Println(buf.Bytes())
-		sink = append(sink, buf.Bytes()...)
+		sink = append(sink, b...)
 		// fmt.Println(hex.EncodeToString(sink))
 	}
 
