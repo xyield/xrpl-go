@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/hex"
-	"fmt"
 	"sort"
 
 	"github.com/xyield/xrpl-go/binary-codec/definitions"
@@ -31,7 +30,7 @@ func Encode(json map[string]interface{}) (string, error) {
 		}
 
 		sink = append(sink, h...)
-		fmt.Println(hex.EncodeToString(sink))
+		// fmt.Println(hex.EncodeToString(sink))
 
 		// need to write bytes to new buffers
 		// amount, uint, hash all big endian
@@ -42,7 +41,7 @@ func Encode(json map[string]interface{}) (string, error) {
 			return "", err
 		}
 
-		fmt.Println(buf.Bytes())
+		// fmt.Println(buf.Bytes())
 		sink = append(sink, buf.Bytes()...)
 		// fmt.Println(hex.EncodeToString(sink))
 	}
@@ -138,14 +137,14 @@ func getSortedKeys(m map[definitions.FieldInstance]interface{}) []definitions.Fi
 
 // }
 
-func uint8ToBytes(i uint8) byte {
-	return byte(i)
-}
+// func uint8ToBytes(i uint8) byte {
+// 	return byte(i)
+// }
 
-func uint16ToBytes(i uint16) byte {
-	return byte(i)
-}
+// func uint16ToBytes(i uint16) byte {
+// 	return byte(i)
+// }
 
-func uint32ToBytes(i uint32) byte {
-	return byte(i)
-}
+// func uint32ToBytes(i uint32) byte {
+// 	return byte(i)
+// }
