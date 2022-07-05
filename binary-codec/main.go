@@ -33,9 +33,6 @@ func Encode(json map[string]interface{}) (string, error) {
 		sink = append(sink, h...)
 		fmt.Println(hex.EncodeToString(sink))
 
-		// fmt.Println(fimap[v])
-		// val := uint32(fimap[v].(int))
-
 		// need to write bytes to new buffers
 		// amount, uint, hash all big endian
 		buf := new(bytes.Buffer)
@@ -98,4 +95,57 @@ func getSortedKeys(m map[definitions.FieldInstance]interface{}) []definitions.Fi
 	})
 
 	return keys
+}
+
+// func accountIDToBytes(address string) byte {}
+
+// func amountToBytes(a string) byte {}
+
+// func blobToBytes(hex string) byte {}
+
+// func hashToBytes(hex string) byte {}
+
+// func hash128ToBytes(hex string) byte {}
+
+// func hash160ToBytes(hex string) (byte, error) {
+// 	b := hashToBytes(hex)
+
+// 	if len(b) != 20 {
+// 		return 0, errors.New("Hash160 is not 160 bits long")
+// 	}
+
+// 	return b, nil
+// }
+
+// func hash256ToBytes(hex string) (byte, error) {
+// 	b := hashToBytes(hex)
+
+// 	if len(b) != 32 {
+// 		return 0, errors.New("Hash256 is not 256 bits long")
+// 	}
+
+// 	return b, nil
+// }
+
+// func pathsetToBytes([][]string) (byte, error) {
+// }
+
+// func arrayToBytes(array []string) byte {
+
+// }
+
+// func objectToBytes(jsonObj string) byte {
+
+// }
+
+func uint8ToBytes(i uint8) byte {
+	return byte(i)
+}
+
+func uint16ToBytes(i uint16) byte {
+	return byte(i)
+}
+
+func uint32ToBytes(i uint32) byte {
+	return byte(i)
 }
