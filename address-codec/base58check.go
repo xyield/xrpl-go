@@ -23,9 +23,9 @@ func checksum(input []byte) (cksum [4]byte) {
 
 // CheckEncode prepends a version byte, appends a four byte checksum and returns
 // a base58 encoding of the byte slice.
-func Base58CheckEncode(input []byte, prefix byte) string {
+func Base58CheckEncode(input []byte, prefix ...byte) string {
 	b := make([]byte, 0, 1+len(input)+4)
-	b = append(b, prefix)
+	b = append(b, prefix...)
 	b = append(b, input...)
 
 	cksum := checksum(b)
@@ -34,18 +34,18 @@ func Base58CheckEncode(input []byte, prefix byte) string {
 }
 
 // CheckDecode decodes a string that was encoded with CheckEncode and verifies the checksum.
-func Base58CheckDecode(input string) (result []byte, prefix byte, err error) {
+func Base58CheckDecode(input string) (result []byte, err error) {
 	decoded := DecodeBase58(input)
 	if len(decoded) < 5 {
-		return nil, 0, ErrInvalidFormat
+		return nil, ErrInvalidFormat
 	}
-	prefix = decoded[0]
+
 	var cksum [4]byte
 	copy(cksum[:], decoded[len(decoded)-4:])
 	if checksum(decoded[:len(decoded)-4]) != cksum {
-		return nil, 0, ErrChecksum
+		return nil, ErrChecksum
 	}
-	payload := decoded[1 : len(decoded)-4]
-	result = append(result, payload...)
+
+	result = decoded[1 : len(decoded)-4]
 	return
 }

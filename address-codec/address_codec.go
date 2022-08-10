@@ -73,16 +73,16 @@ func Encode(b []byte, typePrefix []byte, expectedLength int) string {
 		return ""
 	}
 
-	return Base58CheckEncode(b, typePrefix[0])
+	return Base58CheckEncode(b, typePrefix...)
 }
 
 // Returns the byte slice decoding of the base58-encoded string and prefix.
-func Decode(b58string string, typePrefix []byte) ([]byte, byte, error) {
+func Decode(b58string string, typePrefix []byte) ([]byte, error) {
 
 	prefixLength := len(typePrefix)
 
 	if !bytes.Equal(DecodeBase58(b58string)[:prefixLength], typePrefix) {
-		return nil, 0, errors.New("b58string prefix and typeprefix not equal")
+		return nil, errors.New("b58string prefix and typeprefix not equal")
 	}
 
 	return Base58CheckDecode(b58string)
@@ -113,7 +113,7 @@ func EncodeClassicAddressFromPublicKeyHex(pubkeyhex string, typePrefix []byte) (
 
 	address := Base58CheckEncode(accountID, AccountAddressPrefix)
 
-	if !IsValidClassicAddress(address) {
+	if !isValidClassicAddress(address) {
 		return "", &InvalidClassicAddressError{Input: address}
 	}
 
@@ -131,7 +131,7 @@ func DecodeClassicAddressToAccountID(cAddress string) (typePrefix, accountID []b
 
 }
 
-func IsValidClassicAddress(cAddress string) bool {
+func isValidClassicAddress(cAddress string) bool {
 	_, _, c := DecodeClassicAddressToAccountID(cAddress)
 
 	return c == nil
@@ -146,7 +146,7 @@ func EncodeSeed(entropy []byte, encodingType CryptoAlgorithm) (string, error) {
 
 	switch encodingType {
 	case ED25519:
-		prefix := []byte{ED25519}
+		prefix := []byte{0x01, 0xe1, 0x4b}
 		return Encode(entropy, prefix, FamilySeedLength), nil
 	case SECP256K1:
 		prefix := []byte{SECP256K1}
@@ -158,22 +158,21 @@ func EncodeSeed(entropy []byte, encodingType CryptoAlgorithm) (string, error) {
 }
 
 // Returns decoded seed and its algorithm.
-func DecodeSeed(seed string) ([]byte, CryptoAlgorithm, error) {
+func DecodeSeed(seed string) ([]byte, string, error) {
 
-	entropy, prefix, err := Base58CheckDecode(seed)
+	decoded := DecodeBase58(seed)
+	entropy, err := Base58CheckDecode(seed)
 
-	switch prefix {
-
-	case ED25519:
-		if err == nil {
-			return entropy, ED25519, nil
-		}
-	case SECP256K1:
-		if err == nil {
-			return entropy, SECP256K1, nil
-		}
+	if err != nil {
+		return nil, "", errors.New("invalid seed; could not determine encoding algorithm")
 	}
-	return nil, 0, errors.New("invalid seed; could not determine encoding algorithm")
+
+	if bytes.Equal(decoded[0:3], []byte{0x01, 0xe1, 0x4b}) {
+		return entropy[2:], "ED25519", nil
+	} else {
+		return entropy, "SECP256K1", nil
+	}
+
 }
 
 // Returns byte slice of a double hashed given byte slice.
@@ -203,7 +202,7 @@ func EncodeNodePublicKey(b []byte) (string, error) {
 // Returns the decoded node public key encoding as a byte slice from a base58 string.
 func DecodeNodePublicKey(key string) ([]byte, error) {
 
-	decodedNodeKey, _, err := Decode(key, []byte{NodePublicKeyPrefix})
+	decodedNodeKey, err := Decode(key, []byte{NodePublicKeyPrefix})
 	if err != nil {
 		return nil, err
 	}
@@ -226,7 +225,7 @@ func EncodeAccountPublicKey(b []byte) (string, error) {
 // Returns the decoded account public key encoding as a byte slice from a base58 string.
 func DecodeAccountPublicKey(key string) ([]byte, error) {
 
-	decodedAccountKey, _, err := Decode(key, []byte{AccountPublicKeyPrefix})
+	decodedAccountKey, err := Decode(key, []byte{AccountPublicKeyPrefix})
 	if err != nil {
 		return nil, err
 	}
