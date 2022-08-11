@@ -46,6 +46,6 @@ func Base58CheckDecode(input string) (result []byte, err error) {
 		return nil, ErrChecksum
 	}
 
-	result = decoded[1 : len(decoded)-4]
+	result = decoded[:len(decoded)-4]
 	return
 }
