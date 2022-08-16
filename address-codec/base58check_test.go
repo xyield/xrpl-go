@@ -32,6 +32,7 @@ func TestCheckDecode(t *testing.T) {
 	for x, tc := range tt {
 
 		res, err := Base58CheckDecode(tc.out)
+		res = res[1:]
 		switch {
 		case err != nil:
 			t.Errorf("CheckDecode test #%d failed with err: %v", x, err)
