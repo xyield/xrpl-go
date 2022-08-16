@@ -58,7 +58,7 @@ func TestDecode(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.description, func(t *testing.T) {
 
-			res, _, _ := Decode(tc.input, tc.inputPrefix)
+			res, _ := Decode(tc.input, tc.inputPrefix)
 			assert.Equal(t, tc.expectedOutput, res)
 		})
 	}
@@ -135,16 +135,30 @@ func TestEncodeSeed(t *testing.T) {
 	}{
 		{
 			description:       "successful encode - ED25519",
-			input:             []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			input:             []byte("yurtyurtyurtyurt"),
 			inputEncodingType: ED25519,
-			expectedOutput:    "E2GEWzC8MMH3E2wKHAGWdVrTbtcWC",
+			expectedOutput:    "sEdTzRkEgPoxDG1mJ6WkSucHWnMkm1H",
 			expectedErr:       nil,
 		},
 		{
 			description:       "successful encode - SECP256K1",
-			input:             []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			input:             []byte("yurtyurtyurtyurt"),
 			inputEncodingType: SECP256K1,
-			expectedOutput:    "sp6JS7f14BuwFY8Mw6bTtLKWauoUs",
+			expectedOutput:    "shPSkLzQNWfyXjZ7bbwgCky6twagA",
+			expectedErr:       nil,
+		},
+		{
+			description:       "successful encode - ED25519 additional",
+			input:             []byte("testingsomething"),
+			inputEncodingType: ED25519,
+			expectedOutput:    "sEdTvLVDRVJsrUyBiCPTHDs46GUKQAr",
+			expectedErr:       nil,
+		},
+		{
+			description:       "successful encode - SECP256K1 additional",
+			input:             []byte("testingsomething"),
+			inputEncodingType: SECP256K1,
+			expectedOutput:    "shKMVJjV52uudwfS7HzzaiwmZqVeP",
 			expectedErr:       nil,
 		},
 		{
@@ -156,14 +170,14 @@ func TestEncodeSeed(t *testing.T) {
 		},
 		{
 			description:       "unsuccessful encode - invalid encoding type",
-			input:             []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			input:             []byte("testingsomething"),
 			inputEncodingType: Undefined,
 			expectedOutput:    "",
 			expectedErr:       errors.New("encoding type must be `ed25519` or `secp256k1`"),
 		},
 		{
 			description:       "invalid CryptoAlgorithm Uint type returns err",
-			input:             []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			input:             []byte("testingsomething"),
 			inputEncodingType: CryptoAlgorithm(255),
 			expectedOutput:    "",
 			expectedErr:       errors.New("encoding type must be `ed25519` or `secp256k1`"),
@@ -193,15 +207,29 @@ func TestDecodeSeed(t *testing.T) {
 	}{
 		{
 			description:       "successful decode - ED25519",
-			input:             "E2GEWzC8MMH3E2wKHAGWdVrTbtcWC",
-			expectedOutput:    []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			input:             "sEdTzRkEgPoxDG1mJ6WkSucHWnMkm1H",
+			expectedOutput:    []byte("yurtyurtyurtyurt"),
 			expectedAlgorithm: ED25519,
 			expectedErr:       nil,
 		},
 		{
 			description:       "successful decode - SECP256K1",
-			input:             "sp6JS7f14BuwFY8Mw6bTtLKWauoUs",
-			expectedOutput:    []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			input:             "shPSkLzQNWfyXjZ7bbwgCky6twagA",
+			expectedOutput:    []byte("yurtyurtyurtyurt"),
+			expectedAlgorithm: SECP256K1,
+			expectedErr:       nil,
+		},
+		{
+			description:       "successful decode - ED25519 additional",
+			input:             "sEdTvLVDRVJsrUyBiCPTHDs46GUKQAr",
+			expectedOutput:    []byte("testingsomething"),
+			expectedAlgorithm: ED25519,
+			expectedErr:       nil,
+		},
+		{
+			description:       "successful decode - SECP256K1 additional",
+			input:             "shKMVJjV52uudwfS7HzzaiwmZqVeP",
+			expectedOutput:    []byte("testingsomething"),
 			expectedAlgorithm: SECP256K1,
 			expectedErr:       nil,
 		},
@@ -209,7 +237,7 @@ func TestDecodeSeed(t *testing.T) {
 			description:       "unsuccessful decode - invalid seed",
 			input:             "yurt",
 			expectedOutput:    nil,
-			expectedAlgorithm: 0,
+			expectedAlgorithm: Undefined,
 			expectedErr:       errors.New("invalid seed; could not determine encoding algorithm"),
 		},
 	}
