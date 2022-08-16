@@ -10,7 +10,7 @@ import (
 	"github.com/xyield/xrpl-go/binary-codec/types"
 
 	//nolint
-	"golang.org/x/crypto/ripemd160"
+	"golang.org/x/crypto/ripemd160" //lint:ignore SA1019 // ignore this for now
 )
 
 func Encode(json map[string]interface{}) (string, error) {
