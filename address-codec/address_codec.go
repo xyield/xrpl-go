@@ -85,7 +85,10 @@ func Decode(b58string string, typePrefix []byte) ([]byte, error) {
 		return nil, errors.New("b58string prefix and typeprefix not equal")
 	}
 
-	return Base58CheckDecode(b58string)
+	result, err := Base58CheckDecode(b58string)
+	result = result[prefixLength:]
+
+	return result, err
 }
 
 // Returns the classic address from public key hex string.
