@@ -113,7 +113,7 @@ func EncodeClassicAddressFromPublicKeyHex(pubkeyhex string, typePrefix []byte) (
 
 	address := Base58CheckEncode(accountID, AccountAddressPrefix)
 
-	if !isValidClassicAddress(address) {
+	if !IsValidClassicAddress(address) {
 		return "", &InvalidClassicAddressError{Input: address}
 	}
 
@@ -131,7 +131,7 @@ func DecodeClassicAddressToAccountID(cAddress string) (typePrefix, accountID []b
 
 }
 
-func isValidClassicAddress(cAddress string) bool {
+func IsValidClassicAddress(cAddress string) bool {
 	_, _, c := DecodeClassicAddressToAccountID(cAddress)
 
 	return c == nil
