@@ -5,11 +5,11 @@ import (
 	"encoding/binary"
 )
 
-type UInt64 struct{}
+type UInt8 struct{}
 
-func (u *UInt64) SerializeJson(value any) ([]byte, error) {
+func (u *UInt8) SerializeJson(value any) ([]byte, error) {
 	buf := new(bytes.Buffer)
-	err := binary.Write(buf, binary.BigEndian, uint64(value.(int)))
+	err := binary.Write(buf, binary.BigEndian, uint8(value.(int)))
 
 	if err != nil {
 		return nil, err
