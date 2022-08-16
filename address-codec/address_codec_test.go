@@ -202,42 +202,42 @@ func TestDecodeSeed(t *testing.T) {
 		description       string
 		input             string
 		expectedOutput    []byte
-		expectedAlgorithm string
+		expectedAlgorithm CryptoAlgorithm
 		expectedErr       error
 	}{
 		{
 			description:       "successful decode - ED25519",
 			input:             "sEdTzRkEgPoxDG1mJ6WkSucHWnMkm1H",
 			expectedOutput:    []byte("yurtyurtyurtyurt"),
-			expectedAlgorithm: "ED25519",
+			expectedAlgorithm: ED25519,
 			expectedErr:       nil,
 		},
 		{
 			description:       "successful decode - SECP256K1",
 			input:             "shPSkLzQNWfyXjZ7bbwgCky6twagA",
 			expectedOutput:    []byte("yurtyurtyurtyurt"),
-			expectedAlgorithm: "SECP256K1",
+			expectedAlgorithm: SECP256K1,
 			expectedErr:       nil,
 		},
 		{
 			description:       "successful decode - ED25519 additional",
 			input:             "sEdTvLVDRVJsrUyBiCPTHDs46GUKQAr",
 			expectedOutput:    []byte("testingsomething"),
-			expectedAlgorithm: "ED25519",
+			expectedAlgorithm: ED25519,
 			expectedErr:       nil,
 		},
 		{
 			description:       "successful decode - SECP256K1 additional",
 			input:             "shKMVJjV52uudwfS7HzzaiwmZqVeP",
 			expectedOutput:    []byte("testingsomething"),
-			expectedAlgorithm: "SECP256K1",
+			expectedAlgorithm: SECP256K1,
 			expectedErr:       nil,
 		},
 		{
 			description:       "unsuccessful decode - invalid seed",
 			input:             "yurt",
 			expectedOutput:    nil,
-			expectedAlgorithm: "",
+			expectedAlgorithm: Undefined,
 			expectedErr:       errors.New("invalid seed; could not determine encoding algorithm"),
 		},
 	}

@@ -123,7 +123,7 @@ func EncodeClassicAddressFromPublicKeyHex(pubkeyhex string, typePrefix []byte) (
 	return address, nil
 }
 
-// Returns the decoded 'accountID' byte slice of the classic address. get rid.
+// Returns the decoded 'accountID' byte slice of the classic address.
 func DecodeClassicAddressToAccountID(cAddress string) (typePrefix, accountID []byte, err error) {
 
 	if len(DecodeBase58(cAddress)) != 25 {
@@ -161,19 +161,19 @@ func EncodeSeed(entropy []byte, encodingType CryptoAlgorithm) (string, error) {
 }
 
 // Returns decoded seed and its algorithm.
-func DecodeSeed(seed string) ([]byte, string, error) {
+func DecodeSeed(seed string) ([]byte, CryptoAlgorithm, error) {
 
 	// decoded := DecodeBase58(seed)
 	decoded, err := Base58CheckDecode(seed)
 
 	if err != nil {
-		return nil, "", errors.New("invalid seed; could not determine encoding algorithm")
+		return nil, Undefined, errors.New("invalid seed; could not determine encoding algorithm")
 	}
 
 	if bytes.Equal(decoded[:3], []byte{0x01, 0xe1, 0x4b}) {
-		return decoded[3:], "ED25519", nil
+		return decoded[3:], ED25519, nil
 	} else {
-		return decoded[1:], "SECP256K1", nil
+		return decoded[1:], SECP256K1, nil
 	}
 
 }
