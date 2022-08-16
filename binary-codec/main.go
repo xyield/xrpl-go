@@ -8,6 +8,8 @@ import (
 
 	"github.com/xyield/xrpl-go/binary-codec/definitions"
 	"github.com/xyield/xrpl-go/binary-codec/types"
+
+	//nolint
 	"golang.org/x/crypto/ripemd160"
 )
 
@@ -112,14 +114,14 @@ func calcHash(buf []byte, hasher hash.Hash) []byte {
 
 // func hashToBytes(hex string) byte {}
 
-func hash128(buf []byte) []byte {
+// func hash128(buf []byte) []byte {
 
-	if len(buf) != 16 {
-		panic("hash128 only supports 16 byte buffers")
-	}
+// 	if len(buf) != 16 {
+// 		panic("hash128 only supports 16 byte buffers")
+// 	}
 
-	return calcHash(buf, sha256.New())[:16]
-}
+// 	return calcHash(buf, sha256.New())[:16]
+// }
 
 // func hash128ToBytes(hex string) byte {}
 
