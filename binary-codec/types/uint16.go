@@ -13,15 +13,14 @@ func (u *UInt16) SerializeJson(value any) ([]byte, error) {
 
 	if _, ok := value.(string); ok {
 		tc, err := definitions.Get().GetTransactionTypeCodeByTransactionTypeName(value.(string))
-
 		if err != nil {
 			tc, err = definitions.Get().GetLedgerEntryTypeCodeByLedgerEntryTypeName(value.(string))
-
-			if err == nil {
+			if err != nil {
+				return nil, err
+			} else {
 				value = tc
 			}
 		}
-
 		value = tc
 	}
 

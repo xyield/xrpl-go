@@ -3,13 +3,27 @@ package types
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
+	"strconv"
 )
 
 type UInt64 struct{}
 
 func (u *UInt64) SerializeJson(value any) ([]byte, error) {
+
+	// convert string to uint64
+
+	stringToUint64, err := strconv.ParseUint(value.(string), 10, 64)
+	fmt.Println(stringToUint64)
+
+	if err != nil {
+		return nil, err
+	} else {
+		value = stringToUint64
+	}
+
 	buf := new(bytes.Buffer)
-	err := binary.Write(buf, binary.BigEndian, uint64(value.(int)))
+	err = binary.Write(buf, binary.BigEndian, value)
 
 	if err != nil {
 		return nil, err
