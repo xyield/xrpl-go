@@ -108,7 +108,7 @@ func EncodeClassicAddressFromPublicKeyHex(pubkeyhex string, typePrefix []byte) (
 		return "", &EncodeLengthError{Instance: "PublicKey", Expected: AccountPublicKeyLength, Input: len(pubkey)}
 	}
 
-	accountID := sha256RipeMD160(pubkey)
+	accountID := Sha256RipeMD160(pubkey)
 
 	if len(accountID) != AccountAddressLength {
 		return "", &EncodeLengthError{Instance: "AccountID", Expected: AccountAddressLength, Input: len(accountID)}
@@ -180,7 +180,7 @@ func DecodeSeed(seed string) ([]byte, CryptoAlgorithm, error) {
 
 // Returns byte slice of a double hashed given byte slice.
 // The given byte slice is SHA256 hashed, then the result is RIPEMD160 hashed.
-func sha256RipeMD160(b []byte) []byte {
+func Sha256RipeMD160(b []byte) []byte {
 	sha256 := sha256.New()
 	sha256.Write(b)
 
