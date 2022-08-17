@@ -3,7 +3,6 @@ package types
 import (
 	"bytes"
 	"encoding/binary"
-	"fmt"
 	"strconv"
 )
 
@@ -14,7 +13,6 @@ func (u *UInt64) SerializeJson(value any) ([]byte, error) {
 	// convert string to uint64
 
 	stringToUint64, err := strconv.ParseUint(value.(string), 10, 64)
-	fmt.Println(stringToUint64)
 
 	if err != nil {
 		return nil, err
