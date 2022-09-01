@@ -35,7 +35,6 @@ func Encode(json map[string]interface{}) (string, error) {
 		}
 
 		sink = append(sink, h...)
-		// fmt.Println(hex.EncodeToString(sink))
 
 		// need to write bytes to new buffers
 		// amount, uint, hash all big endian
@@ -45,17 +44,13 @@ func Encode(json map[string]interface{}) (string, error) {
 			return "", err
 		}
 
-		// fmt.Println(buf.Bytes())
 		sink = append(sink, b...)
-		// fmt.Println(hex.EncodeToString(sink))
 	}
 
 	// Loop through and create map of map[FieldInstance]interface{}
 	// Sort by Ordinal
 	// Start serializing
 	//	optimize encode from field id codec, making same call twice
-
-	// fmt.Println(string(sink))
 
 	return hex.EncodeToString(sink), nil
 }
