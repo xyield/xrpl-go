@@ -9,6 +9,7 @@ import (
 
 type UInt8 struct{}
 
+// Serializes the given json value to an 8-bit UInt byte slice.
 func (u *UInt8) SerializeJson(value any) ([]byte, error) {
 
 	if _, ok := value.(string); ok {

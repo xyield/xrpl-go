@@ -5,6 +5,7 @@ import (
 	"sort"
 )
 
+// Returns a string slice of keys and an int slice of values, sorted by the values in ascending order.
 func SortMapByValue(vmap map[string]int) (sortedKeys []string, sortedValues []int, err error) {
 
 	keys := make([]string, 0, len(vmap))

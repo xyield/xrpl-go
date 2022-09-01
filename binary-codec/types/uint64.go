@@ -8,6 +8,7 @@ import (
 
 type UInt64 struct{}
 
+// Serializes the given json value to a 64-bit UInt byte slice.
 func (u *UInt64) SerializeJson(value any) ([]byte, error) {
 
 	// convert string to uint64

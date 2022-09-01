@@ -6,6 +6,7 @@ import (
 
 type AccountID struct{}
 
+// Serializes the given json value to an AccountID byte slice.
 func (a *AccountID) SerializeJson(value any) ([]byte, error) {
 
 	_, accountID, err := addresscodec.DecodeClassicAddressToAccountID(value.(string))

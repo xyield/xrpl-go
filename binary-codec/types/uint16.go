@@ -9,6 +9,7 @@ import (
 
 type UInt16 struct{}
 
+// Serializes the given json value to a 16-bit UInt byte slice.
 func (u *UInt16) SerializeJson(value any) ([]byte, error) {
 
 	if _, ok := value.(string); ok {

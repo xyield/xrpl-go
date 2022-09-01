@@ -13,6 +13,7 @@ import (
 	"golang.org/x/crypto/ripemd160" //lint:ignore SA1019 // ignore this for now
 )
 
+// Encode: encodes a transaction or other object from json to the canonical binary format as a hex string.
 func Encode(json map[string]interface{}) (string, error) {
 
 	fimap, err := createFieldInstanceMapFromJson(json)
