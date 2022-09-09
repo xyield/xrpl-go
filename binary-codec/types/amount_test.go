@@ -24,10 +24,15 @@ func TestContainsDecimal(t *testing.T) {
 			input: "1",
 			want:  false,
 		},
+		{
+			name:  "contains decimal - double dot",
+			input: "1..0",
+			want:  true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := containsDecimal(tt.input); got != tt.want {
+			if got, _ := containsDecimal(tt.input); got != tt.want {
 				t.Errorf("containsDecimal() = %v, want %v", got, tt.want)
 			}
 		})
@@ -42,19 +47,24 @@ func TestVerifyXrpValue(t *testing.T) {
 		ExpErr error
 	}{
 		{
-			name:   "valid xrp value",
+			name:   "invalid xrp value",
 			input:  "1.0",
-			ExpErr: nil,
+			ExpErr: errors.New("XRP value must not contain a decimal"),
 		},
 		{
 			name:   "invalid xrp value - out of range",
 			input:  "0.000000007",
-			ExpErr: errors.New("XRP value is an invalid XRP amount"),
+			ExpErr: errors.New("XRP value must not contain a decimal"),
 		},
 		{
-			name:   "invalid xrp value - no decimal",
-			input:  "1",
-			ExpErr: errors.New("XRP value must contain a decimal"),
+			name:   "valid xrp value - no decimal",
+			input:  "125000708",
+			ExpErr: nil,
+		},
+		{
+			name:   "valid xrp value - no decimal - negative value",
+			input:  "-125000708",
+			ExpErr: errors.New("XRP value is an invalid XRP amount"),
 		},
 	}
 	for _, tt := range tests {
@@ -82,7 +92,7 @@ func TestVerifyIOUValue(t *testing.T) {
 		},
 		{
 			name:   "valid iou value - leading zero after decimal",
-			input:  "3.023857",
+			input:  "345.023857",
 			ExpErr: nil,
 		},
 		{
@@ -109,42 +119,43 @@ func TestVerifyIOUValue(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
+			_, err := VerifyIOUValue(tt.input)
 			if tt.ExpErr != nil {
-				assert.Equal(t, tt.ExpErr, VerifyIOUValue(tt.input))
+				assert.EqualError(t, tt.ExpErr, err.Error())
 			} else {
-				assert.Nil(t, VerifyIOUValue(tt.input))
+				assert.Nil(t, err)
 			}
 		})
 	}
 }
 
-// func TestSerializeIssuedCurrencyValue(t *testing.T) {
-// 	tests := []struct {
-// 		name     string
-// 		input    string
-// 		expected []byte
-// 	}{
-// 		{
-// 			name:     "valid zero value",
-// 			input:    "0",
-// 			expected: []byte{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-// 		},
-// 		{
-// 			name:     "valid value",
-// 			input:    "3.0567",
-// 			expected: []byte{},
-// 		},
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
+func TestSerializeIssuedCurrencyValue(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected []byte
+	}{
+		{
+			name:     "valid zero value",
+			input:    "0",
+			expected: []byte{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+		},
+		{
+			name:     "valid value",
+			input:    "334767.0567",
+			expected: []byte{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
 
-// 			got := serializeIssuedCurrencyValue(tt.input)
+			got, _ := serializeIssuedCurrencyValue(tt.input)
 
-// 			assert.Equal(t, tt.expected, got)
+			assert.Equal(t, tt.expected, got)
 
-// 		})
-// 	}
-// }
+		})
+	}
+}
 
 func TestIsNative(t *testing.T) {
 	tests := []struct {
@@ -196,44 +207,89 @@ func TestIsPositive(t *testing.T) {
 
 func TestCalculatePrecision(t *testing.T) {
 	tests := []struct {
-		name     string
-		input    string
-		expected int
-		expErr   error
+		name    string
+		input   string
+		expPrec int
+		expExp  int
+		expDig  int
+		expSign string
+		expErr  error
 	}{
 		{
-			name:     "correct precision",
-			input:    "3.456000",
-			expected: 4,
-			expErr:   nil,
+			name:    "valid value with E",
+			input:   "-3.6E-6",
+			expPrec: 2,
+			expExp:  -6,
+			expDig:  36,
+			expSign: "-",
+			expErr:  nil,
 		},
 		{
-			name:     "correct precision 2 - trailing zeros",
-			input:    "5.000000000",
-			expected: 1,
-			expErr:   nil,
+			name:    "valid value with e",
+			input:   "-365e-6",
+			expPrec: 3,
+			expExp:  -6,
+			expDig:  365,
+			expSign: "-",
+			expErr:  nil,
 		},
 		{
-			name:     "correct precision 3 - big number",
-			input:    "0.0099845689056094899845689056094899845689056094899845689056094899845689056094899845689056094899845689056094899845689056094899845689056094899845689056094899845689056094899845689056094899845689056094800000000000",
-			expected: 0,
-			expErr:   errors.New("IOU value is an invalid IOU amount - precision is too large > 16"),
+			name:    "correct precision",
+			input:   "0.00007890000",
+			expPrec: 3,
+			expExp:  -7,
+			expDig:  789,
+			expSign: "",
+			expErr:  nil,
 		},
 		{
-			name:     "correct precision 4 - leading zeros",
-			input:    "0000.005466000",
-			expected: 4,
-			expErr:   nil,
+			name:    "correct precision 2 - trailing zeros",
+			input:   "00004326458.0001000",
+			expPrec: 11,
+			expExp:  -4,
+			expDig:  43264580001,
+			expSign: "",
+			expErr:  nil,
+		},
+		{
+			name:    "correct precision 3 - big number",
+			input:   "0.0099845689056094899845689056094899845689056094899845689056094899845689056094899845689056094899845689056094899845689056094899845689056094899845689056094899845689056094899845689056094899845689056094800000000000",
+			expPrec: 0,
+			expExp:  0,
+			expDig:  0,
+			expSign: "",
+			expErr:  errors.New("IOU value is an invalid IOU amount - precision is too large > 16"),
+		},
+		{
+			name:    "correct precision 4 - leading zeros",
+			input:   "0000.005466000",
+			expPrec: 4,
+			expExp:  -6,
+			expDig:  5466,
+			expSign: "",
+			expErr:  nil,
+		},
+		{
+			name:    "correct precision 5 - no decimal",
+			input:   "5632890000",
+			expPrec: 6,
+			expExp:  4,
+			expDig:  563289,
+			expSign: "",
+			expErr:  nil,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := getSignificantDigits(tt.input)
+			got, exp, digits, sign, err := getSignificantDigits(tt.input)
 			if tt.expErr != nil {
 				assert.EqualError(t, tt.expErr, err.Error())
 			} else {
-				assert.Nil(t, err)
-				assert.Equal(t, tt.expected, got)
+				assert.NoError(t, err)
+				assert.Equal(t, tt.expPrec, got)
+				assert.Equal(t, tt.expExp, exp)
+				assert.Equal(t, tt.expDig, digits)
+				assert.Equal(t, tt.expSign, sign)
 			}
 		})
 	}
