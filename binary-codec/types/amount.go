@@ -120,6 +120,7 @@ func NewBigDecimal(value string) (*BigDecimal, error) {
 	}
 
 	if !ePresent { // if the value does not contain an 'e' character
+
 		if containsDecimal && decimalErr == nil { // if the value contains a SINGLE decimal point
 			decimalSuffixNoTrailingZeros := strings.TrimRight(decimalSuffix, "0")                        // remove trailing zeros from the decimal suffix
 			decimalPrefixNoLeadingZeros := strings.TrimLeft(decimalPrefix, "0")                          // remove leading zeros from the decimal prefix

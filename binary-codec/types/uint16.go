@@ -18,8 +18,6 @@ func (u *UInt16) SerializeJson(value any) ([]byte, error) {
 			tc, err = definitions.Get().GetLedgerEntryTypeCodeByLedgerEntryTypeName(value.(string))
 			if err != nil {
 				return nil, err
-			} else {
-				value = tc
 			}
 		}
 		value = tc
