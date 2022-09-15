@@ -26,7 +26,7 @@ const (
 	MinXRP   = 1e-6
 	MaxDrops = 1e17 // 100 billion XRP in drops aka 10^17
 
-	AllowedIOUCharacters = "0123456789.-eE"
+	AllowedIOUCharacters = "0123456789.-eE" // going to do this with Regex
 )
 
 type BigDecimal struct {
@@ -52,10 +52,13 @@ func ContainsInvalidCharacters(value string) bool {
 }
 
 // Creates a new custom BigDecimal object from a value string
-func NewBigDecimal(value string) (bigDecimal BigDecimal, err error) {
+func NewBigDecimal(value string) (*BigDecimal, error) {
+
+	bigDecimal := new(BigDecimal)
+	var err error
 
 	if ContainsInvalidCharacters(value) {
-		return bigDecimal, errors.New("value contains invalid characters: only '0-9' '.' '-' 'e' and 'E' are allowed")
+		return nil, errors.New("value contains invalid characters: only '0-9' '.' '-' 'e' and 'E' are allowed")
 	}
 	if strings.HasPrefix(value, "-") { // if the value is negative, set the sign to negative
 		bigDecimal.Sign = "-"
@@ -66,10 +69,10 @@ func NewBigDecimal(value string) (bigDecimal BigDecimal, err error) {
 	prefix, suffix, ePresent := strings.Cut(value, "e") // split the value into prefix and suffix at the 'e' character, if present
 
 	if strings.Contains(prefix, "-") { // if the value still has a minus sign in the prefix, return an error
-		return BigDecimal{}, errors.New("value contains multiple '-' characters, excluding the exponent sign")
+		return nil, errors.New("value contains multiple '-' characters, excluding the exponent sign")
 	}
 	if strings.Contains(prefix, "e") || strings.Contains(suffix, "e") { // if the prefix or suffix still contains an 'e' character, return an error
-		return BigDecimal{}, errors.New("value contains multiple 'e' or 'E' characters")
+		return nil, errors.New("value contains multiple 'e' or 'E' characters")
 	}
 
 	emptyCheck := strings.Trim(prefix, "0") // remove all zeros from the prefix
@@ -85,7 +88,7 @@ func NewBigDecimal(value string) (bigDecimal BigDecimal, err error) {
 	containsDecimal, decimalErr := containsDecimal(value) // check if the value contains a SINGLE decimal point
 
 	if decimalErr != nil {
-		return BigDecimal{}, decimalErr
+		return nil, decimalErr
 	}
 
 	decimalPrefix, decimalSuffix, _ := strings.Cut(prefix, ".") // split the prefix into decimal prefix and decimal suffix at the '.' character, if present
@@ -93,7 +96,7 @@ func NewBigDecimal(value string) (bigDecimal BigDecimal, err error) {
 	if ePresent { // if the value contains an 'e' character
 		bigDecimal.Scale, err = strconv.Atoi(suffix) // convert the suffix to an int, which is the scale
 		if err != nil {
-			return BigDecimal{}, err
+			return nil, err
 		}
 
 		if containsDecimal { // if the value contains a SINGLE decimal point
@@ -112,7 +115,7 @@ func NewBigDecimal(value string) (bigDecimal BigDecimal, err error) {
 			bigDecimal.Scale = bigDecimal.Scale + (len(prefixNoLeadingZeros) - len(prefixNoTrailingZeros)) // add the difference between the length of the prefix and the length of the prefix with trailing zeros removed, to the scale
 			bigDecimal.UnscaledValue = prefixNoTrailingZeros                                               // set the unscaled value to the prefix with trailing zeros removed
 		} else {
-			return BigDecimal{}, err
+			return nil, err
 		}
 	}
 
@@ -132,18 +135,11 @@ func NewBigDecimal(value string) (bigDecimal BigDecimal, err error) {
 			bigDecimal.Scale = len(prefix) - len(decimalPrefixNoTrailingZeros)         // set the scale to the difference between the length of the prefix and the length of the prefix with trailing zeros removed
 			bigDecimal.UnscaledValue = strings.Trim(decimalPrefixNoTrailingZeros, "0") // remove leading and trailing zeros from the prefix with trailing zeros removed to get the unscaled value
 		} else {
-			return BigDecimal{}, err
+			return nil, err
 		}
 	}
 
 	bigDecimal.Precision = len(bigDecimal.UnscaledValue) // set the precision to the length of the unscaled value
-
-	if bigDecimal.Precision > MaxIOUPrecision {
-		return BigDecimal{}, errors.New("IOU value is an invalid IOU amount - precision is too large > 16") // if the precision is greater than 16, return an error
-	}
-	if bigDecimal.Scale < MinIOUExponent || bigDecimal.Scale > MaxIOUExponent {
-		return BigDecimal{}, errors.New("IOU value is an invalid IOU amount - exponent is out of range") // if the scale is less than -96 or greater than 80, return an error
-	}
 
 	return bigDecimal, nil
 }
@@ -188,10 +184,15 @@ func VerifyXrpValue(value string) error {
 	return nil
 }
 
+func (b *BigDecimal) GetExponent() int {
+	return b.Precision - b.Scale - 1
+}
+
 // validates the format of an issued currency amount value
 func VerifyIOUValue(value string) error {
 
-	_, err := NewBigDecimal(value)
+	bigDecimal, err := NewBigDecimal(value)
+	exp := bigDecimal.GetExponent()
 
 	if err != nil {
 		return err
@@ -207,7 +208,17 @@ func VerifyIOUValue(value string) error {
 		return nil
 	}
 
-	return nil
+	if bigDecimal.Precision > MaxIOUPrecision {
+		return errors.New("IOU value is an invalid IOU amount - precision is too large > 16") // if the precision is greater than 16, return an error
+	}
+	if exp < MinIOUExponent {
+		return errors.New("IOU value is an invalid IOU amount - exponent is out of range") // if the scale is less than -96 or greater than 80, return an error
+	}
+	if exp > MaxIOUExponent {
+		return errors.New("IOU value is an invalid IOU amount - exponent is out of range") // if the scale is less than -96 or greater than 80, return an error
+	}
+
+	return err
 }
 
 // XRPL definition of precision is number of significant digits:
@@ -219,47 +230,47 @@ func VerifyIOUValue(value string) error {
 // over-rounding in the least significant digits.
 
 // Serializes the value field of an issued currency amount to its bytes representation
-func serializeIssuedCurrencyValue(value string) ([]byte, error) {
+// func serializeIssuedCurrencyValue(value string) ([]byte, error) {
 
-	bigDecimal, err := NewBigDecimal(value)
-	if err != nil {
-		return nil, err
-	}
-	exp := bigDecimal.Scale
-	mantissa, err := strconv.ParseFloat(bigDecimal.UnscaledValue, 64)
-	if err != nil {
-		return nil, err
-	}
+// 	bigDecimal, err := NewBigDecimal(value)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	exp := bigDecimal.Scale
+// 	mantissa, err := strconv.ParseFloat(bigDecimal.UnscaledValue, 64)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	decimalValue, _ := new(big.Float).SetString(value) // bigFloat for precision
-	if decimalValue.Sign() == 0 {
-		x := new(big.Int).SetUint64(ZeroCurrencyAmountHex)
-		return []byte(x.Bytes()), nil // if the value is zero, then return the zero currency amount hex
-	}
+// 	decimalValue, _ := new(big.Float).SetString(value) // bigFloat for precision
+// 	if decimalValue.Sign() == 0 {
+// 		x := new(big.Int).SetUint64(ZeroCurrencyAmountHex)
+// 		return []byte(x.Bytes()), nil // if the value is zero, then return the zero currency amount hex
+// 	}
 
-	// convert components to integers
+// 	// convert components to integers
 
-	// x == mantissa * 2^exponent
+// 	// x == mantissa * 2^exponent
 
-	if mantissa < MinIOUMantissa && exp > MinIOUExponent {
-		mantissa *= 10
-		exp -= 1
-	} else if int(mantissa) > MaxIOUMantissa {
-		if exp >= MaxIOUExponent {
-			return nil, errors.New("IOU value is an invalid IOU amount - exponent is out of range")
-		}
-		mantissa /= 10
-		exp += 1
-	}
+// 	if mantissa < MinIOUMantissa && exp > MinIOUExponent {
+// 		mantissa *= 10
+// 		exp -= 1
+// 	} else if int(mantissa) > MaxIOUMantissa {
+// 		if exp >= MaxIOUExponent {
+// 			return nil, errors.New("IOU value is an invalid IOU amount - exponent is out of range")
+// 		}
+// 		mantissa /= 10
+// 		exp += 1
+// 	}
 
-	if exp < MinIOUExponent || mantissa < MinIOUMantissa {
-		// round to zero
-		x := new(big.Int).SetUint64(ZeroCurrencyAmountHex)
-		return []byte(x.Bytes()), nil // don't want this to be a return!
-	}
+// 	if exp < MinIOUExponent || mantissa < MinIOUMantissa {
+// 		// round to zero
+// 		x := new(big.Int).SetUint64(ZeroCurrencyAmountHex)
+// 		return []byte(x.Bytes()), nil // don't want this to be a return!
+// 	}
 
-	return nil, nil
-}
+// 	return nil, nil
+// }
 
 // Returns true if this amount is a "native" XRP amount - first bit in first byte set to 0 for native XRP
 func isNative(value []byte) bool {
