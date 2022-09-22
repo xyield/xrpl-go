@@ -92,11 +92,7 @@ func Decode(b58string string, typePrefix []byte) ([]byte, error) {
 }
 
 // Returns the classic address from public key hex string.
-func EncodeClassicAddressFromPublicKeyHex(pubkeyhex string, typePrefix []byte) (string, error) {
-
-	if len(typePrefix) != 1 {
-		return "", &EncodeLengthError{Instance: "TypePrefix", Expected: 1, Input: len(typePrefix)}
-	}
+func EncodeClassicAddressFromPublicKeyHex(pubkeyhex string) (string, error) {
 
 	pubkey, err := hex.DecodeString(pubkeyhex)
 

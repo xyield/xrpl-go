@@ -2,7 +2,9 @@ package keypairs
 
 import (
 	"crypto/sha512"
+	"encoding/hex"
 	"io"
+	"strings"
 )
 
 type randomizer struct {
@@ -22,4 +24,13 @@ func (r *randomizer) generateBytes(n int) ([]byte, error) {
 func sha512Half(msg []byte) []byte {
 	h := sha512.Sum512(msg)
 	return h[:32]
+}
+
+func formatKey(k []byte) string {
+	return strings.ToUpper(hex.EncodeToString(k))
+}
+
+func deformatKey(k string) []byte {
+	b, _ := hex.DecodeString(k)
+	return b
 }
