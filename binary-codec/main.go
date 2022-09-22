@@ -1,13 +1,19 @@
 package binarycodec
 
 import (
+	"crypto/sha256"
 	"encoding/hex"
+	"hash"
 	"sort"
 
 	"github.com/xyield/xrpl-go/binary-codec/definitions"
 	"github.com/xyield/xrpl-go/binary-codec/types"
+
+	//nolint
+	"golang.org/x/crypto/ripemd160" //lint:ignore SA1019 // ignore this for now
 )
 
+// Encode: encodes a transaction or other object from json to the canonical binary format as a hex string.
 func Encode(json map[string]interface{}) (string, error) {
 
 	fimap, err := createFieldInstanceMapFromJson(json)
@@ -29,7 +35,6 @@ func Encode(json map[string]interface{}) (string, error) {
 		}
 
 		sink = append(sink, h...)
-		// fmt.Println(hex.EncodeToString(sink))
 
 		// need to write bytes to new buffers
 		// amount, uint, hash all big endian
@@ -39,17 +44,13 @@ func Encode(json map[string]interface{}) (string, error) {
 			return "", err
 		}
 
-		// fmt.Println(buf.Bytes())
 		sink = append(sink, b...)
-		// fmt.Println(hex.EncodeToString(sink))
 	}
 
 	// Loop through and create map of map[FieldInstance]interface{}
 	// Sort by Ordinal
 	// Start serializing
 	//	optimize encode from field id codec, making same call twice
-
-	// fmt.Println(string(sink))
 
 	return hex.EncodeToString(sink), nil
 }
@@ -58,8 +59,9 @@ func Encode(json map[string]interface{}) (string, error) {
 // 	return "120007220008000024001ABED82A2380BF2C2019001ABED764D55920AC9391400000000000000000000000000055534400000000000A20B3C85F482532A9578DBB3950B85CA06594D165400000037E11D60068400000000000000A732103EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3744630440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C8114DD76483FACDEE26E60D8A586BB58D09F27045C46", nil
 // }
 
+// nolint
+//
 //lint:ignore U1000 // ignore this for now
-//nolint
 func createFieldInstanceMapFromJson(json map[string]interface{}) (map[definitions.FieldInstance]interface{}, error) {
 
 	m := make(map[definitions.FieldInstance]interface{}, len(json))
@@ -78,8 +80,9 @@ func createFieldInstanceMapFromJson(json map[string]interface{}) (map[definition
 	return m, nil
 }
 
+// nolint
+//
 //lint:ignore U1000 // ignore this for now
-//nolint
 func getSortedKeys(m map[definitions.FieldInstance]interface{}) []definitions.FieldInstance {
 	keys := make([]definitions.FieldInstance, 0, len(m))
 
@@ -100,9 +103,32 @@ func getSortedKeys(m map[definitions.FieldInstance]interface{}) []definitions.Fi
 
 // func blobToBytes(hex string) byte {}
 
+func calcHash(buf []byte, hasher hash.Hash) []byte {
+	_, _ = hasher.Write(buf)
+	return hasher.Sum(nil)
+}
+
 // func hashToBytes(hex string) byte {}
 
+// func hash128(buf []byte) []byte {
+
+// 	if len(buf) != 16 {
+// 		panic("hash128 only supports 16 byte buffers")
+// 	}
+
+// 	return calcHash(buf, sha256.New())[:16]
+// }
+
 // func hash128ToBytes(hex string) byte {}
+
+func Hash160(buf []byte) []byte {
+
+	if len(buf) != 20 {
+		panic("Hash160 only supports 20 byte buffers")
+	}
+
+	return calcHash(calcHash(buf, sha256.New()), ripemd160.New())
+}
 
 // func hash160ToBytes(hex string) (byte, error) {
 // 	b := hashToBytes(hex)
@@ -112,6 +138,15 @@ func getSortedKeys(m map[definitions.FieldInstance]interface{}) []definitions.Fi
 // 	}
 
 // 	return b, nil
+// }
+
+// func Hash256(buf []byte) []byte {
+
+// 	if len(buf) != 32 {
+// 		panic("Hash256 only supports 32 byte buffers")
+// 	}
+
+// 	return calcHash(calcHash(buf, sha256.New()), sha256.New())
 // }
 
 // func hash256ToBytes(hex string) (byte, error) {
