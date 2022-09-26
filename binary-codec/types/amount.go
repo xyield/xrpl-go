@@ -210,90 +210,19 @@ func SerializeXrpAmount(value string) ([]byte, error) {
 		return nil, VerifyXrpValue(value)
 	}
 
-	bf, ok := new(big.Int).SetUint64(ZeroCurrencyAmountHex).SetString(value, 10)
+	val, err := strconv.ParseUint(value, 10, 64)
 
-	if !ok {
-		return nil, errors.New("failed to convert string to big.Float")
+	if err != nil {
+		return nil, err
 	}
 
-	val := bf.Uint64() // XRP values are represented as integers as drops and values - can't be negative
-
 	valWithPosBit := val | PosSignBitMask
-
 	valBytes := make([]byte, NativeAmountByteLength)
 
 	binary.BigEndian.PutUint64(valBytes, uint64(valWithPosBit))
 
 	return valBytes, nil
-
 }
-
-// XRPL definition of precision is number of significant digits:
-// Tokens can represent a wide variety of assets, including those typically measured in very small or very large denominations.
-// This format uses significant digits and a power-of-ten exponent in a similar way to scientific notation.
-// The format supports positive and negative significant digits and exponents within the specified range.
-// Unlike typical floating-point representations of non-whole numbers, this format uses integer math for all calculations,
-// so it always maintains 15 decimal digits of precision. Multiplication and division have adjustments to compensate for
-// over-rounding in the least significant digits.
-
-// Serializes the value field of an issued currency amount to its bytes representation
-// func serializeIssuedCurrencyValue(value string) ([]byte, error) {
-
-// 	decimalValue, _ := new(big.Float).SetString(value) // bigFloat for precision
-// 	if decimalValue.Sign() == 0 {
-// 		zeroAmount := new(big.Int).SetUint64(ZeroCurrencyAmountHex)
-// 		return []byte(zeroAmount.Bytes()), nil // if the value is zero, then return the zero currency amount hex
-// 	}
-
-// 	bigDecimal, err := NewBigDecimal(value)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	exp := bigDecimal.GetExponent()
-// 	// exp := bigDecimal.Scale
-
-// 	// mantissa, _ := decimalValue.SetMantExp(decimalValue, exp).Float64() // get the mantissa and exponent of the decimal value
-
-// 	mantissa, err := strconv.ParseFloat(bigDecimal.UnscaledValue, 64)
-
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	for mantissa < MinIOUMantissa && exp > MinIOUExponent {
-// 		mantissa *= 10
-// 		exp--
-// 	}
-
-// 	for mantissa > float64(MaxIOUMantissa) {
-// 		if exp >= MaxIOUExponent {
-// 			return nil, errors.New("IOU value is an invalid IOU amount - exponent is out of range") // if the scale is less than -96 or greater than 80, return an error
-// 		}
-// 		mantissa /= 10
-// 		exp++
-
-// 		if exp < MinIOUExponent || mantissa < MinIOUMantissa {
-// 			// round down to zero
-// 			x := new(big.Int).SetUint64(ZeroCurrencyAmountHex)
-// 			return []byte(x.Bytes()), nil
-// 		}
-
-// 		if exp > MaxIOUExponent || mantissa > float64(MaxIOUMantissa) {
-// 			return nil, errors.New("IOU value is an invalid IOU amount - exponent is out of range") // if the scale is less than -96 or greater than 80, return an error
-// 		}
-// 	}
-
-// 	// convert components to bytes
-
-// 	serial := uint64(ZeroCurrencyAmountHex)
-// 	if bigDecimal.Sign == "" {
-// 		serial |= uint64(PosSignBitMask) // if the sign is positive, set the sign bit to 1
-// 		serial |= uint64(exp+97) << 54   // if the exponent is positive, set the exponent bits to the exponent + 97
-// 		serial |= uint64(mantissa)       // last 54 bits are mantissa
-// 	}
-
-// 	return []byte(new(big.Int).SetUint64(serial).Bytes()), nil
-// }
 
 // Returns true if this amount is a "native" XRP amount - first bit in first byte set to 0 for native XRP
 func isNative(value []byte) bool {
