@@ -1,6 +1,3 @@
-//go:build unit
-// +build unit
-
 package addresscodec
 
 import (
@@ -84,16 +81,22 @@ func TestEncodeClassicAddressFromPublicKeyHex(t *testing.T) {
 			expectedErr:    nil,
 		},
 		{
-			description:    "Successfully generate address from randomly generated 33-byte hex string",
-			input:          "42e04f55c9f92d0d2ece7a028f88fd37b740ea2086f136d9ed1ac842e5a0226125",
-			expectedOutput: "rJKhsipKHooQbtS3v5Jro6N5Q7TMNPkoAs",
+			description:    "Derive correct address from public key",
+			input:          "ED731C39781B964904E1FEEFFC9F99442196BCB5F499105A79533E2D678CA7D3D2",
+			expectedOutput: "rhTCnDC7v1Jp7NAupzisv6ynWHD161Q9nV",
 			expectedErr:    nil,
 		},
 		{
-			description:    "Invalid Public Key",
-			input:          "yurt",
+			description:    "Invalid Public Key - too short",
+			input:          "ED9434799226374926EDA3B54B1B461B",
 			expectedOutput: "",
-			expectedErr:    &EncodeLengthError{Instance: "PublicKey", Input: 1, Expected: 33},
+			expectedErr:    &EncodeLengthError{Instance: "PublicKey", Input: 16, Expected: 33},
+		},
+		{
+			description:    "Invalid Public Key - too long",
+			input:          "ED9434799226374926EDA3B54B1B461B4ABF7237962EAE18528FEA67595397FA32ED9434799226374926EDA3B54B1B461B4ABF7237962EAE18528FEA67595397FA32",
+			expectedOutput: "",
+			expectedErr:    &EncodeLengthError{Instance: "PublicKey", Input: 66, Expected: 33},
 		},
 	}
 
