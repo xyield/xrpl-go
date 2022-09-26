@@ -73,7 +73,7 @@ func BenchmarkEncodeClassicAddressFromPublicKeyHex(b *testing.B) {
 	for _, tc := range tt {
 		b.Run(tc.description, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				EncodeClassicAddressFromPublicKeyHex(tc.input, tc.prefix)
+				EncodeClassicAddressFromPublicKeyHex(tc.input)
 			}
 		})
 	}

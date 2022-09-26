@@ -68,51 +68,39 @@ func TestEncodeClassicAddressFromPublicKeyHex(t *testing.T) {
 	tt := []struct {
 		description    string
 		input          string
-		inputPrefix    []byte
 		expectedOutput string
 		expectedErr    error
 	}{
 		{
 			description:    "Successfully generate address from a 32-byte ED25519 public key hex string WITH prefix",
 			input:          "ED9434799226374926EDA3B54B1B461B4ABF7237962EAE18528FEA67595397FA32",
-			inputPrefix:    []byte{AccountAddressPrefix},
 			expectedOutput: "rDTXLQ7ZKZVKz33zJbHjgVShjsBnqMBhmN",
 			expectedErr:    nil,
 		},
 		{
 			description:    "Successfully generate address from a 32-byte ED25519 public key hex string WITHOUT prefix",
 			input:          "9434799226374926EDA3B54B1B461B4ABF7237962EAE18528FEA67595397FA32",
-			inputPrefix:    []byte{AccountAddressPrefix},
 			expectedOutput: "rDTXLQ7ZKZVKz33zJbHjgVShjsBnqMBhmN",
 			expectedErr:    nil,
 		},
 		{
 			description:    "Successfully generate address from randomly generated 33-byte hex string",
 			input:          "42e04f55c9f92d0d2ece7a028f88fd37b740ea2086f136d9ed1ac842e5a0226125",
-			inputPrefix:    []byte{AccountAddressPrefix},
 			expectedOutput: "rJKhsipKHooQbtS3v5Jro6N5Q7TMNPkoAs",
 			expectedErr:    nil,
 		},
 		{
 			description:    "Invalid Public Key",
 			input:          "yurt",
-			inputPrefix:    []byte{AccountAddressPrefix},
 			expectedOutput: "",
 			expectedErr:    &EncodeLengthError{Instance: "PublicKey", Input: 1, Expected: 33},
-		},
-		{
-			description:    "Valid Public Key, invalid Type Prefix length",
-			input:          "ED9434799226374926EDA3B54B1B461B4ABF7237962EAE18528FEA67595397FA32",
-			inputPrefix:    []byte{0x00, 0x00},
-			expectedOutput: "",
-			expectedErr:    &EncodeLengthError{Instance: "TypePrefix", Input: 2, Expected: 1},
 		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.description, func(t *testing.T) {
 
-			got, err := EncodeClassicAddressFromPublicKeyHex(tc.input, tc.inputPrefix)
+			got, err := EncodeClassicAddressFromPublicKeyHex(tc.input)
 
 			if tc.expectedErr != nil {
 				assert.EqualError(t, err, tc.expectedErr.Error())
