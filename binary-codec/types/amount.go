@@ -1,6 +1,7 @@
 package types
 
 import (
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"math/big"
@@ -39,16 +40,6 @@ type BigDecimal struct {
 func (a *Amount) SerializeJson(value any) ([]byte, error) {
 
 	return nil, nil
-}
-
-// Checks if a value string contains invalid characters - returns true if it does
-func ContainsInvalidCharacters(value string) bool {
-	for _, char := range value {
-		if !strings.Contains(AllowedIOUCharacters, strings.ToLower(string(char))) { // if the character is not in the allowed characters list return true
-			return true
-		}
-	}
-	return false
 }
 
 // Creates a new custom BigDecimal object from a value string
@@ -145,16 +136,6 @@ func NewBigDecimal(value string) (*BigDecimal, error) {
 	return bigDecimal, nil
 }
 
-// XRP values shouldn't contain a decimal point BECAUSE they are represented as integers as drops
-// returns true if the string contains a SINGLE decimal point character
-func containsDecimal(s string) (bool, error) {
-	decCount := strings.Count(s, ".") // count the number of decimal points
-	if decCount > 1 {
-		return true, errors.New("invalid - string contains more than one decimal point")
-	}
-	return strings.Contains(s, "."), nil
-}
-
 // validates the format of an XRP amount value
 // XRP values shouldn't contain a decimal point BECAUSE they are represented as integers as drops
 func VerifyXrpValue(value string) error {
@@ -222,6 +203,31 @@ func VerifyIOUValue(value string) error {
 	return err
 }
 
+// Serializes an XRP amount value
+func SerializeXrpAmount(value string) ([]byte, error) {
+
+	if VerifyXrpValue(value) != nil {
+		return nil, VerifyXrpValue(value)
+	}
+
+	bf, ok := new(big.Int).SetUint64(ZeroCurrencyAmountHex).SetString(value, 10)
+
+	if !ok {
+		return nil, errors.New("failed to convert string to big.Float")
+	}
+
+	val := bf.Uint64() // XRP values are represented as integers as drops and values - can't be negative
+
+	valWithPosBit := val | PosSignBitMask
+
+	valBytes := make([]byte, NativeAmountByteLength)
+
+	binary.BigEndian.PutUint64(valBytes, uint64(valWithPosBit))
+
+	return valBytes, nil
+
+}
+
 // XRPL definition of precision is number of significant digits:
 // Tokens can represent a wide variety of assets, including those typically measured in very small or very large denominations.
 // This format uses significant digits and a power-of-ten exponent in a similar way to scientific notation.
@@ -233,44 +239,60 @@ func VerifyIOUValue(value string) error {
 // Serializes the value field of an issued currency amount to its bytes representation
 // func serializeIssuedCurrencyValue(value string) ([]byte, error) {
 
+// 	decimalValue, _ := new(big.Float).SetString(value) // bigFloat for precision
+// 	if decimalValue.Sign() == 0 {
+// 		zeroAmount := new(big.Int).SetUint64(ZeroCurrencyAmountHex)
+// 		return []byte(zeroAmount.Bytes()), nil // if the value is zero, then return the zero currency amount hex
+// 	}
+
 // 	bigDecimal, err := NewBigDecimal(value)
 // 	if err != nil {
 // 		return nil, err
 // 	}
-// 	exp := bigDecimal.Scale
+// 	exp := bigDecimal.GetExponent()
+// 	// exp := bigDecimal.Scale
+
+// 	// mantissa, _ := decimalValue.SetMantExp(decimalValue, exp).Float64() // get the mantissa and exponent of the decimal value
+
 // 	mantissa, err := strconv.ParseFloat(bigDecimal.UnscaledValue, 64)
+
 // 	if err != nil {
 // 		return nil, err
 // 	}
 
-// 	decimalValue, _ := new(big.Float).SetString(value) // bigFloat for precision
-// 	if decimalValue.Sign() == 0 {
-// 		x := new(big.Int).SetUint64(ZeroCurrencyAmountHex)
-// 		return []byte(x.Bytes()), nil // if the value is zero, then return the zero currency amount hex
+// 	for mantissa < MinIOUMantissa && exp > MinIOUExponent {
+// 		mantissa *= 10
+// 		exp--
 // 	}
 
-// 	// convert components to integers
-
-// 	// x == mantissa * 2^exponent
-
-// 	if mantissa < MinIOUMantissa && exp > MinIOUExponent {
-// 		mantissa *= 10
-// 		exp -= 1
-// 	} else if int(mantissa) > MaxIOUMantissa {
+// 	for mantissa > float64(MaxIOUMantissa) {
 // 		if exp >= MaxIOUExponent {
-// 			return nil, errors.New("IOU value is an invalid IOU amount - exponent is out of range")
+// 			return nil, errors.New("IOU value is an invalid IOU amount - exponent is out of range") // if the scale is less than -96 or greater than 80, return an error
 // 		}
 // 		mantissa /= 10
-// 		exp += 1
+// 		exp++
+
+// 		if exp < MinIOUExponent || mantissa < MinIOUMantissa {
+// 			// round down to zero
+// 			x := new(big.Int).SetUint64(ZeroCurrencyAmountHex)
+// 			return []byte(x.Bytes()), nil
+// 		}
+
+// 		if exp > MaxIOUExponent || mantissa > float64(MaxIOUMantissa) {
+// 			return nil, errors.New("IOU value is an invalid IOU amount - exponent is out of range") // if the scale is less than -96 or greater than 80, return an error
+// 		}
 // 	}
 
-// 	if exp < MinIOUExponent || mantissa < MinIOUMantissa {
-// 		// round to zero
-// 		x := new(big.Int).SetUint64(ZeroCurrencyAmountHex)
-// 		return []byte(x.Bytes()), nil // don't want this to be a return!
+// 	// convert components to bytes
+
+// 	serial := uint64(ZeroCurrencyAmountHex)
+// 	if bigDecimal.Sign == "" {
+// 		serial |= uint64(PosSignBitMask) // if the sign is positive, set the sign bit to 1
+// 		serial |= uint64(exp+97) << 54   // if the exponent is positive, set the exponent bits to the exponent + 97
+// 		serial |= uint64(mantissa)       // last 54 bits are mantissa
 // 	}
 
-// 	return nil, nil
+// 	return []byte(new(big.Int).SetUint64(serial).Bytes()), nil
 // }
 
 // Returns true if this amount is a "native" XRP amount - first bit in first byte set to 0 for native XRP
@@ -285,4 +307,24 @@ func isPositive(value []byte) bool {
 	fmt.Printf("%08b", value)
 	x := []byte(value)[0]&0x40 > 0
 	return x
+}
+
+// XRP values shouldn't contain a decimal point BECAUSE they are represented as integers as drops
+// returns true if the string contains a SINGLE decimal point character
+func containsDecimal(s string) (bool, error) {
+	decCount := strings.Count(s, ".") // count the number of decimal points
+	if decCount > 1 {
+		return true, errors.New("invalid - string contains more than one decimal point")
+	}
+	return strings.Contains(s, "."), nil
+}
+
+// Checks if a value string contains invalid characters - returns true if it does
+func ContainsInvalidCharacters(value string) bool {
+	for _, char := range value {
+		if !strings.Contains(AllowedIOUCharacters, strings.ToLower(string(char))) { // if the character is not in the allowed characters list return true
+			return true
+		}
+	}
+	return false
 }
