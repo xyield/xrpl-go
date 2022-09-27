@@ -194,8 +194,20 @@ func TestSerializeXrpAmount(t *testing.T) {
 			expErr:         errors.New("XRP value must not contain a decimal"),
 		},
 		{
-			name:           "invalid xrp value - out of range",
-			input:          "983496373783750346983046704237509273095720937560927469729076023947673406",
+			name:           "boundary test - 1 less than max xrp value",
+			input:          "99999999999999999",
+			expectedOutput: []byte{0x41, 0x63, 0x45, 0x78, 0x5d, 0x89, 0xff, 0xff},
+			expErr:         nil,
+		},
+		{
+			name:           "boundary test - max xrp value",
+			input:          "10000000000000000",
+			expectedOutput: []byte{0x40, 0x23, 0x86, 0xf2, 0x6f, 0xc1, 0x00, 0x00},
+			expErr:         nil,
+		},
+		{
+			name:           "boundary test - 1 greater than max xrp value",
+			input:          "100000000000000001",
 			expectedOutput: nil,
 			expErr:         errors.New("XRP value is an invalid XRP amount"),
 		},
