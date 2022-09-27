@@ -1,6 +1,7 @@
 package types
 
 import (
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"math/big"
@@ -39,16 +40,6 @@ type BigDecimal struct {
 func (a *Amount) SerializeJson(value any) ([]byte, error) {
 
 	return nil, nil
-}
-
-// Checks if a value string contains invalid characters - returns true if it does
-func ContainsInvalidCharacters(value string) bool {
-	for _, char := range value {
-		if !strings.Contains(AllowedIOUCharacters, strings.ToLower(string(char))) { // if the character is not in the allowed characters list return true
-			return true
-		}
-	}
-	return false
 }
 
 // Creates a new custom BigDecimal object from a value string
@@ -145,16 +136,6 @@ func NewBigDecimal(value string) (*BigDecimal, error) {
 	return bigDecimal, nil
 }
 
-// XRP values shouldn't contain a decimal point BECAUSE they are represented as integers as drops
-// returns true if the string contains a SINGLE decimal point character
-func containsDecimal(s string) (bool, error) {
-	decCount := strings.Count(s, ".") // count the number of decimal points
-	if decCount > 1 {
-		return true, errors.New("invalid - string contains more than one decimal point")
-	}
-	return strings.Contains(s, "."), nil
-}
-
 // validates the format of an XRP amount value
 // XRP values shouldn't contain a decimal point BECAUSE they are represented as integers as drops
 func VerifyXrpValue(value string) error {
@@ -222,56 +203,26 @@ func VerifyIOUValue(value string) error {
 	return err
 }
 
-// XRPL definition of precision is number of significant digits:
-// Tokens can represent a wide variety of assets, including those typically measured in very small or very large denominations.
-// This format uses significant digits and a power-of-ten exponent in a similar way to scientific notation.
-// The format supports positive and negative significant digits and exponents within the specified range.
-// Unlike typical floating-point representations of non-whole numbers, this format uses integer math for all calculations,
-// so it always maintains 15 decimal digits of precision. Multiplication and division have adjustments to compensate for
-// over-rounding in the least significant digits.
+// Serializes an XRP amount value
+func SerializeXrpAmount(value string) ([]byte, error) {
 
-// Serializes the value field of an issued currency amount to its bytes representation
-// func serializeIssuedCurrencyValue(value string) ([]byte, error) {
+	if VerifyXrpValue(value) != nil {
+		return nil, VerifyXrpValue(value)
+	}
 
-// 	bigDecimal, err := NewBigDecimal(value)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	exp := bigDecimal.Scale
-// 	mantissa, err := strconv.ParseFloat(bigDecimal.UnscaledValue, 64)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	val, err := strconv.ParseUint(value, 10, 64)
 
-// 	decimalValue, _ := new(big.Float).SetString(value) // bigFloat for precision
-// 	if decimalValue.Sign() == 0 {
-// 		x := new(big.Int).SetUint64(ZeroCurrencyAmountHex)
-// 		return []byte(x.Bytes()), nil // if the value is zero, then return the zero currency amount hex
-// 	}
+	if err != nil {
+		return nil, err
+	}
 
-// 	// convert components to integers
+	valWithPosBit := val | PosSignBitMask
+	valBytes := make([]byte, NativeAmountByteLength)
 
-// 	// x == mantissa * 2^exponent
+	binary.BigEndian.PutUint64(valBytes, uint64(valWithPosBit))
 
-// 	if mantissa < MinIOUMantissa && exp > MinIOUExponent {
-// 		mantissa *= 10
-// 		exp -= 1
-// 	} else if int(mantissa) > MaxIOUMantissa {
-// 		if exp >= MaxIOUExponent {
-// 			return nil, errors.New("IOU value is an invalid IOU amount - exponent is out of range")
-// 		}
-// 		mantissa /= 10
-// 		exp += 1
-// 	}
-
-// 	if exp < MinIOUExponent || mantissa < MinIOUMantissa {
-// 		// round to zero
-// 		x := new(big.Int).SetUint64(ZeroCurrencyAmountHex)
-// 		return []byte(x.Bytes()), nil // don't want this to be a return!
-// 	}
-
-// 	return nil, nil
-// }
+	return valBytes, nil
+}
 
 // Returns true if this amount is a "native" XRP amount - first bit in first byte set to 0 for native XRP
 func isNative(value []byte) bool {
@@ -285,4 +236,24 @@ func isPositive(value []byte) bool {
 	fmt.Printf("%08b", value)
 	x := []byte(value)[0]&0x40 > 0
 	return x
+}
+
+// XRP values shouldn't contain a decimal point BECAUSE they are represented as integers as drops
+// returns true if the string contains a SINGLE decimal point character
+func containsDecimal(s string) (bool, error) {
+	decCount := strings.Count(s, ".") // count the number of decimal points
+	if decCount > 1 {
+		return true, errors.New("invalid - string contains more than one decimal point")
+	}
+	return strings.Contains(s, "."), nil
+}
+
+// Checks if a value string contains invalid characters - returns true if it does
+func ContainsInvalidCharacters(value string) bool {
+	for _, char := range value {
+		if !strings.Contains(AllowedIOUCharacters, strings.ToLower(string(char))) { // if the character is not in the allowed characters list return true
+			return true
+		}
+	}
+	return false
 }

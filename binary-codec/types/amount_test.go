@@ -155,6 +155,77 @@ func TestVerifyIOUValue(t *testing.T) {
 	}
 }
 
+func TestSerializeXrpAmount(t *testing.T) {
+
+	tests := []struct {
+		name           string
+		input          string
+		expectedOutput []byte
+		expErr         error
+	}{
+		{
+			name:           "valid xrp value - 1",
+			input:          "524801",
+			expectedOutput: []byte{0x40, 0x00, 0x00, 0x00, 0x00, 0x8, 0x2, 0x01},
+			expErr:         nil,
+		},
+		{
+			name:           "valid xrp value - 2",
+			input:          "7696581656832",
+			expectedOutput: []byte{0x40, 0x00, 0x7, 0x00, 0x00, 0x4, 0x1, 0x00},
+			expErr:         nil,
+		},
+		{
+			name:           "valid xrp value - 3",
+			input:          "10000000",
+			expectedOutput: []byte{0x40, 0x00, 0x00, 0x00, 0x00, 0x98, 0x96, 0x80},
+			expErr:         nil,
+		},
+		{
+			name:           "invalid xrp value - negative",
+			input:          "-125000708",
+			expectedOutput: nil,
+			expErr:         errors.New("XRP value is an invalid XRP amount"),
+		},
+		{
+			name:           "invalid xrp value - decimal",
+			input:          "125000708.0",
+			expectedOutput: nil,
+			expErr:         errors.New("XRP value must not contain a decimal"),
+		},
+		{
+			name:           "boundary test - 1 less than max xrp value",
+			input:          "99999999999999999",
+			expectedOutput: []byte{0x41, 0x63, 0x45, 0x78, 0x5d, 0x89, 0xff, 0xff},
+			expErr:         nil,
+		},
+		{
+			name:           "boundary test - max xrp value",
+			input:          "10000000000000000",
+			expectedOutput: []byte{0x40, 0x23, 0x86, 0xf2, 0x6f, 0xc1, 0x00, 0x00},
+			expErr:         nil,
+		},
+		{
+			name:           "boundary test - 1 greater than max xrp value",
+			input:          "100000000000000001",
+			expectedOutput: nil,
+			expErr:         errors.New("XRP value is an invalid XRP amount"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			got, err := SerializeXrpAmount(tt.input)
+			if tt.expErr != nil {
+				assert.Error(t, tt.expErr, err)
+			} else {
+				assert.Nil(t, err)
+				assert.Equal(t, tt.expectedOutput, got)
+			}
+		})
+	}
+}
+
 func TestNewBigDecimal(t *testing.T) {
 	tt := []struct {
 		name      string
@@ -771,7 +842,7 @@ func TestNewBigDecimal(t *testing.T) {
 // 		},
 // 		{
 // 			name:     "valid value",
-// 			input:    "334767.0567",
+// 			input:    "7072.8",
 // 			expected: []byte{},
 // 		},
 // 	}
