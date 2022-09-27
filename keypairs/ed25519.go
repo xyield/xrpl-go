@@ -19,10 +19,10 @@ func (c *ed25519Alg) deriveKeypair(decodedSeed []byte, validator bool) (string, 
 	if err != nil {
 		return "", "", err
 	}
-	pubKey = append([]byte{addresscodec.ED25519Prefix}, pubKey...)
+	pubKey = append([]byte{addresscodec.ED25519}, pubKey...)
 	public := formatKey(pubKey)
-	privKey = append([]byte{addresscodec.ED25519Prefix}, privKey...)
-	private := formatKey(privKey[:32+len([]byte{addresscodec.ED25519Prefix})])
+	privKey = append([]byte{addresscodec.ED25519}, privKey...)
+	private := formatKey(privKey[:32+len([]byte{addresscodec.ED25519})])
 	return private, public, nil
 }
 

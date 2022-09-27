@@ -96,11 +96,13 @@ func EncodeClassicAddressFromPublicKeyHex(pubkeyhex string) (string, error) {
 
 	pubkey, err := hex.DecodeString(pubkeyhex)
 
-	if len(pubkey) != AccountPublicKeyLength {
-		pubkey = append([]byte{ED25519Prefix}, pubkey...)
+	if err != nil {
+		return "", err
 	}
 
-	if err != nil {
+	if len(pubkey) == AccountPublicKeyLength-1 {
+		pubkey = append([]byte{ED25519}, pubkey...)
+	} else if len(pubkey) != AccountPublicKeyLength {
 		return "", &EncodeLengthError{Instance: "PublicKey", Expected: AccountPublicKeyLength, Input: len(pubkey)}
 	}
 
@@ -110,7 +112,7 @@ func EncodeClassicAddressFromPublicKeyHex(pubkeyhex string) (string, error) {
 		return "", &EncodeLengthError{Instance: "AccountID", Expected: AccountAddressLength, Input: len(accountID)}
 	}
 
-	address := Base58CheckEncode(accountID, AccountAddressPrefix)
+	address := Encode(accountID, []byte{AccountAddressPrefix}, AccountAddressLength)
 
 	if !IsValidClassicAddress(address) {
 		return "", &InvalidClassicAddressError{Input: address}
