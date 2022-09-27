@@ -101,7 +101,7 @@ func EncodeClassicAddressFromPublicKeyHex(pubkeyhex string) (string, error) {
 	}
 
 	if len(pubkey) == AccountPublicKeyLength-1 {
-		pubkey = append([]byte{ED25519Prefix}, pubkey...)
+		pubkey = append([]byte{ED25519}, pubkey...)
 	} else if len(pubkey) != AccountPublicKeyLength {
 		return "", &EncodeLengthError{Instance: "PublicKey", Expected: AccountPublicKeyLength, Input: len(pubkey)}
 	}
