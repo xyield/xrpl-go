@@ -303,6 +303,79 @@ func TestSerializeIssuedCurrencyValue(t *testing.T) {
 	}
 }
 
+func TestCreateValueObject(t *testing.T) {
+	tests := []struct {
+		name          string
+		inputValue    string
+		inputCurrency string
+		inputIssuer   string
+		expected      *ValueObj
+		expectedErr   error
+	}{
+		{
+			name:          "successfully created value object",
+			inputValue:    "7072.8",
+			inputCurrency: "USD",
+			inputIssuer:   "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+			expected: &ValueObj{
+				Value:    []byte{0xD5, 0x59, 0x20, 0xAC, 0x93, 0x91, 0x40, 0x00},
+				Currency: []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x55, 0x53, 0x44, 0x00, 0x00, 0x00, 0x00, 0x00},
+				Issuer:   []byte{0xa, 0x20, 0xb3, 0xc8, 0x5f, 0x48, 0x25, 0x32, 0xa9, 0x57, 0x8d, 0xbb, 0x39, 0x50, 0xb8, 0x5c, 0xa0, 0x65, 0x94, 0xd1},
+			},
+			expectedErr: nil,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			got, err := createValueObject(tt.inputValue, tt.inputCurrency, tt.inputIssuer)
+
+			if tt.expectedErr != nil {
+				assert.EqualError(t, tt.expectedErr, err.Error())
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.expected, got)
+			}
+
+		})
+	}
+}
+func TestSerializeIssuedCurrencyAmount(t *testing.T) {
+	tests := []struct {
+		name          string
+		inputValue    string
+		inputCurrency string
+		inputIssuer   string
+		expected      []byte
+		expectedErr   error
+	}{
+		{
+			name:          "valid serialized issued currency amount",
+			inputValue:    "7072.8",
+			inputCurrency: "USD",
+			inputIssuer:   "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+			expected:      []byte{0xD5, 0x59, 0x20, 0xAC, 0x93, 0x91, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x55, 0x53, 0x44, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0A, 0x20, 0xB3, 0xC8, 0x5F, 0x48, 0x25, 0x32, 0xA9, 0x57, 0x8D, 0xBB, 0x39, 0x50, 0xB8, 0x5C, 0xA0, 0x65, 0x94, 0xD1},
+			expectedErr:   nil,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			got, err := SerializeIssuedCurrencyAmount(tt.inputValue, tt.inputCurrency, tt.inputIssuer)
+
+			if tt.expectedErr != nil {
+				assert.EqualError(t, tt.expectedErr, err.Error())
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.expected, got)
+			}
+
+		})
+	}
+}
+
 func TestIsNative(t *testing.T) {
 	tests := []struct {
 		name     string

@@ -363,7 +363,7 @@ func TestEncode(t *testing.T) {
 		// 		"value":    "7072.8",
 		// 	},
 		// 	},
-		// 	output:      "D55920AC9391400000000000000000000000000055534400000000000A20B3C85F482532A9578DBB3950B85CA06594",
+		// 	output:      "D55920AC9391400000000000000000000000000055534400000000000A20B3C85F482532A9578DBB3950B85CA06594D1",
 		// 	expectedErr: nil,
 		// },
 		// { // output correct from js encode lib

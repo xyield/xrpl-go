@@ -2,11 +2,15 @@ package types
 
 import (
 	"encoding/binary"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"math/big"
 	"strconv"
 	"strings"
+
+	"github.com/rmg/iso4217"
+	addresscodec "github.com/xyield/xrpl-go/address-codec"
 )
 
 type Amount struct{}
@@ -29,6 +33,12 @@ const (
 
 	AllowedIOUCharacters = "0123456789.-eE" // going to do this with Regex
 )
+
+type ValueObj struct {
+	Value    []byte
+	Currency []byte
+	Issuer   []byte
+}
 
 type BigDecimal struct {
 	Scale         int
@@ -292,6 +302,78 @@ func serializeIssuedCurrencyValue(value string) ([]byte, error) {
 	binary.BigEndian.PutUint64(serialReturn, serial)
 
 	return serialReturn, nil
+}
+
+func createValueObject(value, currency, issuer string) (*ValueObj, error) {
+
+	//standard format done, need to handle non-standard format - ie first 8 bits of 160 bits is NOT 0x00
+
+	//check if currency code is iso4217
+	iso, _ := iso4217.ByName(currency)
+
+	var currencyBytes []byte
+
+	if iso > 0 {
+		currencyBytes = []byte(currency)
+	} else if iso == 0 {
+
+		// check if currency code is hex
+		currencyHexToBytes, err := hex.DecodeString(currency)
+
+		if err != nil {
+			return nil, err
+		} else if len(currencyHexToBytes) == 20 {
+			currencyBytes = currencyHexToBytes
+		} else {
+			return nil, errors.New("currency code is not a valid hex string")
+		}
+	}
+
+	isoPrefix := []byte{0x00}
+	reserved88bits := make([]byte, 11)
+	reserved40bits := make([]byte, 5)
+
+	reserved88bits = append(isoPrefix, reserved88bits...)
+	currencyBytes = append(reserved88bits, currencyBytes...)
+	currencyBytes = append(currencyBytes, reserved40bits...)
+
+	valBytes, err := serializeIssuedCurrencyValue(value)
+
+	if err != nil {
+		return nil, err
+	}
+	_, issuerBytes, err := addresscodec.DecodeClassicAddressToAccountID(issuer)
+	if err != nil {
+		return nil, err
+	}
+
+	// AccountIDs that appear as children of special fields (Amount issuer and PathSet account) are not length-prefixed.
+	// So in Amount and PathSet fields, don't use the length indicator 0x14. This is in contrast to the AccountID fields where the length indicator prefix 0x14 is added.
+
+	return &ValueObj{
+		Value:    valBytes,
+		Currency: currencyBytes,
+		Issuer:   issuerBytes,
+	}, nil
+}
+
+// Serializes an issued currency amount
+func SerializeIssuedCurrencyAmount(value, currency, issuer string) ([]byte, error) {
+
+	valueobj, err := createValueObject(value, currency, issuer)
+
+	if err != nil {
+		return nil, err
+	}
+
+	amountBytes := valueobj.Value
+	currencyBytes := valueobj.Currency
+	issuerBytes := valueobj.Issuer
+
+	serializedAmount := append(amountBytes, currencyBytes...)
+	serializedAmount = append(serializedAmount, issuerBytes...)
+
+	return serializedAmount, nil
 }
 
 // Returns true if this amount is a "native" XRP amount - first bit in first byte set to 0 for native XRP
