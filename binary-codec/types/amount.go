@@ -166,10 +166,6 @@ func VerifyXrpValue(value string) error {
 	return nil
 }
 
-func (b *BigDecimal) GetExponent() int {
-	return b.Precision - b.Scale - 1
-}
-
 // validates the format of an issued currency amount value
 func VerifyIOUValue(value string) error {
 
