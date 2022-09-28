@@ -156,7 +156,6 @@ func TestVerifyIOUValue(t *testing.T) {
 }
 
 func TestSerializeXrpAmount(t *testing.T) {
-
 	tests := []struct {
 		name           string
 		input          string
@@ -222,6 +221,132 @@ func TestSerializeXrpAmount(t *testing.T) {
 				assert.Nil(t, err)
 				assert.Equal(t, tt.expectedOutput, got)
 			}
+		})
+	}
+}
+
+func TestSerializeIssuedCurrencyValue(t *testing.T) {
+	tests := []struct {
+		name        string
+		input       string
+		expected    []byte
+		expectedErr error
+	}{
+		{
+			name:        "valid zero value",
+			input:       "0",
+			expected:    []byte{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			expectedErr: nil,
+		},
+		{
+			name:        "valid value - 2",
+			input:       "1",
+			expected:    []byte{0xD4, 0x83, 0x8D, 0x7E, 0xA4, 0xC6, 0x80, 0x00},
+			expectedErr: nil,
+		},
+		{
+			name:        "valid value - 3",
+			input:       "2.1",
+			expected:    []byte{0xD4, 0x87, 0x75, 0xF0, 0x5A, 0x07, 0x40, 0x00},
+			expectedErr: nil,
+		},
+		{
+			name:        "valid value - from Transaction 1 in main_test.go",
+			input:       "7072.8",
+			expected:    []byte{0xD5, 0x59, 0x20, 0xAC, 0x93, 0x91, 0x40, 0x00},
+			expectedErr: nil,
+		},
+		{
+			name:        "valid value - from Transaction 3 in main_test.go",
+			input:       "0.6275558355",
+			expected:    []byte{0xd4, 0x56, 0x4b, 0x96, 0x4a, 0x84, 0x5a, 0xc0},
+			expectedErr: nil,
+		},
+		{
+			name:        "valid value - negative",
+			input:       "-2",
+			expected:    []byte{0x94, 0x87, 0x1A, 0xFD, 0x49, 0x8D, 0x00, 0x00},
+			expectedErr: nil,
+		},
+		{
+			name:        "valid value - negative - 2",
+			input:       "-7072.8",
+			expected:    []byte{0x95, 0x59, 0x20, 0xAC, 0x93, 0x91, 0x40, 0x00},
+			expectedErr: nil,
+		},
+		{
+			name:        "valid value - large currency amount",
+			input:       "1111111111111111.0",
+			expected:    []byte{0xD8, 0x43, 0xF2, 0x8C, 0xB7, 0x15, 0x71, 0xC7},
+			expectedErr: nil,
+		},
+		{
+			name:        "boundary test - max precision - max exponent",
+			input:       "9999999999999999e80",
+			expected:    []byte{0xec, 0x63, 0x86, 0xf2, 0x6f, 0xc0, 0xff, 0xff},
+			expectedErr: nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			got, err := serializeIssuedCurrencyValue(tt.input)
+
+			if tt.expectedErr != nil {
+				assert.EqualError(t, tt.expectedErr, err.Error())
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.expected, got)
+			}
+
+		})
+	}
+}
+
+func TestIsNative(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    []byte
+		expected bool
+	}{
+		{
+			name:     "native XRP",
+			input:    []byte{0, 64, 128, 32}, // 0 in binary is 00000000. If the first bit of the first byte is 0, it is deemed to be native XRP
+			expected: true,
+		},
+		{
+			name:     "not native XRP",
+			input:    []byte{128, 0, 0, 1, 0, 1, 0, 0}, // 128 in binary is 10000000. If the first bit of the first byte is not 0, it is deemed to be not native XRP
+			expected: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, isNative(tt.input))
+		})
+	}
+}
+
+func TestIsPositive(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    []byte
+		expected bool
+	}{
+		{
+			name:     "positive",
+			input:    []byte{64, 0, 0, 0}, // 64 in binary is 01000000. If the second bit of the first byte is 1, it is deemed positive
+			expected: true,
+		},
+		{
+			name:     "negative",
+			input:    []byte{128, 0, 0, 0, 0, 0, 0, 0}, // 128 in binary is 10000000. If the second bit of the first byte is 0, it is deemed negative
+			expected: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, isPositive(tt.input))
 		})
 	}
 }
@@ -825,82 +950,6 @@ func TestNewBigDecimal(t *testing.T) {
 			} else {
 				assert.Equal(t, tc.expBigDec, got)
 			}
-		})
-	}
-}
-
-// func TestSerializeIssuedCurrencyValue(t *testing.T) {
-// 	tests := []struct {
-// 		name     string
-// 		input    string
-// 		expected []byte
-// 	}{
-// 		{
-// 			name:     "valid zero value",
-// 			input:    "0",
-// 			expected: []byte{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-// 		},
-// 		{
-// 			name:     "valid value",
-// 			input:    "7072.8",
-// 			expected: []byte{},
-// 		},
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-
-// 			got, _ := serializeIssuedCurrencyValue(tt.input)
-
-// 			assert.Equal(t, tt.expected, got)
-
-// 		})
-// 	}
-// }
-
-func TestIsNative(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    []byte
-		expected bool
-	}{
-		{
-			name:     "native XRP",
-			input:    []byte{0, 64, 128, 32}, // 0 in binary is 00000000. If the first bit of the first byte is 0, it is deemed to be native XRP
-			expected: true,
-		},
-		{
-			name:     "not native XRP",
-			input:    []byte{128, 0, 0, 1, 0, 1, 0, 0}, // 128 in binary is 10000000. If the first bit of the first byte is not 0, it is deemed to be not native XRP
-			expected: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.expected, isNative(tt.input))
-		})
-	}
-}
-
-func TestIsPositive(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    []byte
-		expected bool
-	}{
-		{
-			name:     "positive",
-			input:    []byte{64, 0, 0, 0}, // 64 in binary is 01000000. If the second bit of the first byte is 1, it is deemed positive
-			expected: true,
-		},
-		{
-			name:     "negative",
-			input:    []byte{128, 0, 0, 0, 0, 0, 0, 0}, // 128 in binary is 10000000. If the second bit of the first byte is 0, it is deemed negative
-			expected: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.expected, isPositive(tt.input))
 		})
 	}
 }
