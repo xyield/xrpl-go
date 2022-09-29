@@ -410,23 +410,17 @@ func TestSerializeIssuedCurrencyCode(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
-			name:        "invalid characters in currency code",
+			name:        "standard currency - invalid characters in currency code",
 			input:       "AD/",
 			expected:    nil,
 			expectedErr: errors.New("IOU code contains invalid characters"),
 		},
-		// {
-		// 	name:        "invalid characters in currency code - hex",
-		// 	input:       "0x00000000000000000000000041442f0000000000",
-		// 	expected:    nil,
-		// 	expectedErr: errors.New("IOU code contains invalid characters"),
-		// },
-		// {
-		// 	name:        "invalid characters in non-standard currency code - hex",
-		// 	input:       "0x10000000000000000000000041442f0000000000",
-		// 	expected:    nil,
-		// 	expectedErr: errors.New("IOU code contains invalid characters"),
-		// },
+		{
+			name:        "standard currency - invalid characters in currency code - hex",
+			input:       "0x00000000000000000000000041442f0000000000",
+			expected:    nil,
+			expectedErr: errors.New("IOU code contains invalid characters"),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

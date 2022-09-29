@@ -306,31 +306,41 @@ func serializeIssuedCurrencyCode(currency string) ([]byte, error) {
 	}
 
 	var currencyBytes []byte
-	disallowedXrpBytes, _ := hex.DecodeString("0000000000000000000000005852500000000000")
 
 	if currency == "XRP" {
 		return nil, errors.New("'XRP' is disallowed as an issued currency")
 	} else if len(currency) == 3 {
 
-		reserved88bits := make([]byte, 12)
+		reserved96bits := make([]byte, 12)
 		reserved40bits := make([]byte, 5)
 		currencyBytes = []byte(currency)
-		currencyBytes = append(reserved88bits, currencyBytes...)
+		currencyBytes = append(reserved96bits, currencyBytes...)
 		currencyBytes = append(currencyBytes, reserved40bits...)
 		return currencyBytes, nil
 
 	} else if (len(currency) == 40 && currency[0:2] == "00") || (len(currency) == 42 && currency[0:4] == "0x00") { // if the currency code is 40 characters long and starts with 00, or 42 characters long and starts with 0x00
 		currency = strings.TrimPrefix(currency, "0x") // remove the 0x hex prefix if it exists
 
-		decodedHex, err := hex.DecodeString(currency)
+		// check if the currency code hex string contains only valid hex characters
+
+		sigHexBytes, err := hex.DecodeString(currency[24:30])
+		if err != nil {
+			return nil, err
+		}
+		if containsInvalidIOUCodeCharactersHex(string(sigHexBytes)) {
+			return nil, errors.New("IOU code contains invalid characters") // if the currency code contains invalid characters, return an error
+		}
+
+		disallowedXrpBytes, _ := hex.DecodeString("0000000000000000000000005852500000000000")
+
+		decodedHexBytes, err := hex.DecodeString(currency)
 
 		if err != nil {
 			return nil, err
-		} else if bytes.Equal(decodedHex, disallowedXrpBytes) {
+		} else if bytes.Equal(decodedHexBytes, disallowedXrpBytes) {
 			return nil, errors.New("'XRP' is disallowed as an issued currency")
 		} else {
-
-			return decodedHex, nil
+			return decodedHexBytes, nil
 		}
 	} else if (len(currency) == 40 && currency[0:2] != "00") || (len(currency) == 42 && currency[0:4] != "0x00") { // if the currency code is 40 characters long and does NOT start with 00, or 42 characters long and does NOT start with 0x00
 		// non-standard currency code with 160-bit hex value - first 8 bits must NOT be 0x00 (standard prefix)
@@ -403,7 +413,7 @@ func containsDecimal(s string) (bool, error) {
 // Checks if a value string contains invalid characters - returns true if it does
 func containsInvalidIOUValueCharacters(value string) bool {
 	for _, char := range value {
-		if !strings.Contains(AllowedIOUValueCharacters, strings.ToLower(string(char))) { // if the character is not in the allowed characters list return true
+		if !strings.ContainsAny(AllowedIOUValueCharacters, strings.ToLower(string(char))) { // if the character is not in the allowed characters list return true
 			return true
 		}
 	}
@@ -412,8 +422,23 @@ func containsInvalidIOUValueCharacters(value string) bool {
 
 // Checks if a currency code string contains invalid characters - returns true if it does
 func containsInvalidIOUCodeCharacters(currency string) bool {
+
 	for _, char := range currency {
-		if !strings.Contains(AllowedIOUCodeCharacters, strings.ToLower(string(char))) { // if the character is not in the allowed characters list return true
+		if !strings.ContainsAny(AllowedIOUCodeCharacters, string(char)) { // if the character is not in the allowed characters list return true
+			return true
+		}
+	}
+
+	return false
+}
+
+func containsInvalidIOUCodeCharactersHex(currency string) bool {
+
+	currencyBytes, _ := hex.DecodeString(currency)
+	allowedIOUCodeCharactersBytes, _ := hex.DecodeString(AllowedIOUCodeCharacters)
+
+	for _, char := range currencyBytes {
+		if !bytes.ContainsAny(allowedIOUCodeCharactersBytes, string(char)) { // if the character is not in the allowed characters list return true
 			return true
 		}
 	}
