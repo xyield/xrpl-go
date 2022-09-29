@@ -1,6 +1,7 @@
 package types
 
 import (
+	"bytes"
 	"encoding/binary"
 	"encoding/hex"
 	"errors"
@@ -9,7 +10,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/rmg/iso4217"
 	addresscodec "github.com/xyield/xrpl-go/address-codec"
 )
 
@@ -31,14 +31,9 @@ const (
 	MinXRP   = 1e-6
 	MaxDrops = 1e17 // 100 billion XRP in drops aka 10^17
 
-	AllowedIOUCharacters = "0123456789.-eE" // going to do this with Regex
+	AllowedIOUValueCharacters = "0123456789.-eE"                                                                   // going to do this with Regex
+	AllowedIOUCodeCharacters  = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz?!@#$%^&*<>(){}[]|" // going to do this with Regex
 )
-
-type ValueObj struct {
-	Value    []byte
-	Currency []byte
-	Issuer   []byte
-}
 
 type BigDecimal struct {
 	Scale         int
@@ -58,7 +53,7 @@ func NewBigDecimal(value string) (*BigDecimal, error) {
 	bigDecimal := new(BigDecimal)
 	var err error
 
-	if ContainsInvalidCharacters(value) {
+	if containsInvalidIOUValueCharacters(value) {
 		return nil, errors.New("value contains invalid characters: only '0-9' '.' '-' 'e' and 'E' are allowed")
 	}
 	if strings.HasPrefix(value, "-") { // if the value is negative, set the sign to negative
@@ -148,7 +143,7 @@ func NewBigDecimal(value string) (*BigDecimal, error) {
 
 // validates the format of an XRP amount value
 // XRP values shouldn't contain a decimal point BECAUSE they are represented as integers as drops
-func VerifyXrpValue(value string) error {
+func verifyXrpValue(value string) error {
 
 	containsDecimal, err := containsDecimal(value)
 
@@ -177,7 +172,7 @@ func VerifyXrpValue(value string) error {
 }
 
 // validates the format of an issued currency amount value
-func VerifyIOUValue(value string) error {
+func verifyIOUValue(value string) error {
 
 	bigDecimal, err := NewBigDecimal(value)
 	exp := bigDecimal.Scale
@@ -212,8 +207,8 @@ func VerifyIOUValue(value string) error {
 // Serializes an XRP amount value
 func SerializeXrpAmount(value string) ([]byte, error) {
 
-	if VerifyXrpValue(value) != nil {
-		return nil, VerifyXrpValue(value)
+	if verifyXrpValue(value) != nil {
+		return nil, verifyXrpValue(value)
 	}
 
 	val, err := strconv.ParseUint(value, 10, 64)
@@ -239,10 +234,10 @@ func SerializeXrpAmount(value string) ([]byte, error) {
 // over-rounding in the least significant digits.
 
 // Serializes the value field of an issued currency amount to its bytes representation
-func serializeIssuedCurrencyValue(value string) ([]byte, error) {
+func SerializeIssuedCurrencyValue(value string) ([]byte, error) {
 
-	if VerifyIOUValue(value) != nil {
-		return nil, VerifyIOUValue(value)
+	if verifyIOUValue(value) != nil {
+		return nil, verifyIOUValue(value)
 	}
 
 	bigDecimal, err := NewBigDecimal(value)
@@ -304,45 +299,70 @@ func serializeIssuedCurrencyValue(value string) ([]byte, error) {
 	return serialReturn, nil
 }
 
-func createValueObject(value, currency, issuer string) (*ValueObj, error) {
+func serializeIssuedCurrencyCode(currency string) ([]byte, error) {
 
-	//standard format done, need to handle non-standard format - ie first 8 bits of 160 bits is NOT 0x00
-
-	//check if currency code is iso4217
-	iso, _ := iso4217.ByName(currency)
+	if containsInvalidIOUCodeCharacters(currency) {
+		return nil, errors.New("IOU code contains invalid characters") // if the currency code contains invalid characters, return an error
+	}
 
 	var currencyBytes []byte
+	disallowedXrpBytes, _ := hex.DecodeString("0000000000000000000000005852500000000000")
 
-	if iso > 0 {
+	if currency == "XRP" {
+		return nil, errors.New("'XRP' is disallowed as an issued currency")
+	} else if len(currency) == 3 {
+
+		reserved88bits := make([]byte, 12)
+		reserved40bits := make([]byte, 5)
 		currencyBytes = []byte(currency)
-	} else if iso == 0 {
+		currencyBytes = append(reserved88bits, currencyBytes...)
+		currencyBytes = append(currencyBytes, reserved40bits...)
+		return currencyBytes, nil
 
-		// check if currency code is hex
-		currencyHexToBytes, err := hex.DecodeString(currency)
+	} else if (len(currency) == 40 && currency[0:2] == "00") || (len(currency) == 42 && currency[0:4] == "0x00") { // if the currency code is 40 characters long and starts with 00, or 42 characters long and starts with 0x00
+		currency = strings.TrimPrefix(currency, "0x") // remove the 0x hex prefix if it exists
+
+		decodedHex, err := hex.DecodeString(currency)
 
 		if err != nil {
 			return nil, err
-		} else if len(currencyHexToBytes) == 20 {
-			currencyBytes = currencyHexToBytes
+		} else if bytes.Equal(decodedHex, disallowedXrpBytes) {
+			return nil, errors.New("'XRP' is disallowed as an issued currency")
 		} else {
-			return nil, errors.New("currency code is not a valid hex string")
+
+			return decodedHex, nil
 		}
+	} else if (len(currency) == 40 && currency[0:2] != "00") || (len(currency) == 42 && currency[0:4] != "0x00") { // if the currency code is 40 characters long and does NOT start with 00, or 42 characters long and does NOT start with 0x00
+		// non-standard currency code with 160-bit hex value - first 8 bits must NOT be 0x00 (standard prefix)
+
+		currency = strings.TrimPrefix(currency, "0x") // remove the 0x hex prefix if it exists
+
+		decodedHex, err := hex.DecodeString(currency)
+		if err != nil {
+			return nil, err
+		}
+
+		return decodedHex, nil
 	}
 
-	isoPrefix := []byte{0x00}
-	reserved88bits := make([]byte, 11)
-	reserved40bits := make([]byte, 5)
+	return nil, errors.New("invalid currency code")
+}
 
-	reserved88bits = append(isoPrefix, reserved88bits...)
-	currencyBytes = append(reserved88bits, currencyBytes...)
-	currencyBytes = append(currencyBytes, reserved40bits...)
+// Serializes the currency field of an issued currency amount to its bytes representation from value, currency code, and issuer address in string form (e.g. "USD", "r123456789")
+// The currency must either be 3 characters OR 160 bits (40 characters) in hex format
+func SerializeIssuedCurrencyAmount(value, currency, issuer string) ([]byte, error) {
 
-	valBytes, err := serializeIssuedCurrencyValue(value)
+	valBytes, err := SerializeIssuedCurrencyValue(value) // serialize the value
 
 	if err != nil {
 		return nil, err
 	}
-	_, issuerBytes, err := addresscodec.DecodeClassicAddressToAccountID(issuer)
+	currencyBytes, err := serializeIssuedCurrencyCode(currency) // serialize the currency code
+
+	if err != nil {
+		return nil, err
+	}
+	_, issuerBytes, err := addresscodec.DecodeClassicAddressToAccountID(issuer) // decode the issuer address
 	if err != nil {
 		return nil, err
 	}
@@ -350,28 +370,8 @@ func createValueObject(value, currency, issuer string) (*ValueObj, error) {
 	// AccountIDs that appear as children of special fields (Amount issuer and PathSet account) are not length-prefixed.
 	// So in Amount and PathSet fields, don't use the length indicator 0x14. This is in contrast to the AccountID fields where the length indicator prefix 0x14 is added.
 
-	return &ValueObj{
-		Value:    valBytes,
-		Currency: currencyBytes,
-		Issuer:   issuerBytes,
-	}, nil
-}
-
-// Serializes an issued currency amount
-func SerializeIssuedCurrencyAmount(value, currency, issuer string) ([]byte, error) {
-
-	valueobj, err := createValueObject(value, currency, issuer)
-
-	if err != nil {
-		return nil, err
-	}
-
-	amountBytes := valueobj.Value
-	currencyBytes := valueobj.Currency
-	issuerBytes := valueobj.Issuer
-
-	serializedAmount := append(amountBytes, currencyBytes...)
-	serializedAmount = append(serializedAmount, issuerBytes...)
+	serializedAmount := append(valBytes, currencyBytes...)      // append the value and currency code bytes
+	serializedAmount = append(serializedAmount, issuerBytes...) // append the issuer address bytes
 
 	return serializedAmount, nil
 }
@@ -401,9 +401,19 @@ func containsDecimal(s string) (bool, error) {
 }
 
 // Checks if a value string contains invalid characters - returns true if it does
-func ContainsInvalidCharacters(value string) bool {
+func containsInvalidIOUValueCharacters(value string) bool {
 	for _, char := range value {
-		if !strings.Contains(AllowedIOUCharacters, strings.ToLower(string(char))) { // if the character is not in the allowed characters list return true
+		if !strings.Contains(AllowedIOUValueCharacters, strings.ToLower(string(char))) { // if the character is not in the allowed characters list return true
+			return true
+		}
+	}
+	return false
+}
+
+// Checks if a currency code string contains invalid characters - returns true if it does
+func containsInvalidIOUCodeCharacters(currency string) bool {
+	for _, char := range currency {
+		if !strings.Contains(AllowedIOUCodeCharacters, strings.ToLower(string(char))) { // if the character is not in the allowed characters list return true
 			return true
 		}
 	}

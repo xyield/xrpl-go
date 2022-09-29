@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestContainsInvalidCharacters(t *testing.T) {
+func TestContainsInvalidIOUValueCharacters(t *testing.T) {
 
 	tests := []struct {
 		name  string
@@ -27,12 +27,45 @@ func TestContainsInvalidCharacters(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := ContainsInvalidCharacters(tt.input); got != tt.want {
+			if got := containsInvalidIOUValueCharacters(tt.input); got != tt.want {
 				t.Errorf("containsInvalidCharacters() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
+
+func TestContainsInvalidIOUCodeCharacters(t *testing.T) {
+
+	tests := []struct {
+		name  string
+		input string
+		want  bool
+	}{
+		{
+			name:  "contains invalid character '/' ",
+			input: "1.0/",
+			want:  true,
+		},
+		{
+			name:  "contains invalid space character",
+			input: "1.0 ",
+			want:  true,
+		},
+		{
+			name:  "does not contain invalid character",
+			input: "10",
+			want:  false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := containsInvalidIOUCodeCharacters(tt.input); got != tt.want {
+				t.Errorf("containsInvalidCharacters() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestContainsDecimal(t *testing.T) {
 
 	tests := []struct {
@@ -96,9 +129,9 @@ func TestVerifyXrpValue(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.expErr != nil {
-				assert.Equal(t, tt.expErr, VerifyXrpValue(tt.input))
+				assert.Equal(t, tt.expErr, verifyXrpValue(tt.input))
 			} else {
-				assert.Nil(t, VerifyXrpValue(tt.input))
+				assert.Nil(t, verifyXrpValue(tt.input))
 			}
 		})
 	}
@@ -145,7 +178,7 @@ func TestVerifyIOUValue(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			err := VerifyIOUValue(tt.input)
+			err := verifyIOUValue(tt.input)
 			if tt.expErr != nil {
 				assert.Error(t, tt.expErr, err)
 			} else {
@@ -290,7 +323,7 @@ func TestSerializeIssuedCurrencyValue(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			got, err := serializeIssuedCurrencyValue(tt.input)
+			got, err := SerializeIssuedCurrencyValue(tt.input)
 
 			if tt.expectedErr != nil {
 				assert.EqualError(t, tt.expectedErr, err.Error())
@@ -303,33 +336,102 @@ func TestSerializeIssuedCurrencyValue(t *testing.T) {
 	}
 }
 
-func TestCreateValueObject(t *testing.T) {
+func TestSerializeIssuedCurrencyCode(t *testing.T) {
 	tests := []struct {
-		name          string
-		inputValue    string
-		inputCurrency string
-		inputIssuer   string
-		expected      *ValueObj
-		expectedErr   error
+		name        string
+		input       string
+		expected    []byte
+		expectedErr error
 	}{
 		{
-			name:          "successfully created value object",
-			inputValue:    "7072.8",
-			inputCurrency: "USD",
-			inputIssuer:   "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
-			expected: &ValueObj{
-				Value:    []byte{0xD5, 0x59, 0x20, 0xAC, 0x93, 0x91, 0x40, 0x00},
-				Currency: []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x55, 0x53, 0x44, 0x00, 0x00, 0x00, 0x00, 0x00},
-				Issuer:   []byte{0xa, 0x20, 0xb3, 0xc8, 0x5f, 0x48, 0x25, 0x32, 0xa9, 0x57, 0x8d, 0xbb, 0x39, 0x50, 0xb8, 0x5c, 0xa0, 0x65, 0x94, 0xd1},
-			},
+			name:        "valid standard currency - ISO4217 - USD",
+			input:       "USD",
+			expected:    []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x55, 0x53, 0x44, 0x00, 0x00, 0x00, 0x00, 0x00},
 			expectedErr: nil,
 		},
+		{
+			name:        "valid standard currency - ISO4217 - USD - hex",
+			input:       "0x0000000000000000000000005553440000000000",
+			expected:    []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x55, 0x53, 0x44, 0x00, 0x00, 0x00, 0x00, 0x00},
+			expectedErr: nil,
+		},
+		{
+			name:        "valid standard currency - non ISO4217 - BTC",
+			input:       "BTC",
+			expected:    []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x42, 0x54, 0x43, 0x00, 0x00, 0x00, 0x00, 0x00},
+			expectedErr: nil,
+		},
+		{
+			name:        "valid standard currency - non ISO4217 - BTC - hex",
+			input:       "0x0000000000000000000000004254430000000000",
+			expected:    []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x42, 0x54, 0x43, 0x00, 0x00, 0x00, 0x00, 0x00},
+			expectedErr: nil,
+		},
+		{
+			name:        "disallowed standard currency - XRP",
+			input:       "XRP",
+			expected:    nil,
+			expectedErr: errors.New("'XRP' is disallowed as an issued currency"),
+		},
+		{
+			name:        "disallowed standard currency - XRP - hex",
+			input:       "0000000000000000000000005852500000000000",
+			expected:    nil,
+			expectedErr: errors.New("'XRP' is disallowed as an issued currency"),
+		},
+		{
+			name:        "invalid standard currency - 4 characters",
+			input:       "ABCD",
+			expected:    nil,
+			expectedErr: errors.New("invalid currency code"),
+		},
+		{
+			name:        "valid non-standard currency - 4 characters - hex",
+			input:       "0x4142434400000000000000000000000000000000",
+			expected:    []byte{0x41, 0x42, 0x43, 0x44, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			expectedErr: nil,
+		},
+		{
+			name:        "special case - XRP - hex",
+			input:       "0x0000000000000000000000000000000000000000",
+			expected:    []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			expectedErr: nil,
+		},
+		{
+			name:        "standard currency - valid symbols in currency code - 3 characters",
+			input:       "A*B",
+			expected:    []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x41, 0x2a, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00},
+			expectedErr: nil,
+		},
+		{
+			name:        "standard currency - valid symbols in currency code - 3 characters - hex",
+			input:       "0x000000000000000000000000412a420000000000",
+			expected:    []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x41, 0x2a, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00},
+			expectedErr: nil,
+		},
+		{
+			name:        "invalid characters in currency code",
+			input:       "AD/",
+			expected:    nil,
+			expectedErr: errors.New("IOU code contains invalid characters"),
+		},
+		// {
+		// 	name:        "invalid characters in currency code - hex",
+		// 	input:       "0x00000000000000000000000041442f0000000000",
+		// 	expected:    nil,
+		// 	expectedErr: errors.New("IOU code contains invalid characters"),
+		// },
+		// {
+		// 	name:        "invalid characters in non-standard currency code - hex",
+		// 	input:       "0x10000000000000000000000041442f0000000000",
+		// 	expected:    nil,
+		// 	expectedErr: errors.New("IOU code contains invalid characters"),
+		// },
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			got, err := createValueObject(tt.inputValue, tt.inputCurrency, tt.inputIssuer)
+			got, err := serializeIssuedCurrencyCode(tt.input)
 
 			if tt.expectedErr != nil {
 				assert.EqualError(t, tt.expectedErr, err.Error())
@@ -341,6 +443,7 @@ func TestCreateValueObject(t *testing.T) {
 		})
 	}
 }
+
 func TestSerializeIssuedCurrencyAmount(t *testing.T) {
 	tests := []struct {
 		name          string

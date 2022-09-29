@@ -3,7 +3,6 @@ module github.com/xyield/xrpl-go
 go 1.19
 
 require (
-	github.com/rmg/iso4217 v1.0.0
 	github.com/stretchr/testify v1.7.5
 	github.com/ugorji/go/codec v1.2.7
 )
