@@ -182,21 +182,16 @@ func verifyXrpValue(value string) error {
 func verifyIOUValue(value string) error {
 
 	bigDecimal, err := NewBigDecimal(value)
-	exp := bigDecimal.Scale
 
 	if err != nil {
 		return err
 	}
 
-	decimalValue, ok := new(big.Float).SetString(value) // bigFloat for precision
-
-	if !ok {
-		return errors.New("failed to convert string to big.Float")
-	}
-
-	if decimalValue.Sign() == 0 {
+	if bigDecimal.UnscaledValue == "" {
 		return nil
 	}
+
+	exp := bigDecimal.Scale
 
 	if bigDecimal.Precision > MaxIOUPrecision {
 		return errors.New("IOU value is an invalid IOU amount - precision is too large > 16") // if the precision is greater than 16, return an error
@@ -308,61 +303,44 @@ func SerializeIssuedCurrencyValue(value string) ([]byte, error) {
 
 func serializeIssuedCurrencyCode(currency string) ([]byte, error) {
 
-	if containsInvalidIOUCodeCharacters(currency) {
-		return nil, errors.New("IOU code contains invalid characters") // if the currency code contains invalid characters, return an error
+	currency = strings.TrimPrefix(currency, "0x")                                                                                                // remove the 0x prefix if it exists
+	if currency == "XRP" || currency == "0x0000000000000000000000005852500000000000" || currency == "0000000000000000000000005852500000000000" { // if the currency is XRP, return the XRP currency code
+		return nil, errors.New("'XRP' is disallowed as an issued currency")
 	}
 
-	var currencyBytes []byte
-
-	if currency == "XRP" {
-		return nil, errors.New("'XRP' is disallowed as an issued currency")
-	} else if len(currency) == 3 {
-
-		reserved96bits := make([]byte, 12)
-		reserved40bits := make([]byte, 5)
-		currencyBytes = []byte(currency)
-		currencyBytes = append(reserved96bits, currencyBytes...)
-		currencyBytes = append(currencyBytes, reserved40bits...)
-		return currencyBytes, nil
-
-	} else if (len(currency) == 40 && currency[0:2] == "00") || (len(currency) == 42 && currency[0:4] == "0x00") { // if the currency code is 40 characters long and starts with 00, or 42 characters long and starts with 0x00
-		currency = strings.TrimPrefix(currency, "0x") // remove the 0x hex prefix if it exists
-
-		// check if the currency code hex string contains only valid hex characters
-
-		sigHexBytes, err := hex.DecodeString(currency[24:30])
-		if err != nil {
-			return nil, err
-		}
-		if containsInvalidIOUCodeCharactersHex(string(sigHexBytes)) {
+	switch len(currency) {
+	case 3:
+		if containsInvalidIOUCodeCharacters(currency) {
 			return nil, errors.New("IOU code contains invalid characters") // if the currency code contains invalid characters, return an error
 		}
+		var currencyBytes [20]byte
+		copy(currencyBytes[12:], []byte(currency))
+		return currencyBytes[:], nil
+	case 40:
+		if currency[0:2] == "00" {
+			decodedHexBytes, err := hex.DecodeString(currency)
 
-		disallowedXrpBytes, _ := hex.DecodeString("0000000000000000000000005852500000000000")
+			if err != nil {
+				return nil, err
+			}
 
-		decodedHexBytes, err := hex.DecodeString(currency)
+			if containsInvalidIOUCodeCharactersHex(string(decodedHexBytes[12:15])) {
+				return nil, errors.New("IOU code contains invalid characters") // if the currency code contains invalid characters, return an error
+			}
 
-		if err != nil {
-			return nil, err
-		} else if bytes.Equal(decodedHexBytes, disallowedXrpBytes) {
-			return nil, errors.New("'XRP' is disallowed as an issued currency")
-		} else {
 			return decodedHexBytes, nil
+		} else {
+			decodedHex, err := hex.DecodeString(strings.TrimPrefix(currency, "0x"))
+			if err != nil {
+				return nil, err
+			}
+
+			return decodedHex, nil
 		}
-	} else if (len(currency) == 40 && currency[0:2] != "00") || (len(currency) == 42 && currency[0:4] != "0x00") { // if the currency code is 40 characters long and does NOT start with 00, or 42 characters long and does NOT start with 0x00
-		// non-standard currency code with 160-bit hex value - first 8 bits must NOT be 0x00 (standard prefix)
-
-		currency = strings.TrimPrefix(currency, "0x") // remove the 0x hex prefix if it exists
-
-		decodedHex, err := hex.DecodeString(currency)
-		if err != nil {
-			return nil, err
-		}
-
-		return decodedHex, nil
 	}
 
 	return nil, errors.New("invalid currency code")
+
 }
 
 // Serializes the currency field of an issued currency amount to its bytes representation from value, currency code, and issuer address in string form (e.g. "USD", "r123456789")
