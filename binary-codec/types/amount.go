@@ -319,26 +319,19 @@ func serializeIssuedCurrencyCode(currency string) ([]byte, error) {
 		return currencyBytes[:], nil
 	case 40:
 
-		switch strings.HasPrefix(currency, "00") { // if the currency code is 20 bytes of hex, check if the first two bytes are 00
-		case true: // if the first two bytes are 00, it is a standard currency
-			decodedHex, err := hex.DecodeString(currency)
+		decodedHex, err := hex.DecodeString(currency)
 
-			if err != nil {
-				return nil, err
-			}
+		if err != nil {
+			return nil, err
+		}
 
+		switch bytes.HasPrefix(decodedHex, []byte{0x00}) {
+		case true:
 			if containsInvalidIOUCodeCharactersHex(string(decodedHex[12:15])) {
 				return nil, errors.New("IOU code contains invalid characters") // if the currency code contains invalid characters, return an error
 			}
-
 			return decodedHex, nil
-		case false: // if the first two bytes are not 00, it is a non-standard currency
-			decodedHex, err := hex.DecodeString(currency)
-
-			if err != nil {
-				return nil, err
-			}
-
+		case false:
 			return decodedHex, nil
 		}
 	}
