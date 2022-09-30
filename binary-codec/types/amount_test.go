@@ -15,7 +15,7 @@ func TestContainsInvalidIOUValueCharacters(t *testing.T) {
 	}{
 		{
 			name:  "contains invalid character",
-			input: "1.0a",
+			input: "1.0aa",
 			want:  true,
 		},
 		{
