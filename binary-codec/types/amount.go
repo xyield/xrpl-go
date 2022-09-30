@@ -44,7 +44,14 @@ type BigDecimal struct {
 
 func (a *Amount) SerializeJson(value any) ([]byte, error) {
 
-	return nil, nil
+	switch value := value.(type) {
+	case string:
+		return SerializeXrpAmount(value)
+	case map[string]interface{}:
+		return SerializeIssuedCurrencyAmount(value["value"].(string), value["currency"].(string), value["issuer"].(string))
+	default:
+		return nil, errors.New("invalid amount type")
+	}
 }
 
 // Creates a new custom BigDecimal object from a value string
