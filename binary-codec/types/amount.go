@@ -47,7 +47,7 @@ func (a *Amount) SerializeJson(value any) ([]byte, error) {
 	switch value := value.(type) {
 	case string:
 		return SerializeXrpAmount(value)
-	case map[string]interface{}:
+	case map[string]any:
 		return SerializeIssuedCurrencyAmount(value["value"].(string), value["currency"].(string), value["issuer"].(string))
 	default:
 		return nil, errors.New("invalid amount type")
@@ -301,10 +301,11 @@ func SerializeIssuedCurrencyValue(value string) ([]byte, error) {
 	return serialReturn, nil
 }
 
+// Serializes an issued currency code to its bytes representation. The currency code can be 3 allowed string characters, or 20 bytes of hex
 func serializeIssuedCurrencyCode(currency string) ([]byte, error) {
 
-	currency = strings.TrimPrefix(currency, "0x")                                                                                                // remove the 0x prefix if it exists
-	if currency == "XRP" || currency == "0x0000000000000000000000005852500000000000" || currency == "0000000000000000000000005852500000000000" { // if the currency is XRP, return the XRP currency code
+	currency = strings.TrimPrefix(currency, "0x")                                    // remove the 0x prefix if it exists
+	if currency == "XRP" || currency == "0000000000000000000000005852500000000000" { // if the currency code is uppercase XRP, return an error
 		return nil, errors.New("'XRP' is disallowed as an issued currency")
 	}
 
@@ -317,20 +318,23 @@ func serializeIssuedCurrencyCode(currency string) ([]byte, error) {
 		copy(currencyBytes[12:], []byte(currency))
 		return currencyBytes[:], nil
 	case 40:
-		if currency[0:2] == "00" {
-			decodedHexBytes, err := hex.DecodeString(currency)
+
+		switch strings.HasPrefix(currency, "00") { // if the currency code is 20 bytes of hex, check if the first two bytes are 00
+		case true: // if the first two bytes are 00, it is a standard currency
+			decodedHex, err := hex.DecodeString(currency)
 
 			if err != nil {
 				return nil, err
 			}
 
-			if containsInvalidIOUCodeCharactersHex(string(decodedHexBytes[12:15])) {
+			if containsInvalidIOUCodeCharactersHex(string(decodedHex[12:15])) {
 				return nil, errors.New("IOU code contains invalid characters") // if the currency code contains invalid characters, return an error
 			}
 
-			return decodedHexBytes, nil
-		} else {
-			decodedHex, err := hex.DecodeString(strings.TrimPrefix(currency, "0x"))
+			return decodedHex, nil
+		case false: // if the first two bytes are not 00, it is a non-standard currency
+			decodedHex, err := hex.DecodeString(currency)
+
 			if err != nil {
 				return nil, err
 			}
@@ -344,7 +348,7 @@ func serializeIssuedCurrencyCode(currency string) ([]byte, error) {
 }
 
 // Serializes the currency field of an issued currency amount to its bytes representation from value, currency code, and issuer address in string form (e.g. "USD", "r123456789")
-// The currency must either be 3 characters OR 160 bits (40 characters) in hex format
+// The currency code can be 3 allowed string characters, or 20 bytes of hex in standard currency format (e.g. with "00" prefix) or non-standard currency format (e.g. without "00" prefix)
 func SerializeIssuedCurrencyAmount(value, currency, issuer string) ([]byte, error) {
 
 	valBytes, err := SerializeIssuedCurrencyValue(value) // serialize the value
@@ -365,10 +369,7 @@ func SerializeIssuedCurrencyAmount(value, currency, issuer string) ([]byte, erro
 	// AccountIDs that appear as children of special fields (Amount issuer and PathSet account) are not length-prefixed.
 	// So in Amount and PathSet fields, don't use the length indicator 0x14. This is in contrast to the AccountID fields where the length indicator prefix 0x14 is added.
 
-	serializedAmount := append(valBytes, currencyBytes...)      // append the value and currency code bytes
-	serializedAmount = append(serializedAmount, issuerBytes...) // append the issuer address bytes
-
-	return serializedAmount, nil
+	return append(append(valBytes, currencyBytes...), issuerBytes...), nil
 }
 
 // Returns true if this amount is a "native" XRP amount - first bit in first byte set to 0 for native XRP
