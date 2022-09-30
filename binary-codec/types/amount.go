@@ -39,7 +39,7 @@ type BigDecimal struct {
 	Scale         int
 	Precision     int
 	UnscaledValue string
-	Sign          string
+	Sign          int // 1 for negative, 0 for positive
 }
 
 func (a *Amount) SerializeJson(value any) ([]byte, error) {
@@ -64,7 +64,7 @@ func NewBigDecimal(value string) (*BigDecimal, error) {
 		return nil, errors.New("value contains invalid characters: only '0-9' '.' '-' 'e' and 'E' are allowed")
 	}
 	if strings.HasPrefix(value, "-") { // if the value is negative, set the sign to negative
-		bigDecimal.Sign = "-"
+		bigDecimal.Sign = 1
 	}
 
 	value = strings.ToLower(strings.TrimPrefix(value, "-")) // remove the sign from the value
@@ -84,7 +84,7 @@ func NewBigDecimal(value string) (*BigDecimal, error) {
 		bigDecimal.Scale = 0
 		bigDecimal.Precision = 0
 		bigDecimal.UnscaledValue = ""
-		bigDecimal.Sign = ""
+		bigDecimal.Sign = 0
 		return bigDecimal, nil
 	}
 
@@ -289,7 +289,7 @@ func SerializeIssuedCurrencyValue(value string) ([]byte, error) {
 	// convert components to bytes
 
 	serial := uint64(ZeroCurrencyAmountHex) // set first bit to 1 because it is not XRP
-	if bigDecimal.Sign == "" {
+	if bigDecimal.Sign == 0 {
 		serial |= PosSignBitMask // if the sign is positive, set the sign (second) bit to 1
 	}
 	serial |= (uint64(exp+97) << 54) // if the exponent is positive, set the exponent bits to the exponent + 97
