@@ -6,97 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestContainsInvalidIOUValueCharacters(t *testing.T) {
-
-	tests := []struct {
-		name  string
-		input string
-		want  bool
-	}{
-		{
-			name:  "contains invalid character",
-			input: "1.0aa",
-			want:  true,
-		},
-		{
-			name:  "does not contain invalid character",
-			input: "1.0",
-			want:  false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := containsInvalidIOUValueCharacters(tt.input); got != tt.want {
-				t.Errorf("containsInvalidCharacters() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestContainsInvalidIOUCodeCharacters(t *testing.T) {
-
-	tests := []struct {
-		name  string
-		input string
-		want  bool
-	}{
-		{
-			name:  "contains invalid character '/' ",
-			input: "1.0/",
-			want:  true,
-		},
-		{
-			name:  "contains invalid space character",
-			input: "1.0 ",
-			want:  true,
-		},
-		{
-			name:  "does not contain invalid character",
-			input: "10",
-			want:  false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := containsInvalidIOUCodeCharacters(tt.input); got != tt.want {
-				t.Errorf("containsInvalidCharacters() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestContainsDecimal(t *testing.T) {
-
-	tests := []struct {
-		name  string
-		input string
-		want  bool
-	}{
-		{
-			name:  "contains decimal",
-			input: "1.0",
-			want:  true,
-		},
-		{
-			name:  "does not contain decimal",
-			input: "1",
-			want:  false,
-		},
-		{
-			name:  "contains decimal - double dot",
-			input: "1..0",
-			want:  true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := containsDecimal(tt.input); got != tt.want {
-				t.Errorf("containsDecimal() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestVerifyXrpValue(t *testing.T) {
 
 	tests := []struct {
@@ -107,12 +16,12 @@ func TestVerifyXrpValue(t *testing.T) {
 		{
 			name:   "invalid xrp value",
 			input:  "1.0",
-			expErr: &InvalidNativeCharacterError{InvalidCharacter: "decimal point"},
+			expErr: ErrInvalidXRPValue,
 		},
 		{
 			name:   "invalid xrp value - out of range",
 			input:  "0.000000007",
-			expErr: &InvalidNativeCharacterError{InvalidCharacter: "decimal point"},
+			expErr: ErrInvalidXRPValue,
 		},
 		{
 			name:   "valid xrp value - no decimal",
@@ -222,7 +131,7 @@ func TestSerializeXrpAmount(t *testing.T) {
 			name:           "invalid xrp value - decimal",
 			input:          "125000708.0",
 			expectedOutput: nil,
-			expErr:         &InvalidNativeCharacterError{InvalidCharacter: "decimal point"},
+			expErr:         ErrInvalidXRPValue,
 		},
 		{
 			name:           "boundary test - 1 less than max xrp value",
@@ -412,13 +321,13 @@ func TestSerializeIssuedCurrencyCode(t *testing.T) {
 			name:        "standard currency - invalid characters in currency code",
 			input:       "AD/",
 			expected:    nil,
-			expectedErr: &InvalidCharacterError{AllowedChars: AllowedIOUCodeCharacters},
+			expectedErr: ErrInvalidCurrencyCode,
 		},
 		{
 			name:        "standard currency - invalid characters in currency code - hex",
 			input:       "0x00000000000000000000000041442f0000000000",
 			expected:    nil,
-			expectedErr: &InvalidCharacterError{AllowedChars: AllowedIOUCodeCharacters},
+			expectedErr: ErrInvalidCurrencyCode,
 		},
 	}
 	for _, tt := range tests {

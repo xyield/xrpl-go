@@ -1,10 +1,9 @@
-package types
+package bigdecimal
 
 import (
-	"errors"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNewBigDecimal(t *testing.T) {
@@ -576,25 +575,25 @@ func TestNewBigDecimal(t *testing.T) {
 			name:      "contains invalid chars",
 			input:     "12345678r90.1234567890a",
 			expBigDec: nil,
-			expErr:    &InvalidCharacterError{AllowedChars: AllowedIOUValueCharacters},
+			expErr:    ErrInvalidCharacter,
 		},
 		{
 			name:      "contains multiple decimal points",
 			input:     "12345678.90.1234567890",
 			expBigDec: nil,
-			expErr:    &InvalidCodeError{"multiple decimal points"},
+			expErr:    ErrInvalidCharacter,
 		},
 		{
 			name:      "contains multiple 'e' or 'E'",
 			input:     "12345678e90E1234567890",
 			expBigDec: nil,
-			expErr:    errors.New("value contains multiple 'e' or 'E' characters"),
+			expErr:    ErrInvalidCharacter,
 		},
 		{
 			name:      "contains multiple '-' signs:  excluding the exponent sign",
 			input:     "-1234-567890.1234567890e-9",
 			expBigDec: nil,
-			expErr:    errors.New("value contains multiple '-' characters, excluding the exponent sign"),
+			expErr:    ErrInvalidCharacter,
 		},
 	}
 	for _, tc := range tt {
@@ -602,9 +601,10 @@ func TestNewBigDecimal(t *testing.T) {
 			got, err := NewBigDecimal(tc.input)
 
 			if tc.expErr != nil {
-				assert.EqualError(t, tc.expErr, err.Error())
+				require.EqualError(t, tc.expErr, err.Error())
 			} else {
-				assert.Equal(t, tc.expBigDec, got)
+				require.NoError(t, err)
+				require.Equal(t, tc.expBigDec, got)
 			}
 		})
 	}
