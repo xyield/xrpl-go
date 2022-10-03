@@ -19,6 +19,8 @@ func GetSerializedType(t string) SerializedType {
 		return &Hash256{}
 	case "AccountID":
 		return &AccountID{}
+	case "Amount":
+		return &Amount{}
 	}
 	return nil
 }
