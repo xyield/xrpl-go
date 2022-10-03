@@ -12,8 +12,10 @@ const (
 	BigDecRegEx       = "-?(?:[0|1-9]\\d*)(?:\\.\\d+)?(?:[eE][+\\-]?\\d+)?"
 )
 
-var ErrInvalidCharacter = fmt.Errorf("value contains invalid characters. Only the following are allowed: %q", AllowedCharacters)
-var ErrMultiple = fmt.Errorf("multiple decimal points")
+var (
+	ErrInvalidCharacter = fmt.Errorf("value contains invalid characters. Only the following are allowed: %q", AllowedCharacters)
+	ErrMultiple         = fmt.Errorf("multiple decimal points")
+)
 
 type BigDecimal struct {
 	Scale         int
