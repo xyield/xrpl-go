@@ -26,83 +26,85 @@ type BigDecimal struct {
 }
 
 // Creates a new custom BigDecimal object from a value string
-func NewBigDecimal(value string) (*BigDecimal, error) {
+func NewBigDecimal(value string) (bd *BigDecimal, err error) {
 
-	if !bigDecimalRegEx(value) { // check if the value string contains only allowed characters
+	// check if the value string contains only allowed characters
+	if !bigDecimalRegEx(value) {
 		return nil, ErrInvalidCharacter
 	}
 
 	v := strings.ToLower(value)
-	bd := new(BigDecimal)
-	bd.Sign, v = checkAndSetSign(v)     // check if the value is negative and set the sign accordingly
-	p, s, eFound := strings.Cut(v, "e") // check if the value contains the 'e' character and split the string into prefix and suffix accordingly
+	bd = new(BigDecimal)
+
+	// check if the value is negative and set the sign accordingly
+	bd.Sign, v = checkAndSetSign(v)
+
+	// check if the value contains the 'e' character and split the string into prefix and suffix accordingly
+	p, s, eFound := strings.Cut(v, "e")
 	trimP := strings.Trim(p, "0")
 
-	if trimP == "" || trimP == "." { // if the prefix without trailing & leading zeros is empty or only contains a decimal character, return an error
+	// if the prefix without trailing & leading zeros is empty or only contains a decimal character, return an error
+	if trimP == "" || trimP == "." {
 		return nil, ErrInvalidZeroValue
 	}
 
-	decP, decS, decFound := strings.Cut(p, ".")                                                       // if the decimal character is present, split the prefix into two parts, otherwise set the decimalPrefix to the prefix
-	bd.Scale, bd.UnscaledValue = getScaleAndUnscaledVal(eFound, decFound, bd.Scale, p, s, decP, decS) // calculate the scale and unscaled value
+	// check if the value contains a decimal character and split the string into prefix and suffix accordingly
+	decP, decS, decFound := strings.Cut(p, ".")
+
+	bd.Scale, bd.UnscaledValue = getScaleAndUnscaledVal(eFound, decFound, p, s, decP, decS)
 
 	if bd.UnscaledValue == "" {
 		return nil, ErrInvalidZeroValue
 	}
-	bd.Precision = len(bd.UnscaledValue) // set the precision to the length of the unscaled value
 
-	return bd, nil
+	bd.Precision = len(bd.UnscaledValue)
+	return
 }
 
-func getScaleAndUnscaledVal(eFound, decFound bool, scale int, prefix, suffix, decimalPrefix, decimalSuffix string) (int, string) {
+func getScaleAndUnscaledVal(eFound, decFound bool, p, s, decP, decS string) (sc int, uv string) {
 
-	if eFound { // if the 'e' character is present, calculate the scale and unscaled value according to the rules for scientific notation
-		scale, err := strconv.Atoi(suffix) // convert the suffix to an integer. Will return an error if the integer is too large
+	// if the 'e' character is present, calculate the scale and unscaled value according to the rules for scientific notation
+	// Otherwise, calculate the scale and unscaled value according to the rules for decimal notation
+
+	if eFound {
+		// convert the suffix to an integer, which is scale. Will error if the integer is too large
+		// if error occurs, return empty unscaled value
+		sc, err := strconv.Atoi(s)
 		if err != nil {
-			return 0, "" // if the suffix cannot be converted to an integer, return empty unscaled value
+			return 0, ""
 		}
 		if decFound {
-			return valHasDecimal(eFound, scale, decimalPrefix, decimalSuffix)
+			return valHasDecimal(sc, decP, decS)
 		} else {
-			return valNoDecimal(eFound, scale, prefix, decimalPrefix)
+			return valNoDecimal(eFound, sc, p, decP)
 		}
-	} else { // if the 'e' character is not present, calculate the scale and unscaled value according to the rules for decimal notation
+	} else {
 		if decFound {
-			return valHasDecimal(eFound, scale, decimalPrefix, decimalSuffix)
+			return valHasDecimal(0, decP, decS)
 		} else {
-			return valNoDecimal(eFound, scale, prefix, decimalPrefix)
+			return valNoDecimal(eFound, 0, p, decP)
 		}
 	}
 }
 
-func valHasDecimal(eFound bool, scale int, decimalPrefix, decimalSuffix string) (int, string) {
-	unscaledValue := strings.Trim((decimalPrefix + decimalSuffix), "0")
-	scale = scale - len(strings.TrimRight(decimalSuffix, "0"))
-
-	lenUnscaledValue := len(unscaledValue)
-	lenDecPrefixTrimL := len(strings.TrimLeft(decimalPrefix, "0"))
-
-	if eFound {
-		if strings.TrimRight(decimalSuffix, "0") == "" {
-			scale = scale + lenDecPrefixTrimL - lenUnscaledValue
-		}
-		return scale, unscaledValue
-	} else {
-		if strings.TrimRight(decimalSuffix, "0") == "" {
-			scale = lenDecPrefixTrimL - lenUnscaledValue
-		}
-		return scale, unscaledValue
+func valHasDecimal(scale int, decP, decS string) (sc int, uv string) {
+	uv = strings.Trim((decP + decS), "0")
+	sc = scale - len(strings.TrimRight(decS, "0"))
+	if strings.TrimRight(decS, "0") == "" {
+		sc = scale + len(strings.TrimLeft(decP, "0")) - len(uv)
 	}
+	return
 }
 
-func valNoDecimal(eFound bool, scale int, prefix, decimalPrefix string) (int, string) {
+func valNoDecimal(eFound bool, scale int, prefix, decP string) (sc int, uv string) {
 	if eFound {
-		unscaledValue := strings.Trim(prefix, "0")
-		scale = scale + len(strings.TrimLeft(prefix, "0")) - len(unscaledValue)
-		return scale, unscaledValue
+		uv = strings.Trim(prefix, "0")
+		sc = scale + len(strings.TrimLeft(prefix, "0")) - len(uv)
+		return
 	} else {
-		unscaledValue := strings.Trim(decimalPrefix, "0")
-		scale = len(prefix) - len(strings.TrimRight(decimalPrefix, "0"))
-		return scale, unscaledValue
+		uv = strings.Trim(decP, "0")
+		sc = len(prefix) - len(strings.TrimRight(decP, "0"))
+		return
 	}
 }
 
