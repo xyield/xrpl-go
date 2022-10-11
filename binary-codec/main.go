@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"hash"
 	"sort"
+	"strings"
 
 	"github.com/xyield/xrpl-go/binary-codec/definitions"
 	"github.com/xyield/xrpl-go/binary-codec/types"
@@ -52,7 +53,7 @@ func Encode(json map[string]interface{}) (string, error) {
 	// Start serializing
 	//	optimize encode from field id codec, making same call twice
 
-	return hex.EncodeToString(sink), nil
+	return strings.ToUpper(hex.EncodeToString(sink)), nil
 }
 
 // func Serialize(json string) (string, error) {
