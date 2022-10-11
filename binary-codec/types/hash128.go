@@ -1,11 +1,7 @@
 package types
 
 type Hash128 struct {
-	hash
-}
-
-func (h *Hash128) getLength() int {
-	return 16
+	hashI
 }
 
 func NewHash128() *Hash128 {

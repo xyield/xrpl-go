@@ -14,7 +14,8 @@ func (e *ErrInvalidHashLength) Error() string {
 }
 
 type hashI interface {
-	getLength()
+	SerializedType
+	getLength() int
 }
 
 type hash struct {
@@ -27,11 +28,11 @@ func newHash(l int) hash {
 	}
 }
 
-func (h *hash) getLength() int {
+func (h hash) getLength() int {
 	return h.Length
 }
 
-func (h *hash) SerializeJson(json any) ([]byte, error) {
+func (h hash) SerializeJson(json any) ([]byte, error) {
 	v, err := hex.DecodeString(json.(string))
 	if err != nil {
 		return nil, err
