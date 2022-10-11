@@ -15,8 +15,12 @@ func GetSerializedType(t string) SerializedType {
 		return &UInt32{}
 	case "UInt64":
 		return &UInt64{}
+	case "Hash128":
+		return NewHash128()
+	case "Hash160":
+		return NewHash160()
 	case "Hash256":
-		return &Hash256{}
+		return NewHash256()
 	case "AccountID":
 		return &AccountID{}
 	case "Amount":
