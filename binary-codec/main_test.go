@@ -1,11 +1,14 @@
 package binarycodec
 
 import (
+	"encoding/hex"
 	"errors"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/xyield/xrpl-go/binary-codec/definitions"
 	"github.com/xyield/xrpl-go/binary-codec/types"
 )
@@ -409,20 +412,20 @@ func TestEncode(t *testing.T) {
 			output:      "68400000000000000A",
 			expectedErr: nil,
 		},
-		// { // output correct from js encode lib
-		// 	description: "serialize SigningPubKey from successfully signed tx 1",
-		// 	fromTx:      Tx1,
-		// 	input:       map[string]any{"SigningPubKey": "03EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3"},
-		// 	output:      "732103EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3",
-		// 	expectedErr: nil,
-		// },
-		// { // output correct from js encode lib
-		// 	description: "serialize TxnSignature from successfully signed tx 1",
-		// 	fromTx:      Tx1,
-		// 	input:       map[string]any{"TxnSignature": "30440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C"},
-		// 	output:      "744630440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C",
-		// 	expectedErr: nil,
-		// },
+		{ // output correct from js encode lib
+			description: "serialize SigningPubKey from successfully signed tx 1",
+			fromTx:      Tx1,
+			input:       map[string]any{"SigningPubKey": "03EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3"},
+			output:      "732103EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3",
+			expectedErr: nil,
+		},
+		{ // output correct from js encode lib
+			description: "serialize TxnSignature from successfully signed tx 1",
+			fromTx:      Tx1,
+			input:       map[string]any{"TxnSignature": "30440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C"},
+			output:      "744630440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C",
+			expectedErr: nil,
+		},
 		{ // output correct from js encode lib
 			description: "serialize Account from successfully signed tx 1",
 			fromTx:      Tx1,
@@ -542,4 +545,54 @@ func TestEncode(t *testing.T) {
 		})
 	}
 
+}
+
+func TestEncodeVariableLength(t *testing.T) {
+	tt := []struct {
+		description string
+		len         int
+		expected    []byte
+		expectedErr error
+	}{
+		{
+			description: "length less than 193",
+			len:         100,
+			expected:    []byte{0x64},
+			expectedErr: nil,
+		},
+		{
+			description: "length more than 193 and less than 12481",
+			len:         1000,
+			expected:    []byte{0xC4, 0x27},
+			expectedErr: nil,
+		},
+		{
+			description: "length more than 12841 ad less than 918744",
+			len:         20000,
+			expected:    []byte{0xF1, 0x1D, 0x5F},
+			expectedErr: nil,
+		},
+		{
+			description: "length more than 918744",
+			len:         1000000,
+			expected:    nil,
+			expectedErr: ErrLengthPrefixTooLong,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.description, func(t *testing.T) {
+			s := strings.Repeat("A2", tc.len)
+			b, _ := hex.DecodeString(s)
+			require.Equal(t, tc.len, len(b))
+			actual, err := encodeVariableLength(len(b))
+			if tc.expectedErr != nil {
+				require.Error(t, err, tc.expectedErr.Error())
+				require.Nil(t, actual)
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, tc.expected, actual)
+			}
+		})
+	}
 }

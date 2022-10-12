@@ -22,5 +22,5 @@ func (a *AccountID) SerializeJson(value any) ([]byte, error) {
 	// AccountIDs that appear as children of special fields (Amount issuer and PathSet account) are not length-prefixed.
 	// So in Amount and PathSet fields, don't use the length indicator 0x14.
 
-	return append([]byte{0x14}, accountID...), nil
+	return accountID, nil
 }

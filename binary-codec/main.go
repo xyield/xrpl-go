@@ -1,18 +1,18 @@
 package binarycodec
 
 import (
-	"crypto/sha256"
 	"encoding/hex"
-	"hash"
+	"errors"
 	"sort"
 	"strings"
 
 	"github.com/xyield/xrpl-go/binary-codec/definitions"
 	"github.com/xyield/xrpl-go/binary-codec/types"
-
 	//nolint
-	"golang.org/x/crypto/ripemd160" //lint:ignore SA1019 // ignore this for now
+	//lint:ignore SA1019 // ignore this for now
 )
+
+var ErrLengthPrefixTooLong = errors.New("length of value must not exceed 918744 bytes of data")
 
 // Encode: encodes a transaction or other object from json to the canonical binary format as a hex string.
 func Encode(json map[string]interface{}) (string, error) {
@@ -45,20 +45,19 @@ func Encode(json map[string]interface{}) (string, error) {
 			return "", err
 		}
 
+		if v.IsVLEncoded {
+			vl, err := encodeVariableLength(len(b))
+			if err != nil {
+				return "", err
+			}
+			sink = append(sink, vl...)
+		}
+
 		sink = append(sink, b...)
 	}
 
-	// Loop through and create map of map[FieldInstance]interface{}
-	// Sort by Ordinal
-	// Start serializing
-	//	optimize encode from field id codec, making same call twice
-
 	return strings.ToUpper(hex.EncodeToString(sink)), nil
 }
-
-// func Serialize(json string) (string, error) {
-// 	return "120007220008000024001ABED82A2380BF2C2019001ABED764D55920AC9391400000000000000000000000000055534400000000000A20B3C85F482532A9578DBB3950B85CA06594D165400000037E11D60068400000000000000A732103EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3744630440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C8114DD76483FACDEE26E60D8A586BB58D09F27045C46", nil
-// }
 
 // nolint
 //
@@ -98,87 +97,22 @@ func getSortedKeys(m map[definitions.FieldInstance]interface{}) []definitions.Fi
 	return keys
 }
 
-// func accountIDToBytes(address string) byte {}
-
-// func amountToBytes(a string) byte {}
-
-// func blobToBytes(hex string) byte {}
-
-func calcHash(buf []byte, hasher hash.Hash) []byte {
-	_, _ = hasher.Write(buf)
-	return hasher.Sum(nil)
-}
-
-// func hashToBytes(hex string) byte {}
-
-// func hash128(buf []byte) []byte {
-
-// 	if len(buf) != 16 {
-// 		panic("hash128 only supports 16 byte buffers")
-// 	}
-
-// 	return calcHash(buf, sha256.New())[:16]
-// }
-
-// func hash128ToBytes(hex string) byte {}
-
-func Hash160(buf []byte) []byte {
-
-	if len(buf) != 20 {
-		panic("Hash160 only supports 20 byte buffers")
+func encodeVariableLength(len int) ([]byte, error) {
+	if len <= 192 {
+		return []byte{byte(len)}, nil
 	}
-
-	return calcHash(calcHash(buf, sha256.New()), ripemd160.New())
+	if len < 12480 {
+		len -= 193
+		b1 := byte((len >> 8) + 193)
+		b2 := byte((len & 0xFF))
+		return []byte{b1, b2}, nil
+	}
+	if len <= 918744 {
+		len -= 12481
+		b1 := byte((len >> 16) + 241)
+		b2 := byte((len >> 8) & 0xFF)
+		b3 := byte(len & 0xFF)
+		return []byte{b1, b2, b3}, nil
+	}
+	return nil, ErrLengthPrefixTooLong
 }
-
-// func hash160ToBytes(hex string) (byte, error) {
-// 	b := hashToBytes(hex)
-
-// 	if len(b) != 20 {
-// 		return 0, errors.New("Hash160 is not 160 bits long")
-// 	}
-
-// 	return b, nil
-// }
-
-// func Hash256(buf []byte) []byte {
-
-// 	if len(buf) != 32 {
-// 		panic("Hash256 only supports 32 byte buffers")
-// 	}
-
-// 	return calcHash(calcHash(buf, sha256.New()), sha256.New())
-// }
-
-// func hash256ToBytes(hex string) (byte, error) {
-// 	b := hashToBytes(hex)
-
-// 	if len(b) != 32 {
-// 		return 0, errors.New("Hash256 is not 256 bits long")
-// 	}
-
-// 	return b, nil
-// }
-
-// func pathsetToBytes([][]string) (byte, error) {
-// }
-
-// func arrayToBytes(array []string) byte {
-
-// }
-
-// func objectToBytes(jsonObj string) byte {
-
-// }
-
-// func uint8ToBytes(i uint8) byte {
-// 	return byte(i)
-// }
-
-// func uint16ToBytes(i uint16) byte {
-// 	return byte(i)
-// }
-
-// func uint32ToBytes(i uint32) byte {
-// 	return byte(i)
-// }
