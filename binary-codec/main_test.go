@@ -1,11 +1,14 @@
 package binarycodec
 
 import (
+	"encoding/hex"
 	"errors"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/xyield/xrpl-go/binary-codec/definitions"
 	"github.com/xyield/xrpl-go/binary-codec/types"
 )
@@ -126,29 +129,29 @@ func TestEncode(t *testing.T) {
 		output      string
 		expectedErr error
 	}{
-		// {
-		// 	description: "successfully serialized signed transaction 1",
-		// 	input: map[string]any{
-		// 		"Account":       "rMBzp8CgpE441cp5PVyA9rpVV7oT8hP3ys",
-		// 		"Expiration":    595640108,
-		// 		"Fee":           "10",
-		// 		"Flags":         524288,
-		// 		"OfferSequence": 1752791,
-		// 		"Sequence":      1752792,
-		// 		"SigningPubKey": "03EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3",
-		// 		"TakerGets":     "15000000000",
-		// 		"TakerPays": map[string]any{
-		// 			"currency": "USD",
-		// 			"issuer":   "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
-		// 			"value":    "7072.8",
-		// 		},
-		// 		"TransactionType": "OfferCreate",
-		// 		"TxnSignature":    "30440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C",
-		// 		"hash":            "73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C",
-		// 	},
-		// 	output:      "120007220008000024001ABED82A2380BF2C2019001ABED764D55920AC9391400000000000000000000000000055534400000000000A20B3C85F482532A9578DBB3950B85CA06594D165400000037E11D60068400000000000000A732103EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3744630440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C8114DD76483FACDEE26E60D8A586BB58D09F27045C46",
-		// 	expectedErr: nil,
-		// },
+		{
+			description: "successfully serialized signed transaction 1",
+			input: map[string]any{
+				"Account":       "rMBzp8CgpE441cp5PVyA9rpVV7oT8hP3ys",
+				"Expiration":    595640108,
+				"Fee":           "10",
+				"Flags":         524288,
+				"OfferSequence": 1752791,
+				"Sequence":      1752792,
+				"SigningPubKey": "03EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3",
+				"TakerGets":     "15000000000",
+				"TakerPays": map[string]any{
+					"currency": "USD",
+					"issuer":   "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+					"value":    "7072.8",
+				},
+				"TransactionType": "OfferCreate",
+				"TxnSignature":    "30440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C",
+				"hash":            "73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C",
+			},
+			output:      "120007220008000024001ABED82A2380BF2C2019001ABED764D55920AC9391400000000000000000000000000055534400000000000A20B3C85F482532A9578DBB3950B85CA06594D165400000037E11D60068400000000000000A732103EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3744630440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C8114DD76483FACDEE26E60D8A586BB58D09F27045C46",
+			expectedErr: nil,
+		},
 		// {
 		// 	description: "successfully serialized signed transaction 2",
 		// 	input: map[string]any{
@@ -236,179 +239,179 @@ func TestEncode(t *testing.T) {
 		// 	output: "1200002200000000240000034A201B009717BE61400000000098968068400000000000000C69D4564B964A845AC0000000000000000000000000555344000000000069D33B18D53385F8A3185516C2EDA5DEDB8AC5C673210379F17CFA0FFD7518181594BE69FE9A10471D6DE1F4055C6D2746AFD6CF89889E74473045022100D55ED1953F860ADC1BC5CD993ABB927F48156ACA31C64737865F4F4FF6D015A80220630704D2BD09C8E99F26090C25F11B28F5D96A1350454402C2CED92B39FFDBAF811469D33B18D53385F8A3185516C2EDA5DEDB8AC5C6831469D33B18D53385F8A3185516C2EDA5DEDB8AC5C6F9EA7C06636C69656E747D077274312E312E31E1F1011201F3B1997562FD742B54D4EBDEA1D6AEA3D4906B8F100000000000000000000000000000000000000000FF014B4E9C06F24296074F7BC48F92A97916C6DC5EA901DD39C650A96EDA48334E70CC4A85B8B2E8502CD310000000000000000000000000000000000000000000",
 		// 	expectedErr: nil,
 		// },
-		// { // output correct from js encode lib
-		// 	description: "serialize Destination example - AccountID",
-		// 	fromTx:      "",
-		// 	input:       map[string]any{"Destination": "r3Y6vCE8XqfZmYBRngy22uFYkmz3y9eCRA"},
-		// 	output:      "831452C7F01AD13B3CA9C1D133FA8F3482D2EF08FA7D",
-		// 	expectedErr: nil,
-		// },
-		// { // output correct from js encode lib
-		// 	description: "serialize Issuer example - AccountID",
-		// 	fromTx:      "",
-		// 	input:       map[string]any{"Issuer": "r3Y6vCE8XqfZmYBRngy22uFYkmz3y9eCRA"},
-		// 	output:      "841452C7F01AD13B3CA9C1D133FA8F3482D2EF08FA7D",
-		// 	expectedErr: nil,
-		// },
-		// { // output correct from js encode lib
-		// 	description: "serialize Authorize example - AccountID",
-		// 	fromTx:      "",
-		// 	input:       map[string]any{"Authorize": "r3Y6vCE8XqfZmYBRngy22uFYkmz3y9eCRA"},
-		// 	output:      "851452C7F01AD13B3CA9C1D133FA8F3482D2EF08FA7D",
-		// 	expectedErr: nil,
-		// },
-		// { // output correct from js encode lib
-		// 	description: "serialize Unauthorize example - AccountID",
-		// 	fromTx:      "",
-		// 	input:       map[string]any{"Unauthorize": "r3Y6vCE8XqfZmYBRngy22uFYkmz3y9eCRA"},
-		// 	output:      "861452C7F01AD13B3CA9C1D133FA8F3482D2EF08FA7D",
-		// 	expectedErr: nil,
-		// },
-		// { // output correct from js encode lib
-		// 	description: "serialize Target example - AccountID",
-		// 	fromTx:      "",
-		// 	input:       map[string]any{"Target": "r3Y6vCE8XqfZmYBRngy22uFYkmz3y9eCRA"},
-		// 	output:      "871452C7F01AD13B3CA9C1D133FA8F3482D2EF08FA7D",
-		// 	expectedErr: nil,
-		// },
-		// { // output correct from js encode lib
-		// 	description: "serialize NFTokenMinter example - AccountID",
-		// 	fromTx:      "",
-		// 	input:       map[string]any{"NFTokenMinter": "r3Y6vCE8XqfZmYBRngy22uFYkmz3y9eCRA"},
-		// 	output:      "891452C7F01AD13B3CA9C1D133FA8F3482D2EF08FA7D",
-		// 	expectedErr: nil,
-		// },
-		// {
-		// 	description: "serialize OwnderNode example - UInt64",
-		// 	fromTx:      UInt64TypeExample,
-		// 	input:       map[string]any{"OwnerNode": "18446744073"},
-		// 	output:      "34000000044B82FA09",
-		// 	expectedErr: nil,
-		// },
-		// {
-		// 	description: "serialize LedgerEntryType example - UInt8",
-		// 	fromTx:      LedgerEntryTypeExample,
-		// 	input:       map[string]any{"LedgerEntryType": "RippleState"},
-		// 	output:      "110072",
-		// 	expectedErr: nil,
-		// },
-		// {
-		// 	description: "serialize int example - UInt8",
-		// 	fromTx:      UInt8IntExample,
-		// 	input:       map[string]any{"CloseResolution": 25},
-		// 	output:      "011019",
-		// 	expectedErr: nil,
-		// },
-		// {
-		// 	description: "serialize multiple fields out of sequence to check ordering for successfully signed tx 1",
-		// 	fromTx:      Tx1,
-		// 	input: map[string]any{
-		// 		"Flags":           524288,
-		// 		"OfferSequence":   1752791,
-		// 		"TransactionType": "OfferCreate",
-		// 		"Expiration":      595640108,
-		// 		"Sequence":        1752792,
-		// 	},
-		// 	output:      "120007220008000024001ABED82A2380BF2C2019001ABED7",
-		// 	expectedErr: nil,
-		// },
-		// {
-		// 	description: "serialize TransactionType from successfully signed tx 1",
-		// 	fromTx:      Tx1,
-		// 	input:       map[string]any{"TransactionType": "OfferCreate"},
-		// 	output:      "120007",
-		// 	expectedErr: nil,
-		// },
-		// {
-		// 	description: "serialize Flags from successfully signed tx 1",
-		// 	fromTx:      Tx1,
-		// 	input:       map[string]any{"Flags": 524288},
-		// 	output:      "2200080000",
-		// 	expectedErr: nil,
-		// },
-		// {
-		// 	description: "serialize Sequence from successfully signed tx 1",
-		// 	fromTx:      Tx1,
-		// 	input:       map[string]any{"Sequence": 1752792},
-		// 	output:      "24001ABED8",
-		// 	expectedErr: nil,
-		// },
-		// {
-		// 	description: "serialize Expiration from successfully signed tx 1",
-		// 	fromTx:      Tx1,
-		// 	input:       map[string]any{"Expiration": 595640108},
-		// 	output:      "2A2380BF2C",
-		// 	expectedErr: nil,
-		// },
-		// {
-		// 	description: "serialize OfferSequence from successfully signed tx 1",
-		// 	fromTx:      Tx1,
-		// 	input:       map[string]any{"OfferSequence": 1752791},
-		// 	output:      "2019001ABED7",
-		// 	expectedErr: nil,
-		// },
-		// {
-		// 	description: "serialize hash 128",
-		// 	input:       map[string]any{"EmailHash": "73734B611DDA23D3F5F62E20A173B78A"},
-		// 	output:      "4173734B611DDA23D3F5F62E20A173B78A",
-		// 	expectedErr: nil,
-		// },
-		// {
-		// 	description: "hash128 wrong length",
-		// 	input:       map[string]any{"EmailHash": "73734B611DDA23D3F5F62E20A173"},
-		// 	output:      "",
-		// 	expectedErr: &types.ErrInvalidHashLength{Expected: 16},
-		// },
-		// {
-		// 	description: "serialize hash 160",
-		// 	input:       map[string]any{"TakerPaysCurrency": "73734B611DDA23D3F5F62E20A173B78AB8406AC5"},
-		// 	output:      "011173734B611DDA23D3F5F62E20A173B78AB8406AC5",
-		// 	expectedErr: nil,
-		// },
-		// {
-		// 	description: "hash160 wrong length",
-		// 	input:       map[string]any{"TakerPaysCurrency": "73734B611DDA23D3F5F62E20A173B789"},
-		// 	output:      "",
-		// 	expectedErr: &types.ErrInvalidHashLength{Expected: 20},
-		// },
-		// { // hash output doesn't appear in the txjson serialized binary output
-		// 	description: "serialize hash 256",
-		// 	input:       map[string]any{"Digest": "73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C"},
-		// 	output:      "501573734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C",
-		// 	expectedErr: nil,
-		// },
-		// { // hash output doesn't appear in the txjson serialized binary output
-		// 	description: "hash256 wrong length",
-		// 	input:       map[string]any{"Digest": "73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F537"},
-		// 	output:      "",
-		// 	expectedErr: &types.ErrInvalidHashLength{Expected: 32},
-		// },
-		// { // output correct from js encode lib
-		// 	description: "serialize TakerPays from successfully signed tx 1",
-		// 	fromTx:      Tx1,
-		// 	input: map[string]any{"TakerPays": map[string]any{
-		// 		"currency": "USD",
-		// 		"issuer":   "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
-		// 		"value":    "7072.8",
-		// 	},
-		// 	},
-		// 	output:      "64D55920AC9391400000000000000000000000000055534400000000000A20B3C85F482532A9578DBB3950B85CA06594D1",
-		// 	expectedErr: nil,
-		// },
-		// { // output correct from js encode lib
-		// 	description: "serialize TakerGets from successfully signed tx 1",
-		// 	fromTx:      Tx1,
-		// 	input:       map[string]any{"TakerGets": "15000000000"},
-		// 	output:      "65400000037E11D600",
-		// 	expectedErr: nil,
-		// },
-		// { // output correct from js encode lib
-		// 	description: "serialize Fee from successfully signed tx 1",
-		// 	fromTx:      Tx1,
-		// 	input:       map[string]any{"Fee": "10"},
-		// 	output:      "68400000000000000A",
-		// 	expectedErr: nil,
-		// },
+		{ // output correct from js encode lib
+			description: "serialize Destination example - AccountID",
+			fromTx:      "",
+			input:       map[string]any{"Destination": "r3Y6vCE8XqfZmYBRngy22uFYkmz3y9eCRA"},
+			output:      "831452C7F01AD13B3CA9C1D133FA8F3482D2EF08FA7D",
+			expectedErr: nil,
+		},
+		{ // output correct from js encode lib
+			description: "serialize Issuer example - AccountID",
+			fromTx:      "",
+			input:       map[string]any{"Issuer": "r3Y6vCE8XqfZmYBRngy22uFYkmz3y9eCRA"},
+			output:      "841452C7F01AD13B3CA9C1D133FA8F3482D2EF08FA7D",
+			expectedErr: nil,
+		},
+		{ // output correct from js encode lib
+			description: "serialize Authorize example - AccountID",
+			fromTx:      "",
+			input:       map[string]any{"Authorize": "r3Y6vCE8XqfZmYBRngy22uFYkmz3y9eCRA"},
+			output:      "851452C7F01AD13B3CA9C1D133FA8F3482D2EF08FA7D",
+			expectedErr: nil,
+		},
+		{ // output correct from js encode lib
+			description: "serialize Unauthorize example - AccountID",
+			fromTx:      "",
+			input:       map[string]any{"Unauthorize": "r3Y6vCE8XqfZmYBRngy22uFYkmz3y9eCRA"},
+			output:      "861452C7F01AD13B3CA9C1D133FA8F3482D2EF08FA7D",
+			expectedErr: nil,
+		},
+		{ // output correct from js encode lib
+			description: "serialize Target example - AccountID",
+			fromTx:      "",
+			input:       map[string]any{"Target": "r3Y6vCE8XqfZmYBRngy22uFYkmz3y9eCRA"},
+			output:      "871452C7F01AD13B3CA9C1D133FA8F3482D2EF08FA7D",
+			expectedErr: nil,
+		},
+		{ // output correct from js encode lib
+			description: "serialize NFTokenMinter example - AccountID",
+			fromTx:      "",
+			input:       map[string]any{"NFTokenMinter": "r3Y6vCE8XqfZmYBRngy22uFYkmz3y9eCRA"},
+			output:      "891452C7F01AD13B3CA9C1D133FA8F3482D2EF08FA7D",
+			expectedErr: nil,
+		},
+		{
+			description: "serialize OwnderNode example - UInt64",
+			fromTx:      UInt64TypeExample,
+			input:       map[string]any{"OwnerNode": "18446744073"},
+			output:      "34000000044B82FA09",
+			expectedErr: nil,
+		},
+		{
+			description: "serialize LedgerEntryType example - UInt8",
+			fromTx:      LedgerEntryTypeExample,
+			input:       map[string]any{"LedgerEntryType": "RippleState"},
+			output:      "110072",
+			expectedErr: nil,
+		},
+		{
+			description: "serialize int example - UInt8",
+			fromTx:      UInt8IntExample,
+			input:       map[string]any{"CloseResolution": 25},
+			output:      "011019",
+			expectedErr: nil,
+		},
+		{
+			description: "serialize multiple fields out of sequence to check ordering for successfully signed tx 1",
+			fromTx:      Tx1,
+			input: map[string]any{
+				"Flags":           524288,
+				"OfferSequence":   1752791,
+				"TransactionType": "OfferCreate",
+				"Expiration":      595640108,
+				"Sequence":        1752792,
+			},
+			output:      "120007220008000024001ABED82A2380BF2C2019001ABED7",
+			expectedErr: nil,
+		},
+		{
+			description: "serialize TransactionType from successfully signed tx 1",
+			fromTx:      Tx1,
+			input:       map[string]any{"TransactionType": "OfferCreate"},
+			output:      "120007",
+			expectedErr: nil,
+		},
+		{
+			description: "serialize Flags from successfully signed tx 1",
+			fromTx:      Tx1,
+			input:       map[string]any{"Flags": 524288},
+			output:      "2200080000",
+			expectedErr: nil,
+		},
+		{
+			description: "serialize Sequence from successfully signed tx 1",
+			fromTx:      Tx1,
+			input:       map[string]any{"Sequence": 1752792},
+			output:      "24001ABED8",
+			expectedErr: nil,
+		},
+		{
+			description: "serialize Expiration from successfully signed tx 1",
+			fromTx:      Tx1,
+			input:       map[string]any{"Expiration": 595640108},
+			output:      "2A2380BF2C",
+			expectedErr: nil,
+		},
+		{
+			description: "serialize OfferSequence from successfully signed tx 1",
+			fromTx:      Tx1,
+			input:       map[string]any{"OfferSequence": 1752791},
+			output:      "2019001ABED7",
+			expectedErr: nil,
+		},
+		{
+			description: "serialize hash 128",
+			input:       map[string]any{"EmailHash": "73734B611DDA23D3F5F62E20A173B78A"},
+			output:      "4173734B611DDA23D3F5F62E20A173B78A",
+			expectedErr: nil,
+		},
+		{
+			description: "hash128 wrong length",
+			input:       map[string]any{"EmailHash": "73734B611DDA23D3F5F62E20A173"},
+			output:      "",
+			expectedErr: &types.ErrInvalidHashLength{Expected: 16},
+		},
+		{
+			description: "serialize hash 160",
+			input:       map[string]any{"TakerPaysCurrency": "73734B611DDA23D3F5F62E20A173B78AB8406AC5"},
+			output:      "011173734B611DDA23D3F5F62E20A173B78AB8406AC5",
+			expectedErr: nil,
+		},
+		{
+			description: "hash160 wrong length",
+			input:       map[string]any{"TakerPaysCurrency": "73734B611DDA23D3F5F62E20A173B789"},
+			output:      "",
+			expectedErr: &types.ErrInvalidHashLength{Expected: 20},
+		},
+		{ // hash output doesn't appear in the txjson serialized binary output
+			description: "serialize hash 256",
+			input:       map[string]any{"Digest": "73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C"},
+			output:      "501573734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C",
+			expectedErr: nil,
+		},
+		{ // hash output doesn't appear in the txjson serialized binary output
+			description: "hash256 wrong length",
+			input:       map[string]any{"Digest": "73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F537"},
+			output:      "",
+			expectedErr: &types.ErrInvalidHashLength{Expected: 32},
+		},
+		{ // output correct from js encode lib
+			description: "serialize TakerPays from successfully signed tx 1",
+			fromTx:      Tx1,
+			input: map[string]any{"TakerPays": map[string]any{
+				"currency": "USD",
+				"issuer":   "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+				"value":    "7072.8",
+			},
+			},
+			output:      "64D55920AC9391400000000000000000000000000055534400000000000A20B3C85F482532A9578DBB3950B85CA06594D1",
+			expectedErr: nil,
+		},
+		{ // output correct from js encode lib
+			description: "serialize TakerGets from successfully signed tx 1",
+			fromTx:      Tx1,
+			input:       map[string]any{"TakerGets": "15000000000"},
+			output:      "65400000037E11D600",
+			expectedErr: nil,
+		},
+		{ // output correct from js encode lib
+			description: "serialize Fee from successfully signed tx 1",
+			fromTx:      Tx1,
+			input:       map[string]any{"Fee": "10"},
+			output:      "68400000000000000A",
+			expectedErr: nil,
+		},
 		// { // output correct from js encode lib
 		// 	description: "serialize SigningPubKey from successfully signed tx 1",
 		// 	fromTx:      Tx1,
@@ -423,55 +426,55 @@ func TestEncode(t *testing.T) {
 		// 	output:      "744630440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C",
 		// 	expectedErr: nil,
 		// },
-		// { // output correct from js encode lib
-		// 	description: "serialize Account from successfully signed tx 1",
-		// 	fromTx:      Tx1,
-		// 	input:       map[string]any{"Account": "rMBzp8CgpE441cp5PVyA9rpVV7oT8hP3ys"},
-		// 	output:      "8114DD76483FACDEE26E60D8A586BB58D09F27045C46",
-		// 	expectedErr: nil,
-		// },
-		// {
-		// 	description: "serialize TransactionType from successfully signed tx 2",
-		// 	fromTx:      Tx2,
-		// 	input:       map[string]any{"TransactionType": "EscrowFinish"},
-		// 	output:      "120002",
-		// 	expectedErr: nil,
-		// },
-		// {
-		// 	description: "serialize Flags from successfully signed tx 2",
-		// 	fromTx:      Tx2,
-		// 	input:       map[string]any{"Flags": 2147483648},
-		// 	output:      "2280000000",
-		// 	expectedErr: nil,
-		// },
-		// {
-		// 	description: "serialize Sequence from successfully signed tx 2",
-		// 	fromTx:      Tx2,
-		// 	input:       map[string]any{"Sequence": 1},
-		// 	output:      "2400000001",
-		// 	expectedErr: nil,
-		// },
-		// {
-		// 	description: "serialize OfferSequence from successfully signed tx 2",
-		// 	fromTx:      Tx2,
-		// 	input:       map[string]any{"OfferSequence": 11},
-		// 	output:      "20190000000B",
-		// 	expectedErr: nil,
-		// },
-		// { // output correct from js encode lib
-		// 	description: "serialize Account from successfully signed tx 2 - AccountID",
-		// 	fromTx:      Tx2,
-		// 	input:       map[string]any{"Account": "r3Y6vCE8XqfZmYBRngy22uFYkmz3y9eCRA"},
-		// 	output:      "811452C7F01AD13B3CA9C1D133FA8F3482D2EF08FA7D",
-		// 	expectedErr: nil,
-		// },
-		// { // output correct from js encode lib
-		// 	description: "serialize Owner from successfully signed tx 2 - AccountID",
-		// 	fromTx:      Tx2,
-		// 	input:       map[string]any{"Owner": "r9NpyVfLfUG8hatuCCHKzosyDtKnBdsEN3"},
-		// 	output:      "82145A380FBD236B6A1CD14B939AD21101E5B6B6FFA2",
-		// 	expectedErr: nil,
-		// },
+		{ // output correct from js encode lib
+			description: "serialize Account from successfully signed tx 1",
+			fromTx:      Tx1,
+			input:       map[string]any{"Account": "rMBzp8CgpE441cp5PVyA9rpVV7oT8hP3ys"},
+			output:      "8114DD76483FACDEE26E60D8A586BB58D09F27045C46",
+			expectedErr: nil,
+		},
+		{
+			description: "serialize TransactionType from successfully signed tx 2",
+			fromTx:      Tx2,
+			input:       map[string]any{"TransactionType": "EscrowFinish"},
+			output:      "120002",
+			expectedErr: nil,
+		},
+		{
+			description: "serialize Flags from successfully signed tx 2",
+			fromTx:      Tx2,
+			input:       map[string]any{"Flags": 2147483648},
+			output:      "2280000000",
+			expectedErr: nil,
+		},
+		{
+			description: "serialize Sequence from successfully signed tx 2",
+			fromTx:      Tx2,
+			input:       map[string]any{"Sequence": 1},
+			output:      "2400000001",
+			expectedErr: nil,
+		},
+		{
+			description: "serialize OfferSequence from successfully signed tx 2",
+			fromTx:      Tx2,
+			input:       map[string]any{"OfferSequence": 11},
+			output:      "20190000000B",
+			expectedErr: nil,
+		},
+		{ // output correct from js encode lib
+			description: "serialize Account from successfully signed tx 2 - AccountID",
+			fromTx:      Tx2,
+			input:       map[string]any{"Account": "r3Y6vCE8XqfZmYBRngy22uFYkmz3y9eCRA"},
+			output:      "811452C7F01AD13B3CA9C1D133FA8F3482D2EF08FA7D",
+			expectedErr: nil,
+		},
+		{ // output correct from js encode lib
+			description: "serialize Owner from successfully signed tx 2 - AccountID",
+			fromTx:      Tx2,
+			input:       map[string]any{"Owner": "r9NpyVfLfUG8hatuCCHKzosyDtKnBdsEN3"},
+			output:      "82145A380FBD236B6A1CD14B939AD21101E5B6B6FFA2",
+			expectedErr: nil,
+		},
 
 		// {
 		// 	description: "serialize TransactionType from successfully signed tx 3",
@@ -511,7 +514,7 @@ func TestEncode(t *testing.T) {
 		{
 			description: "serialize Vector256 successfully,",
 			input:       map[string]any{"Amendments": []string{"73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C", "73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C"}},
-			output:      "031373734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C",
+			output:      "03134073734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C",
 			expectedErr: nil,
 		},
 		{
@@ -560,4 +563,54 @@ func TestEncode(t *testing.T) {
 		})
 	}
 
+}
+
+func TestEncodeVariableLength(t *testing.T) {
+	tt := []struct {
+		description string
+		len         int
+		expected    []byte
+		expectedErr error
+	}{
+		{
+			description: "length less than 193",
+			len:         100,
+			expected:    []byte{0x64},
+			expectedErr: nil,
+		},
+		{
+			description: "length more than 193 and less than 12481",
+			len:         1000,
+			expected:    []byte{0xC4, 0x27},
+			expectedErr: nil,
+		},
+		{
+			description: "length more than 12841 ad less than 918744",
+			len:         20000,
+			expected:    []byte{0xF1, 0x1D, 0x5F},
+			expectedErr: nil,
+		},
+		{
+			description: "length more than 918744",
+			len:         1000000,
+			expected:    nil,
+			expectedErr: ErrLengthPrefixTooLong,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.description, func(t *testing.T) {
+			s := strings.Repeat("A2", tc.len)
+			b, _ := hex.DecodeString(s)
+			require.Equal(t, tc.len, len(b))
+			actual, err := encodeVariableLength(len(b))
+			if tc.expectedErr != nil {
+				require.Error(t, err, tc.expectedErr.Error())
+				require.Nil(t, actual)
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, tc.expected, actual)
+			}
+		})
+	}
 }
