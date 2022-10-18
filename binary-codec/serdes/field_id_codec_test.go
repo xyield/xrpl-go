@@ -82,7 +82,7 @@ func TestEncodeFieldID(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.description, func(t *testing.T) {
-			got, err := EncodeFieldID(tc.input)
+			got, err := encodeFieldID(tc.input)
 
 			if tc.expectedErr != nil {
 				assert.EqualError(t, err, tc.expectedErr.Error())
@@ -162,7 +162,7 @@ func TestDecodeFieldID(t *testing.T) {
 		t.Run(tc.description, func(t *testing.T) {
 			hex := hex.EncodeToString(tc.input)
 			// fmt.Println("hex string:", hex)
-			actual, err := DecodeFieldID(hex)
+			actual, err := decodeFieldID(hex)
 			// fmt.Println(actual)
 
 			if tc.expectedErr != nil {

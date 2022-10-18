@@ -47,7 +47,7 @@ func BenchmarkDecode(b *testing.B) {
 		b.Run(fmt.Sprintf("input_name_%v", test.input), func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				hex := hex.EncodeToString(test.input)
-				DecodeFieldID(hex)
+				decodeFieldID(hex)
 			}
 		})
 	}

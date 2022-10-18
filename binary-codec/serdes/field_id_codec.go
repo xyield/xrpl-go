@@ -31,7 +31,7 @@ func encodeFieldID(fieldName string) ([]byte, error) {
 }
 
 // Returns the field name represented by the given field ID in hex string form.
-func DecodeFieldID(h string) (string, error) {
+func decodeFieldID(h string) (string, error) {
 	b, err := hex.DecodeString(h)
 	if err != nil {
 		return "", err
