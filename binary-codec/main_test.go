@@ -475,7 +475,6 @@ func TestEncode(t *testing.T) {
 			output:      "82145A380FBD236B6A1CD14B939AD21101E5B6B6FFA2",
 			expectedErr: nil,
 		},
-
 		{
 			description: "serialize TransactionType from successfully signed tx 3",
 			fromTx:      Tx3,
@@ -510,6 +509,24 @@ func TestEncode(t *testing.T) {
 			input:       map[string]any{"Account": "rweYz56rfmQ98cAdRaeTxQS9wVMGnrdsFp"},
 			output:      "811469D33B18D53385F8A3185516C2EDA5DEDB8AC5C6",
 			expectedErr: nil,
+		},
+		{
+			description: "serialize Vector256 successfully,",
+			input:       map[string]any{"Amendments": []string{"73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C", "73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C"}},
+			output:      "03134073734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C",
+			expectedErr: nil,
+		},
+		{
+			description: "invalid input for Vector256 - not a string array",
+			input:       map[string]any{"Amendments": []int{1, 2, 3}},
+			output:      "",
+			expectedErr: &types.ErrInvalidVector256Type{Got: "[]int"},
+		},
+		{
+			description: "invalid input for Vector256 - wrong hash length",
+			input:       map[string]any{"Amendments": []string{"73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C56342689", "73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06"}},
+			output:      "",
+			expectedErr: &types.ErrInvalidHashLength{Expected: types.HashLengthBytes},
 		},
 	}
 
