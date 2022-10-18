@@ -333,7 +333,7 @@ func TestSerializeIssuedCurrencyCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			got, err := serializeIssuedCurrencyCode(tt.input)
+			got, err := SerializeIssuedCurrencyCode(tt.input)
 
 			if tt.expectedErr != nil {
 				assert.EqualError(t, tt.expectedErr, err.Error())
