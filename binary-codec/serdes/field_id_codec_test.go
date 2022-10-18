@@ -1,7 +1,7 @@
 //go:build unit
 // +build unit
 
-package binarycodec
+package serdes
 
 import (
 	"encoding/hex"

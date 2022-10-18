@@ -1,4 +1,4 @@
-package binarycodec
+package serdes
 
 import (
 	"encoding/hex"
@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-//nolint
+// nolint
 func BenchmarkEncode(b *testing.B) {
 
 	tt := []struct {
@@ -23,13 +23,13 @@ func BenchmarkEncode(b *testing.B) {
 	for _, test := range tt {
 		b.Run(fmt.Sprintf("input_name_%v", test.input), func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				EncodeFieldID(test.input)
+				encodeFieldID(test.input)
 			}
 		})
 	}
 }
 
-//nolint
+// nolint
 func BenchmarkDecode(b *testing.B) {
 
 	tt := []struct {

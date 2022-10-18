@@ -29,6 +29,10 @@ func GetSerializedType(t string) SerializedType {
 		return &Vector256{}
 	case "Blob":
 		return &Blob{}
+	case "STObject":
+		return &STObject{}
+	case "STArray":
+		return &STArray{}
 	}
 	return nil
 }

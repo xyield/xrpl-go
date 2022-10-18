@@ -1,4 +1,4 @@
-package binarycodec
+package serdes
 
 import (
 	"encoding/hex"
@@ -9,7 +9,7 @@ import (
 // Returns the unique field ID for a given field name.
 // This field ID consists of the type code and field code, in 1 to 3 bytes
 // depending on whether those values are "common" (<16) or "uncommon" (>16).
-func EncodeFieldID(fieldName string) ([]byte, error) {
+func encodeFieldID(fieldName string) ([]byte, error) {
 	fh, err := definitions.Get().GetFieldHeaderByFieldName(fieldName)
 	if err != nil {
 		return nil, err
