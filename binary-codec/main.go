@@ -29,6 +29,9 @@ func Encode(json map[string]interface{}) (string, error) {
 
 	for _, v := range sk {
 
+		if !v.IsSerialized {
+			continue
+		}
 		h, err := EncodeFieldID(v.FieldName)
 
 		if err != nil {
