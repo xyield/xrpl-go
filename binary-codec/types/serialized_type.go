@@ -25,6 +25,8 @@ func GetSerializedType(t string) SerializedType {
 		return &AccountID{}
 	case "Amount":
 		return &Amount{}
+	case "Vector256":
+		return &Vector256{}
 	}
 	return nil
 }
