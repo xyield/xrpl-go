@@ -1,11 +1,14 @@
 package binarycodec
 
 import (
+	"encoding/hex"
 	"errors"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/xyield/xrpl-go/binary-codec/definitions"
 	"github.com/xyield/xrpl-go/binary-codec/types"
 )
@@ -126,29 +129,29 @@ func TestEncode(t *testing.T) {
 		output      string
 		expectedErr error
 	}{
-		// {
-		// 	description: "successfully serialized signed transaction 1",
-		// 	input: map[string]any{
-		// 		"Account":       "rMBzp8CgpE441cp5PVyA9rpVV7oT8hP3ys",
-		// 		"Expiration":    595640108,
-		// 		"Fee":           "10",
-		// 		"Flags":         524288,
-		// 		"OfferSequence": 1752791,
-		// 		"Sequence":      1752792,
-		// 		"SigningPubKey": "03EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3",
-		// 		"TakerGets":     "15000000000",
-		// 		"TakerPays": map[string]any{
-		// 			"currency": "USD",
-		// 			"issuer":   "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
-		// 			"value":    "7072.8",
-		// 		},
-		// 		"TransactionType": "OfferCreate",
-		// 		"TxnSignature":    "30440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C",
-		// 		"hash":            "73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C",
-		// 	},
-		// 	output:      "120007220008000024001ABED82A2380BF2C2019001ABED764D55920AC9391400000000000000000000000000055534400000000000A20B3C85F482532A9578DBB3950B85CA06594D165400000037E11D60068400000000000000A732103EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3744630440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C8114DD76483FACDEE26E60D8A586BB58D09F27045C46",
-		// 	expectedErr: nil,
-		// },
+		{
+			description: "successfully serialized signed transaction 1",
+			input: map[string]any{
+				"Account":       "rMBzp8CgpE441cp5PVyA9rpVV7oT8hP3ys",
+				"Expiration":    595640108,
+				"Fee":           "10",
+				"Flags":         524288,
+				"OfferSequence": 1752791,
+				"Sequence":      1752792,
+				"SigningPubKey": "03EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3",
+				"TakerGets":     "15000000000",
+				"TakerPays": map[string]any{
+					"currency": "USD",
+					"issuer":   "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+					"value":    "7072.8",
+				},
+				"TransactionType": "OfferCreate",
+				"TxnSignature":    "30440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C",
+				"hash":            "73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C",
+			},
+			output:      "120007220008000024001ABED82A2380BF2C2019001ABED764D55920AC9391400000000000000000000000000055534400000000000A20B3C85F482532A9578DBB3950B85CA06594D165400000037E11D60068400000000000000A732103EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3744630440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C8114DD76483FACDEE26E60D8A586BB58D09F27045C46",
+			expectedErr: nil,
+		},
 		// {
 		// 	description: "successfully serialized signed transaction 2",
 		// 	input: map[string]any{
@@ -409,20 +412,20 @@ func TestEncode(t *testing.T) {
 			output:      "68400000000000000A",
 			expectedErr: nil,
 		},
-		// { // output correct from js encode lib
-		// 	description: "serialize SigningPubKey from successfully signed tx 1",
-		// 	fromTx:      Tx1,
-		// 	input:       map[string]any{"SigningPubKey": "03EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3"},
-		// 	output:      "732103EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3",
-		// 	expectedErr: nil,
-		// },
-		// { // output correct from js encode lib
-		// 	description: "serialize TxnSignature from successfully signed tx 1",
-		// 	fromTx:      Tx1,
-		// 	input:       map[string]any{"TxnSignature": "30440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C"},
-		// 	output:      "744630440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C",
-		// 	expectedErr: nil,
-		// },
+		{ // output correct from js encode lib
+			description: "serialize SigningPubKey from successfully signed tx 1",
+			fromTx:      Tx1,
+			input:       map[string]any{"SigningPubKey": "03EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3"},
+			output:      "732103EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3",
+			expectedErr: nil,
+		},
+		{ // output correct from js encode lib
+			description: "serialize TxnSignature from successfully signed tx 1",
+			fromTx:      Tx1,
+			input:       map[string]any{"TxnSignature": "30440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C"},
+			output:      "744630440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C",
+			expectedErr: nil,
+		},
 		{ // output correct from js encode lib
 			description: "serialize Account from successfully signed tx 1",
 			fromTx:      Tx1,
@@ -472,7 +475,6 @@ func TestEncode(t *testing.T) {
 			output:      "82145A380FBD236B6A1CD14B939AD21101E5B6B6FFA2",
 			expectedErr: nil,
 		},
-
 		{
 			description: "serialize TransactionType from successfully signed tx 3",
 			fromTx:      Tx3,
@@ -508,6 +510,24 @@ func TestEncode(t *testing.T) {
 			output:      "811469D33B18D53385F8A3185516C2EDA5DEDB8AC5C6",
 			expectedErr: nil,
 		},
+		{
+			description: "serialize Vector256 successfully,",
+			input:       map[string]any{"Amendments": []string{"73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C", "73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C"}},
+			output:      "03134073734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C",
+			expectedErr: nil,
+		},
+		{
+			description: "invalid input for Vector256 - not a string array",
+			input:       map[string]any{"Amendments": []int{1, 2, 3}},
+			output:      "",
+			expectedErr: &types.ErrInvalidVector256Type{Got: "[]int"},
+		},
+		{
+			description: "invalid input for Vector256 - wrong hash length",
+			input:       map[string]any{"Amendments": []string{"73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C56342689", "73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06"}},
+			output:      "",
+			expectedErr: &types.ErrInvalidHashLength{Expected: types.HashLengthBytes},
+		},
 	}
 
 	for _, tc := range tt {
@@ -542,4 +562,54 @@ func TestEncode(t *testing.T) {
 		})
 	}
 
+}
+
+func TestEncodeVariableLength(t *testing.T) {
+	tt := []struct {
+		description string
+		len         int
+		expected    []byte
+		expectedErr error
+	}{
+		{
+			description: "length less than 193",
+			len:         100,
+			expected:    []byte{0x64},
+			expectedErr: nil,
+		},
+		{
+			description: "length more than 193 and less than 12481",
+			len:         1000,
+			expected:    []byte{0xC4, 0x27},
+			expectedErr: nil,
+		},
+		{
+			description: "length more than 12841 ad less than 918744",
+			len:         20000,
+			expected:    []byte{0xF1, 0x1D, 0x5F},
+			expectedErr: nil,
+		},
+		{
+			description: "length more than 918744",
+			len:         1000000,
+			expected:    nil,
+			expectedErr: ErrLengthPrefixTooLong,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.description, func(t *testing.T) {
+			s := strings.Repeat("A2", tc.len)
+			b, _ := hex.DecodeString(s)
+			require.Equal(t, tc.len, len(b))
+			actual, err := encodeVariableLength(len(b))
+			if tc.expectedErr != nil {
+				require.Error(t, err, tc.expectedErr.Error())
+				require.Nil(t, actual)
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, tc.expected, actual)
+			}
+		})
+	}
 }
