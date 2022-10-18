@@ -8,14 +8,12 @@ import (
 
 	"github.com/xyield/xrpl-go/binary-codec/definitions"
 	"github.com/xyield/xrpl-go/binary-codec/types"
-	//nolint
-	//lint:ignore SA1019 // ignore this for now
 )
 
 var ErrLengthPrefixTooLong = errors.New("length of value must not exceed 918744 bytes of data")
 
 // Encode: encodes a transaction or other object from json to the canonical binary format as a hex string.
-func Encode(json map[string]interface{}) (string, error) {
+func Encode(json map[string]any) (string, error) {
 
 	fimap, err := createFieldInstanceMapFromJson(json)
 
@@ -65,9 +63,9 @@ func Encode(json map[string]interface{}) (string, error) {
 // nolint
 //
 //lint:ignore U1000 // ignore this for now
-func createFieldInstanceMapFromJson(json map[string]interface{}) (map[definitions.FieldInstance]interface{}, error) {
+func createFieldInstanceMapFromJson(json map[string]any) (map[definitions.FieldInstance]any, error) {
 
-	m := make(map[definitions.FieldInstance]interface{}, len(json))
+	m := make(map[definitions.FieldInstance]any, len(json))
 
 	for k, v := range json {
 		fi, err := definitions.Get().GetFieldInstanceByFieldName(k)
@@ -86,7 +84,7 @@ func createFieldInstanceMapFromJson(json map[string]interface{}) (map[definition
 // nolint
 //
 //lint:ignore U1000 // ignore this for now
-func getSortedKeys(m map[definitions.FieldInstance]interface{}) []definitions.FieldInstance {
+func getSortedKeys(m map[definitions.FieldInstance]any) []definitions.FieldInstance {
 	keys := make([]definitions.FieldInstance, 0, len(m))
 
 	for k := range m {
