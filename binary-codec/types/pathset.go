@@ -1,8 +1,6 @@
 package types
 
 import (
-	"errors"
-
 	addresscodec "github.com/xyield/xrpl-go/address-codec"
 )
 
@@ -15,40 +13,57 @@ const (
 	pathSeparatorByte = 0xFF
 )
 
-type PathSet []byte
+type PathSet struct{}
 
-type PathStep []byte
+type ErrInvalidPathSet struct {
+}
 
-type Path []byte
+func (e ErrInvalidPathSet) Error() string {
+	return "Invalid type to construct PathSet from. Expected []any"
+}
+
+// Serializes a path set from a json representation of a slice of paths to a byte array
+func (p PathSet) SerializeJson(json any) ([]byte, error) {
+
+	if _, ok := json.([]any)[0].([]any); !ok {
+		return nil, &ErrInvalidPathSet{}
+	}
+
+	if !isPathSet(json.([]any)) {
+		return nil, &ErrInvalidPathSet{}
+	}
+
+	return newPathSet(json.([]any)), nil
+}
 
 // determine if an array represents a valid path set
-func isPathSet(v [][]map[string]string) bool {
-	return len(v) == 0 || len(v[0]) == 0 || isPathStep(v[0][0])
+func isPathSet(v []any) bool {
+	return len(v) == 0 || len(v[0].([]any)) == 0 || isPathStep(v[0].([]any)[0].(map[string]any))
 }
 
 // determine if a map represents a valid path step
-func isPathStep(v map[string]string) bool {
-	return v["account"] != "" || v["currency"] != "" || v["issuer"] != ""
+func isPathStep(v map[string]any) bool {
+	return v["account"] != nil || v["currency"] != nil || v["issuer"] != nil
 }
 
 // creates a path step from a map representation
-func newPathStep(v map[string]string) PathStep {
+func newPathStep(v map[string]any) []byte {
 
 	dataType := 0x00
 	b := make([]byte, 0)
 
-	if v["account"] != "" {
-		_, account, _ := addresscodec.DecodeClassicAddressToAccountID(v["account"])
+	if v["account"] != nil {
+		_, account, _ := addresscodec.DecodeClassicAddressToAccountID(v["account"].(string))
 		b = append(b, account...)
 		dataType |= typeAccount
 	}
-	if v["currency"] != "" {
-		currency, _ := SerializeIssuedCurrencyCode(v["currency"])
+	if v["currency"] != nil {
+		currency, _ := SerializeIssuedCurrencyCode(v["currency"].(string))
 		b = append(b, currency...)
 		dataType |= typeCurrency
 	}
-	if v["issuer"] != "" {
-		_, issuer, _ := addresscodec.DecodeClassicAddressToAccountID(v["issuer"])
+	if v["issuer"] != nil {
+		_, issuer, _ := addresscodec.DecodeClassicAddressToAccountID(v["issuer"].(string))
 		b = append(b, issuer...)
 		dataType |= typeIssuer
 	}
@@ -57,29 +72,29 @@ func newPathStep(v map[string]string) PathStep {
 }
 
 // constructs a path from a slice of path steps
-func newPath(v []map[string]string) Path {
+func newPath(v []any) []byte {
 	b := make([]byte, 0)
-	for _, step := range v {
-		b = append(b, newPathStep(step)...)
+
+	for _, step := range v { // for each step in the path (slice of path steps)
+		b = append(b, newPathStep(step.(map[string]any))...) // append the path step to the byte array
 	}
 	return b
 }
 
-func newPathSet(v [][]map[string]string) (PathSet, error) {
-
-	if !isPathSet(v) {
-		return nil, errors.New("invalid path set")
-	}
+// constructs a path set from a slice of paths
+func newPathSet(v []any) []byte {
 
 	b := make([]byte, 0)
+	padding := make([]byte, 20)
 
-	for _, path := range v {
-		for _, step := range path {
-			b = append(b, newPathStep(step)...)
-		}
-		b = append(b, pathSeparatorByte)
+	for _, path := range v { // for each path in the path set (slice of paths)
+		b = append(b, newPath(path.([]any))...) // append the path to the byte array
+		b = append(b, padding...)               // append 20 empty bytes to the byte array between paths
+		b = append(b, pathSeparatorByte)        // between each path, append a path separator byte
 	}
 
-	return append(b, pathsetEndByte), nil
+	b[len(b)-1] = pathsetEndByte // replace last path separator with path set end byte
+
+	return b
 
 }
