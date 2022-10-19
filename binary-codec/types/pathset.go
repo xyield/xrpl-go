@@ -19,7 +19,7 @@ type ErrInvalidPathSet struct {
 }
 
 func (e ErrInvalidPathSet) Error() string {
-	return "Invalid type to construct PathSet from. Expected []any"
+	return "Invalid type to construct PathSet from. Expected []any of []any"
 }
 
 // Serializes a path set from a json representation of a slice of paths to a byte array
