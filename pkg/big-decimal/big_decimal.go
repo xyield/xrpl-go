@@ -48,10 +48,12 @@ func NewBigDecimal(value string) (bd *BigDecimal, err error) {
 		return nil, ErrInvalidZeroValue
 	}
 
-	// check if the value contains a decimal character and split the string into prefix and suffix accordingly
-	decP, decS, decFound := strings.Cut(p, ".")
-
-	bd.Scale, bd.UnscaledValue = getScaleAndUnscaledVal(eFound, decFound, p, s, decP, decS)
+	// if the value contains the 'e' character, call the appropriate function to get the scale and unscaled value
+	if eFound {
+		bd.Scale, bd.UnscaledValue = getScaleAndUnscaledValWithE(p, s)
+	} else {
+		bd.Scale, bd.UnscaledValue = getScaleAndUnscaledValNoE(p, s)
+	}
 
 	if bd.UnscaledValue == "" {
 		return nil, ErrInvalidZeroValue
@@ -61,29 +63,28 @@ func NewBigDecimal(value string) (bd *BigDecimal, err error) {
 	return
 }
 
-func getScaleAndUnscaledVal(eFound, decFound bool, p, s, decP, decS string) (sc int, uv string) {
+func getScaleAndUnscaledValNoE(p, s string) (sc int, uv string) {
 
-	// if the 'e' character is present, calculate the scale and unscaled value according to the rules for scientific notation
-	// Otherwise, calculate the scale and unscaled value according to the rules for decimal notation
-
-	if eFound {
-		// convert the suffix to an integer, which is scale. Will error if the integer is too large
-		// if error occurs, return empty unscaled value
-		sc, err := strconv.Atoi(s)
-		if err != nil {
-			return 0, ""
-		}
-		if decFound {
-			return valHasDecimal(sc, decP, decS)
-		} else {
-			return valNoDecimal(eFound, sc, p, decP)
-		}
+	// check if the value contains a decimal character and split the string into prefix and suffix accordingly
+	decP, decS, decFound := strings.Cut(p, ".")
+	if decFound {
+		return valHasDecimal(0, decP, decS)
 	} else {
-		if decFound {
-			return valHasDecimal(0, decP, decS)
-		} else {
-			return valNoDecimal(eFound, 0, p, decP)
-		}
+		return valNoDecimalNoE(0, p, decP)
+	}
+}
+
+func getScaleAndUnscaledValWithE(p, s string) (sc int, uv string) {
+	// check if the value contains a decimal character and split the string into prefix and suffix accordingly
+	decP, decS, decFound := strings.Cut(p, ".")
+	sc, err := strconv.Atoi(s)
+	if err != nil {
+		return 0, ""
+	}
+	if decFound {
+		return valHasDecimal(sc, decP, decS)
+	} else {
+		return valNoDecimalHasE(sc, p, decP)
 	}
 }
 
@@ -96,16 +97,17 @@ func valHasDecimal(scale int, decP, decS string) (sc int, uv string) {
 	return
 }
 
-func valNoDecimal(eFound bool, scale int, prefix, decP string) (sc int, uv string) {
-	if eFound {
-		uv = strings.Trim(prefix, "0")
-		sc = scale + len(strings.TrimLeft(prefix, "0")) - len(uv)
-		return
-	} else {
-		uv = strings.Trim(decP, "0")
-		sc = len(prefix) - len(strings.TrimRight(decP, "0"))
-		return
-	}
+func valNoDecimalNoE(scale int, prefix, decP string) (sc int, uv string) {
+	uv = strings.Trim(decP, "0")
+	sc = len(prefix) - len(strings.TrimRight(decP, "0"))
+	return
+}
+
+func valNoDecimalHasE(scale int, prefix, decP string) (sc int, uv string) {
+	uv = strings.Trim(prefix, "0")
+	sc = scale + len(strings.TrimLeft(prefix, "0")) - len(uv)
+	return
+
 }
 
 func checkAndSetSign(value string) (int, string) {
