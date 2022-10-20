@@ -33,6 +33,8 @@ func GetSerializedType(t string) SerializedType {
 		return &STObject{}
 	case "STArray":
 		return &STArray{}
+	case "PathSet":
+		return &PathSet{}
 	}
 	return nil
 }
