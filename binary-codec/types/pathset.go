@@ -1,6 +1,8 @@
 package types
 
 import (
+	"errors"
+
 	addresscodec "github.com/xyield/xrpl-go/address-codec"
 )
 
@@ -15,22 +17,17 @@ const (
 
 type PathSet struct{}
 
-type ErrInvalidPathSet struct {
-}
-
-func (e ErrInvalidPathSet) Error() string {
-	return "Invalid type to construct PathSet from. Expected []any of []any"
-}
+var ErrInvalidPathSet error = errors.New("invalid type to construct PathSet from. Expected []any of []any")
 
 // Serializes a path set from a json representation of a slice of paths to a byte array
 func (p PathSet) SerializeJson(json any) ([]byte, error) {
 
 	if _, ok := json.([]any)[0].([]any); !ok {
-		return nil, &ErrInvalidPathSet{}
+		return nil, ErrInvalidPathSet
 	}
 
 	if !isPathSet(json.([]any)) {
-		return nil, &ErrInvalidPathSet{}
+		return nil, ErrInvalidPathSet
 	}
 
 	return newPathSet(json.([]any)), nil
@@ -58,7 +55,7 @@ func newPathStep(v map[string]any) []byte {
 		dataType |= typeAccount
 	}
 	if v["currency"] != nil {
-		currency, _ := SerializeIssuedCurrencyCode(v["currency"].(string))
+		currency, _ := serializeIssuedCurrencyCode(v["currency"].(string))
 		b = append(b, currency...)
 		dataType |= typeCurrency
 	}
