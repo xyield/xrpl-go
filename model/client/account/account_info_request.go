@@ -1,4 +1,4 @@
-package client
+package account
 
 import (
 	. "github.com/xyield/xrpl-go/model/client/common"

@@ -9,6 +9,8 @@ type XAddress string
 
 type Hash256 []byte
 
+type Hash128 []byte
+
 type XrpCurrencyAmount uint64
 
 type Marker any
