@@ -29,8 +29,6 @@ func (t *STObject) SerializeJson(json any) ([]byte, error) {
 			continue
 		}
 
-		// need to write bytes to new buffers
-		// amount, uint, hash all big endian
 		st := GetSerializedType(v.Type)
 		b, err := st.SerializeJson(fimap[v])
 		if err != nil {
