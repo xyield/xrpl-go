@@ -38,15 +38,13 @@ func EncodeForSigning(json map[string]any) (string, error) {
 
 func removeNonSigningFields(json map[string]any) map[string]any {
 
-	updatedJson := json
-
 	for k := range json {
 		fi, _ := definitions.Get().GetFieldInstanceByFieldName(k)
 
 		if fi != nil && !fi.IsSigningField {
-			delete(updatedJson, k)
+			delete(json, k)
 		}
 	}
 
-	return updatedJson
+	return json
 }
