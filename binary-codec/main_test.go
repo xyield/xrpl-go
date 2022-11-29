@@ -299,3 +299,53 @@ func TestEncodeForMultisigning(t *testing.T) {
 		})
 	}
 }
+
+func TestEncodeForSigningClaim(t *testing.T) {
+
+	tt := []struct {
+		description string
+		input       map[string]any
+		expected    string
+		expectedErr error
+	}{
+		{
+			description: "successfully encode claim",
+			input: map[string]any{
+				"Channel": "43904CBFCDCEC530B4037871F86EE90BF799DF8D2E0EA564BC8A3F332E4F5FB1",
+				"Amount":  "1000",
+			},
+			expected:    "434C4D0043904CBFCDCEC530B4037871F86EE90BF799DF8D2E0EA564BC8A3F332E4F5FB100000000000003E8",
+			expectedErr: nil,
+		},
+		{
+			description: "fail to encode claim - no channel",
+			input: map[string]any{
+				"Amount": "1000",
+			},
+			expected:    "",
+			expectedErr: ErrSigningClaimFieldNotFound,
+		},
+		{
+			description: "fail to encode claim - no amount",
+			input: map[string]any{
+				"Channel": "43904CBFCDCEC530B4037871F86EE90BF799DF8D2E0EA564BC8A3F332E4F5FB1",
+			},
+			expected:    "",
+			expectedErr: ErrSigningClaimFieldNotFound,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.description, func(t *testing.T) {
+			got, err := EncodeForSigningClaim(tc.input)
+
+			if tc.expectedErr != nil {
+				require.EqualError(t, err, tc.expectedErr.Error())
+				require.Empty(t, got)
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, tc.expected, got)
+			}
+		})
+	}
+}

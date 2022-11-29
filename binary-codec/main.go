@@ -2,14 +2,18 @@ package binarycodec
 
 import (
 	"encoding/hex"
+	"errors"
 	"strings"
 
 	"github.com/xyield/xrpl-go/binary-codec/definitions"
 	"github.com/xyield/xrpl-go/binary-codec/types"
 )
 
+var ErrSigningClaimFieldNotFound = errors.New("'Channel' & 'Amount' fields are both required, but were not found")
+
 const (
-	txMultiSigPrefix = "534D5400"
+	txMultiSigPrefix          = "534D5400"
+	paymentChannelClaimPrefix = "434C4D00"
 )
 
 // Encode: encodes a transaction or other object from json to the canonical binary format as a hex string.
@@ -48,6 +52,31 @@ func EncodeForMultisigning(json map[string]any, xrpAccountID map[string]any) (st
 	}
 
 	return strings.ToUpper(txMultiSigPrefix + encoded + hex.EncodeToString(suffix)), nil
+}
+
+func EncodeForSigningClaim(json map[string]any) (string, error) {
+
+	if _, ok := json["Channel"]; !ok {
+		return "", ErrSigningClaimFieldNotFound
+	} else if _, ok := json["Amount"]; !ok {
+		return "", ErrSigningClaimFieldNotFound
+	}
+
+	channel, err := types.NewHash256().SerializeJson(json["Channel"])
+
+	if err != nil {
+		return "", err
+	}
+
+	st := &types.UInt64{}
+	amount, err := st.SerializeJson(json["Amount"])
+
+	if err != nil {
+		return "", err
+	}
+
+	return strings.ToUpper(paymentChannelClaimPrefix + hex.EncodeToString(channel) + hex.EncodeToString(amount)), nil
+
 }
 
 func removeNonSigningFields(json map[string]any) map[string]any {
