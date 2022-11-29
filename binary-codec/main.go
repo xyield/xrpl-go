@@ -54,6 +54,7 @@ func EncodeForMultisigning(json map[string]any, xrpAccountID map[string]any) (st
 	return strings.ToUpper(txMultiSigPrefix + encoded + hex.EncodeToString(suffix)), nil
 }
 
+// EncodeForPaymentChannelClaim: encodes a payment channel claim into binary format in preparation for signing.
 func EncodeForSigningClaim(json map[string]any) (string, error) {
 
 	if _, ok := json["Channel"]; !ok {
