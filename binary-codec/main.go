@@ -57,9 +57,7 @@ func EncodeForMultisigning(json map[string]any, xrpAccountID map[string]any) (st
 // EncodeForPaymentChannelClaim: encodes a payment channel claim into binary format in preparation for signing.
 func EncodeForSigningClaim(json map[string]any) (string, error) {
 
-	if _, ok := json["Channel"]; !ok {
-		return "", ErrSigningClaimFieldNotFound
-	} else if _, ok := json["Amount"]; !ok {
+	if json["Channel"] == nil || json["Amount"] == nil {
 		return "", ErrSigningClaimFieldNotFound
 	}
 
