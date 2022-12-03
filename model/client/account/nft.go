@@ -16,8 +16,8 @@ type NFTokenFlag uint
 type Nft struct {
 	Flags        NFTokenFlag
 	Issuer       Address
-	NFTokenID    string
+	NFTokenID    NfTokenID
 	NFTokenTaxon uint
-	URI          string
+	URI          NfTokenUri
 	NftSerial    uint `json:"nft_serial"`
 }
