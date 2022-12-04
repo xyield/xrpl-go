@@ -32,14 +32,14 @@ func Encode(json map[string]any) (string, error) {
 // EncodeForMultiSign: encodes a transaction into binary format in preparation for providing one
 // signature towards a multi-signed transaction.
 // (Only encodes fields that are intended to be signed.)
-func EncodeForMultisigning(json map[string]any, xrpAccountID map[string]any) (string, error) {
+func EncodeForMultisigning(json map[string]any, xrpAccountID string) (string, error) {
 
-	st := &types.STObject{}
+	st := &types.AccountID{}
 
 	// remove the SigningPubKey field because any existing signing keys
 	// shouldn't be signed over again.
 
-	delete(json, "SigningPubKey")
+	json["SigningPubKey"] = ""
 
 	suffix, err := st.SerializeJson(xrpAccountID)
 	if err != nil {
@@ -80,8 +80,8 @@ func EncodeForSigningClaim(json map[string]any) (string, error) {
 		return "", err
 	}
 
-	st := &types.UInt64{}
-	amount, err := st.SerializeJson(json["Amount"])
+	t := &types.UInt64{}
+	amount, err := t.SerializeJson(json["Amount"])
 
 	if err != nil {
 		return "", err
