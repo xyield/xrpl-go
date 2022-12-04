@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	addresscodec "github.com/xyield/xrpl-go/address-codec"
+	"github.com/xyield/xrpl-go/binary-codec/serdes"
 )
 
 const (
@@ -20,7 +21,7 @@ type PathSet struct{}
 var ErrInvalidPathSet error = errors.New("invalid type to construct PathSet from. Expected []any of []any")
 
 // Serializes a path set from a json representation of a slice of paths to a byte array
-func (p PathSet) SerializeJson(json any) ([]byte, error) {
+func (p PathSet) FromJson(json any) ([]byte, error) {
 
 	if _, ok := json.([]any)[0].([]any); !ok {
 		return nil, ErrInvalidPathSet
@@ -31,6 +32,10 @@ func (p PathSet) SerializeJson(json any) ([]byte, error) {
 	}
 
 	return newPathSet(json.([]any)), nil
+}
+
+func (p PathSet) FromParser(parser *serdes.BinaryParser) ([]byte, error) {
+	return nil, nil
 }
 
 // determine if an array represents a valid path set

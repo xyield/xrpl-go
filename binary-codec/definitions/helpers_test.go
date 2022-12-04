@@ -185,13 +185,13 @@ func TestGetFieldHeaderByFieldName(t *testing.T) {
 	tt := []struct {
 		description   string
 		input         string
-		expected      *fieldHeader
+		expected      *FieldHeader
 		expectedError error
 	}{
 		{
 			description: "correct FieldHeader",
 			input:       "TransferRate",
-			expected: &fieldHeader{
+			expected: &FieldHeader{
 				TypeCode:  2,
 				FieldCode: 11,
 			},
@@ -226,13 +226,13 @@ func TestGetFieldHeaderByFieldName(t *testing.T) {
 func TestGetFieldNameByFieldHeader(t *testing.T) {
 	tt := []struct {
 		description   string
-		input         fieldHeader
+		input         FieldHeader
 		expected      string
 		expectedError error
 	}{
 		{
 			description: "correct fieldName",
-			input: fieldHeader{
+			input: FieldHeader{
 				TypeCode:  1,
 				FieldCode: 1,
 			},
@@ -241,7 +241,7 @@ func TestGetFieldNameByFieldHeader(t *testing.T) {
 		},
 		{
 			description: "correct fieldName 2",
-			input: fieldHeader{
+			input: FieldHeader{
 				TypeCode:  5,
 				FieldCode: 21,
 			},
@@ -249,15 +249,15 @@ func TestGetFieldNameByFieldHeader(t *testing.T) {
 			expectedError: nil,
 		},
 		{
-			description: "invalid fieldHeader",
-			input: fieldHeader{
+			description: "invalid FieldHeader",
+			input: FieldHeader{
 				TypeCode:  0000000000000111,
 				FieldCode: 000000000000111,
 			},
 			expected: "",
 			expectedError: &NotFoundErrorFieldHeader{
 				Instance: "FieldHeader",
-				Input: fieldHeader{
+				Input: FieldHeader{
 					TypeCode:  0000000000000111,
 					FieldCode: 000000000000111,
 				},
@@ -343,7 +343,7 @@ func TestGetFieldInstanceByFieldName(t *testing.T) {
 					IsSigningField: true,
 					Type:           "UInt32",
 				},
-				FieldHeader: &fieldHeader{
+				FieldHeader: &FieldHeader{
 					TypeCode:  2,
 					FieldCode: 11,
 				},

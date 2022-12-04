@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	addresscodec "github.com/xyield/xrpl-go/address-codec"
+	"github.com/xyield/xrpl-go/binary-codec/serdes"
 	bigdecimal "github.com/xyield/xrpl-go/pkg/big-decimal"
 )
 
@@ -66,7 +67,7 @@ func (e *InvalidCodeError) Error() string {
 type Amount struct{}
 
 // Serializes an issued currency amount to its bytes representation from json
-func (a *Amount) SerializeJson(value any) ([]byte, error) {
+func (a *Amount) FromJson(value any) ([]byte, error) {
 
 	switch value := value.(type) {
 	case string:
@@ -76,6 +77,10 @@ func (a *Amount) SerializeJson(value any) ([]byte, error) {
 	default:
 		return nil, errors.New("invalid amount type")
 	}
+}
+
+func (a *Amount) FromParser(p *serdes.BinaryParser) ([]byte, error) {
+	return nil, nil
 }
 
 // validates the format of an XRP amount value

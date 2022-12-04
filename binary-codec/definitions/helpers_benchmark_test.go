@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-//nolint
+// nolint
 func BenchmarkGetTypeNameByFieldName(b *testing.B) {
 
 	tt := []struct {
@@ -28,7 +28,7 @@ func BenchmarkGetTypeNameByFieldName(b *testing.B) {
 	}
 }
 
-//nolint
+// nolint
 func BenchmarkGetTypeCodeByTypeName(b *testing.B) {
 
 	tt := []struct {
@@ -51,7 +51,7 @@ func BenchmarkGetTypeCodeByTypeName(b *testing.B) {
 	}
 }
 
-//nolint
+// nolint
 func BenchmarkGetTypeCodeByFieldName(b *testing.B) {
 	tt := []struct {
 		input string
@@ -73,7 +73,7 @@ func BenchmarkGetTypeCodeByFieldName(b *testing.B) {
 	}
 }
 
-//nolint
+// nolint
 func BenchmarkGetFieldCodeByFieldName(b *testing.B) {
 	tt := []struct {
 		input string
@@ -95,7 +95,7 @@ func BenchmarkGetFieldCodeByFieldName(b *testing.B) {
 	}
 }
 
-//nolint
+// nolint
 func BenchmarkGetFieldHeaderByFieldName(b *testing.B) {
 	tt := []struct {
 		input string
@@ -119,16 +119,16 @@ func BenchmarkGetFieldHeaderByFieldName(b *testing.B) {
 
 // func BenchmarkGetFieldNameByFieldHeader(b *testing.B) {
 // 	tt := []struct {
-// 		input fieldHeader
+// 		input FieldHeader
 // 	}{
 // 		{
-// 			input: fieldHeader{
+// 			input: FieldHeader{
 // 				TypeCode:  []byte{1},
 // 				FieldCode: []byte{1},
 // 			},
 // 		},
 // 		{
-// 			input: fieldHeader{
+// 			input: FieldHeader{
 // 				TypeCode: []byte() 0000000000111,
 // 				FieldCode: 00000000000000111,
 // 			},
@@ -144,7 +144,7 @@ func BenchmarkGetFieldHeaderByFieldName(b *testing.B) {
 // 	}
 // }
 
-//nolint
+// nolint
 func BenchmarkGetFieldInfoByFieldName(b *testing.B) {
 	tt := []struct {
 		input string
@@ -166,7 +166,7 @@ func BenchmarkGetFieldInfoByFieldName(b *testing.B) {
 	}
 }
 
-//nolint
+// nolint
 func BenchmarkGetFieldInstanceByFieldName(b *testing.B) {
 	tt := []struct {
 		input string
@@ -188,7 +188,7 @@ func BenchmarkGetFieldInstanceByFieldName(b *testing.B) {
 	}
 }
 
-//nolint
+// nolint
 func BenchmarkGetTransactionTypeCodeByTransactionTypeName(b *testing.B) {
 	tt := []struct {
 		input string
@@ -210,7 +210,7 @@ func BenchmarkGetTransactionTypeCodeByTransactionTypeName(b *testing.B) {
 	}
 }
 
-//nolint
+// nolint
 func BenchmarkGetTransactionTypeNameByTransactionTypeCode(b *testing.B) {
 	tt := []struct {
 		input int32
@@ -232,7 +232,7 @@ func BenchmarkGetTransactionTypeNameByTransactionTypeCode(b *testing.B) {
 	}
 }
 
-//nolint
+// nolint
 func BenchmarkGetTransactionResultNameByTransactionResultTypeCode(b *testing.B) {
 	tt := []struct {
 		input int32
@@ -254,7 +254,7 @@ func BenchmarkGetTransactionResultNameByTransactionResultTypeCode(b *testing.B) 
 	}
 }
 
-//nolint
+// nolint
 func BenchmarkGetTransactionResultTypeCodeByTransactionResultName(b *testing.B) {
 	tt := []struct {
 		input string
@@ -276,7 +276,7 @@ func BenchmarkGetTransactionResultTypeCodeByTransactionResultName(b *testing.B) 
 	}
 }
 
-//nolint
+// nolint
 func BenchmarkGetLedgerEntryTypeCodeByLedgerEntryTypeName(b *testing.B) {
 	tt := []struct {
 		input string
@@ -298,7 +298,7 @@ func BenchmarkGetLedgerEntryTypeCodeByLedgerEntryTypeName(b *testing.B) {
 	}
 }
 
-//nolint
+// nolint
 func BenchmarkGetLedgerEntryTypeNameByLedgerEntryTypeCode(b *testing.B) {
 	tt := []struct {
 		input int32

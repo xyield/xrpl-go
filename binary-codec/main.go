@@ -5,7 +5,11 @@ import (
 	"errors"
 	"strings"
 
+	"encoding/json"
+
 	"github.com/xyield/xrpl-go/binary-codec/definitions"
+
+	"github.com/xyield/xrpl-go/binary-codec/serdes"
 	"github.com/xyield/xrpl-go/binary-codec/types"
 )
 
@@ -21,7 +25,7 @@ const (
 func Encode(json map[string]any) (string, error) {
 
 	st := &types.STObject{}
-	b, err := st.SerializeJson(json)
+	b, err := st.FromJson(json)
 	if err != nil {
 		return "", err
 	}
@@ -40,7 +44,7 @@ func EncodeForMultisigning(json map[string]any, xrpAccountID string) (string, er
 
 	json["SigningPubKey"] = ""
 
-	suffix, err := st.SerializeJson(xrpAccountID)
+	suffix, err := st.FromJson(xrpAccountID)
 	if err != nil {
 		return "", err
 	}
@@ -73,14 +77,14 @@ func EncodeForSigningClaim(json map[string]any) (string, error) {
 		return "", ErrSigningClaimFieldNotFound
 	}
 
-	channel, err := types.NewHash256().SerializeJson(json["Channel"])
+	channel, err := types.NewHash256().FromJson(json["Channel"])
 
 	if err != nil {
 		return "", err
 	}
 
 	t := &types.UInt64{}
-	amount, err := t.SerializeJson(json["Amount"])
+	amount, err := t.FromJson(json["Amount"])
 
 	if err != nil {
 		return "", err
@@ -100,4 +104,23 @@ func removeNonSigningFields(json map[string]any) map[string]any {
 	}
 
 	return json
+}
+
+func Decode(hexEncoded string) (map[string]any, error) {
+	b, err := hex.DecodeString(hexEncoded)
+	if err != nil {
+		return nil, err
+	}
+	p := serdes.NewBinaryParser(b)
+	st := &types.STObject{}
+	res, err := st.FromParser(p)
+	if err != nil {
+		return nil, err
+	}
+	var tx map[string]any
+	err = json.Unmarshal(res, &tx)
+	if err != nil {
+		return nil, err
+	}
+	return tx, nil
 }
