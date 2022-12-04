@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	bigdecimal "github.com/xyield/xrpl-go/pkg/big-decimal"
 )
 
 func TestVerifyXrpValue(t *testing.T) {
@@ -174,10 +175,10 @@ func TestSerializeIssuedCurrencyValue(t *testing.T) {
 		expectedErr error
 	}{
 		{
-			name:        "valid zero value",
+			name:        "invalid zero value",
 			input:       "0",
-			expected:    []byte{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-			expectedErr: nil,
+			expected:    nil,
+			expectedErr: bigdecimal.ErrInvalidZeroValue,
 		},
 		{
 			name:        "valid value - 2",

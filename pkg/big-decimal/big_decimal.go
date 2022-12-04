@@ -1,6 +1,7 @@
 package bigdecimal
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -14,7 +15,8 @@ const (
 
 var (
 	ErrInvalidCharacter = fmt.Errorf("value contains invalid characters. Only the following are allowed: %q", AllowedCharacters)
-	ErrMultiple         = fmt.Errorf("multiple decimal points")
+	ErrInvalidZeroValue = errors.New("value cannot be zero")
+	ErrInvalidScale     = errors.New("scale too large")
 )
 
 type BigDecimal struct {
@@ -25,85 +27,99 @@ type BigDecimal struct {
 }
 
 // Creates a new custom BigDecimal object from a value string
-func NewBigDecimal(value string) (*BigDecimal, error) {
+func NewBigDecimal(value string) (bd *BigDecimal, err error) {
 
-	r := regexp.MustCompile(BigDecRegEx)
-	m := r.FindAllString(value, -1)
-	if len(m) != 1 {
+	// check if the value string contains only allowed characters
+	if !bigDecimalRegEx(value) {
 		return nil, ErrInvalidCharacter
 	}
-	value = strings.ToLower(value) // convert to lowercase
 
-	bigDecimal := new(BigDecimal)
-	var err error
+	v := strings.ToLower(value)
+	bd = new(BigDecimal)
 
-	if strings.HasPrefix(value, "-") { // if the value is negative, set the sign to negative
-		bigDecimal.Sign = 1
-		value = strings.TrimPrefix(value, "-") // remove the sign from the value
+	// check if the value is negative and set the sign accordingly
+	bd.Sign, v = handleSign(v)
+
+	// check if the value contains the 'e' character and split the string into prefix and suffix accordingly
+	p, s, eFound := strings.Cut(v, "e")
+
+	// if the prefix without trailing & leading zeros is empty or only contains a decimal character, return an error
+	trimP := strings.Trim(p, "0")
+	if trimP == "" || trimP == "." {
+		return nil, ErrInvalidZeroValue
 	}
 
-	prefix, suffix, ePresent := strings.Cut(value, "e") // split the value into prefix and suffix at the 'e' character, if present
-
-	emptyCheck := strings.Trim(prefix, "0") // remove all zeros from the prefix
-
-	if emptyCheck == "" || emptyCheck == "." { // if the prefix is empty or just a decimal point, set everything to 0 or "" and return
-		bigDecimal.Scale = 0
-		bigDecimal.Precision = 0
-		bigDecimal.UnscaledValue = ""
-		bigDecimal.Sign = 0
-		return bigDecimal, nil
+	// if the value contains the 'e' character, call the appropriate function to get the scale and unscaled value
+	if eFound {
+		bd.Scale, bd.UnscaledValue = getScaleAndUnscaledValWithE(p, s)
+	} else {
+		bd.Scale, bd.UnscaledValue = getScaleAndUnscaledValNoE(p, s)
 	}
 
-	decimalPrefix, decimalSuffix, ok := strings.Cut(prefix, ".") // split the prefix into decimal prefix and decimal suffix at the '.' character, if present
-
-	if ePresent { // if the value contains an 'e' character
-		bigDecimal.Scale, err = strconv.Atoi(suffix) // convert the suffix to an int, which is the scale
-		if err != nil {
-			return nil, err
-		}
-
-		if ok { // if the value contains a SINGLE decimal point
-			decimalSuffixNoTrailingZeros := strings.TrimRight(decimalSuffix, "0")         // remove trailing zeros from the decimal suffix
-			decimalPrefixNoLeadingZeros := strings.TrimLeft(decimalPrefix, "0")           // remove leading zeros from the decimal prefix
-			bigDecimal.Scale = bigDecimal.Scale - len(decimalSuffixNoTrailingZeros)       // subtract the length of the decimal suffix from the scale
-			bigDecimal.UnscaledValue = strings.Trim((decimalPrefix + decimalSuffix), "0") // remove leading and trailing zeros from the concatenated decimal prefix and decimal suffix to get the unscaled value
-
-			if decimalSuffixNoTrailingZeros == "" { // if the decimal suffix is empty because it only contained trailing zeros
-				bigDecimal.Scale = bigDecimal.Scale + (len(decimalPrefixNoLeadingZeros) - len(bigDecimal.UnscaledValue)) // add the difference between the length of the decimal prefix and the length of the unscaled value, to the scale
-			}
-
-		} else if !ok { // if the value does not contain a SINGLE decimal point
-			prefixNoTrailingZeros := strings.Trim(prefix, "0")                                             // remove trailing zeros from the prefix
-			prefixNoLeadingZeros := strings.TrimLeft(prefix, "0")                                          // remove leading zeros from the prefix
-			bigDecimal.Scale = bigDecimal.Scale + (len(prefixNoLeadingZeros) - len(prefixNoTrailingZeros)) // add the difference between the length of the prefix and the length of the prefix with trailing zeros removed, to the scale
-			bigDecimal.UnscaledValue = prefixNoTrailingZeros                                               // set the unscaled value to the prefix with trailing zeros removed
-		} else {
-			return nil, err // Do I need this?
-		}
+	if bd.UnscaledValue == "" {
+		return nil, ErrInvalidZeroValue
 	}
 
-	if !ePresent { // if the value does not contain an 'e' character
+	bd.Precision = len(bd.UnscaledValue)
+	return
+}
 
-		if ok { // if the value contains a SINGLE decimal point
-			decimalSuffixNoTrailingZeros := strings.TrimRight(decimalSuffix, "0")                        // remove trailing zeros from the decimal suffix
-			decimalPrefixNoLeadingZeros := strings.TrimLeft(decimalPrefix, "0")                          // remove leading zeros from the decimal prefix
-			bigDecimal.Scale = -len(decimalSuffixNoTrailingZeros)                                        // set the scale to the negative of the length of the decimal suffix with trailing zeros removed
-			bigDecimal.UnscaledValue = strings.Trim((decimalPrefix + decimalSuffixNoTrailingZeros), "0") // remove leading and trailing zeros from the concatenated decimal prefix and decimal suffix with trailing zeros removed to get the unscaled value
+func getScaleAndUnscaledValNoE(p, s string) (sc int, uv string) {
 
-			if decimalSuffixNoTrailingZeros == "" { // if the decimal suffix is empty because it only contained trailing zeros
-				bigDecimal.Scale = len(decimalPrefixNoLeadingZeros) - len(bigDecimal.UnscaledValue) // set the scale to the difference between the length of the decimal prefix and the length of the unscaled value
-			}
-
-		} else if !ok { // if the value does not contain a SINGLE decimal point
-			decimalPrefixNoTrailingZeros := strings.TrimRight(prefix, "0")             // remove trailing zeros from the prefix
-			bigDecimal.Scale = len(prefix) - len(decimalPrefixNoTrailingZeros)         // set the scale to the difference between the length of the prefix and the length of the prefix with trailing zeros removed
-			bigDecimal.UnscaledValue = strings.Trim(decimalPrefixNoTrailingZeros, "0") // remove leading and trailing zeros from the prefix with trailing zeros removed to get the unscaled value
-		} else {
-			return nil, err // Do I need this?
-		}
+	// check if the value contains a decimal character and split the string into prefix and suffix accordingly
+	decP, decS, decFound := strings.Cut(p, ".")
+	if decFound {
+		return valHasDecimal(0, decP, decS)
+	} else {
+		return valNoDecimalNoE(0, p, decP)
 	}
+}
 
-	bigDecimal.Precision = len(bigDecimal.UnscaledValue) // set the precision to the length of the unscaled value
+func getScaleAndUnscaledValWithE(p, s string) (sc int, uv string) {
+	// check if the value contains a decimal character and split the string into prefix and suffix accordingly
+	decP, decS, decFound := strings.Cut(p, ".")
+	sc, err := strconv.Atoi(s)
+	if err != nil {
+		return 0, ""
+	}
+	if decFound {
+		return valHasDecimal(sc, decP, decS)
+	} else {
+		return valNoDecimalHasE(sc, p, decP)
+	}
+}
 
-	return bigDecimal, nil
+func valHasDecimal(scale int, decP, decS string) (sc int, uv string) {
+	uv = strings.Trim((decP + decS), "0")
+	sc = scale - len(strings.TrimRight(decS, "0"))
+	if strings.TrimRight(decS, "0") == "" {
+		sc = scale + len(strings.TrimLeft(decP, "0")) - len(uv)
+	}
+	return
+}
+
+func valNoDecimalNoE(scale int, prefix, decP string) (sc int, uv string) {
+	uv = strings.Trim(decP, "0")
+	sc = len(prefix) - len(strings.TrimRight(decP, "0"))
+	return
+}
+
+func valNoDecimalHasE(scale int, prefix, decP string) (sc int, uv string) {
+	uv = strings.Trim(prefix, "0")
+	sc = scale + len(strings.TrimLeft(prefix, "0")) - len(uv)
+	return
+
+}
+
+func handleSign(value string) (int, string) {
+	if strings.HasPrefix(value, "-") {
+		return 1, strings.TrimPrefix(value, "-")
+	}
+	return 0, value
+}
+
+func bigDecimalRegEx(value string) bool {
+	r := regexp.MustCompile(BigDecRegEx)
+	m := r.FindAllString(value, -1)
+	return len(m) == 1
 }
