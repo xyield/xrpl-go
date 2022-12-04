@@ -1,13 +1,21 @@
 package types
 
-import "encoding/hex"
+import (
+	"encoding/hex"
+
+	"github.com/xyield/xrpl-go/binary-codec/serdes"
+)
 
 type Blob struct{}
 
-func (b *Blob) SerializeJson(json any) ([]byte, error) {
+func (b *Blob) FromJson(json any) ([]byte, error) {
 	v, err := hex.DecodeString(json.(string))
 	if err != nil {
 		return nil, err
 	}
 	return v, nil
+}
+
+func (b *Blob) FromParser(p *serdes.BinaryParser) ([]byte, error) {
+	return nil, nil
 }

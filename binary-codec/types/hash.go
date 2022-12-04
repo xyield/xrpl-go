@@ -3,6 +3,8 @@ package types
 import (
 	"encoding/hex"
 	"fmt"
+
+	"github.com/xyield/xrpl-go/binary-codec/serdes"
 )
 
 type ErrInvalidHashLength struct {
@@ -32,7 +34,7 @@ func (h hash) getLength() int {
 	return h.Length
 }
 
-func (h hash) SerializeJson(json any) ([]byte, error) {
+func (h hash) FromJson(json any) ([]byte, error) {
 	v, err := hex.DecodeString(json.(string))
 	if err != nil {
 		return nil, err
@@ -41,4 +43,8 @@ func (h hash) SerializeJson(json any) ([]byte, error) {
 		return nil, &ErrInvalidHashLength{Expected: h.getLength()}
 	}
 	return v, nil
+}
+
+func (h hash) FromParser(p *serdes.BinaryParser) ([]byte, error) {
+	return nil, nil
 }

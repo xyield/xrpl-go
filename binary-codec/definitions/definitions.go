@@ -37,7 +37,7 @@ func (e *NotFoundErrorInt) Error() string {
 
 type NotFoundErrorFieldHeader struct {
 	Instance string
-	Input    fieldHeader
+	Input    FieldHeader
 }
 
 func (e *NotFoundErrorFieldHeader) Error() string {
@@ -50,7 +50,7 @@ type Definitions struct {
 	Fields             fieldInstanceMap
 	TransactionResults map[string]int32
 	TransactionTypes   map[string]int32
-	FieldIdNameMap     map[fieldHeader]string
+	FieldIdNameMap     map[FieldHeader]string
 }
 type definitionsDoc struct {
 	Types              map[string]int32 `json:"TYPES"`
@@ -135,7 +135,7 @@ func addFieldHeadersAndOrdinals() {
 		t, _ := definitions.GetTypeCodeByTypeName(definitions.Fields[k].Type)
 
 		if fi, ok := definitions.Fields[k]; ok {
-			fi.FieldHeader = &fieldHeader{
+			fi.FieldHeader = &FieldHeader{
 				TypeCode:  t,
 				FieldCode: definitions.Fields[k].Nth,
 			}
@@ -145,7 +145,7 @@ func addFieldHeadersAndOrdinals() {
 }
 
 func createFieldIdNameMap() {
-	definitions.FieldIdNameMap = make(map[fieldHeader]string, len(definitions.Fields))
+	definitions.FieldIdNameMap = make(map[FieldHeader]string, len(definitions.Fields))
 	for k := range definitions.Fields {
 		fh, _ := definitions.GetFieldHeaderByFieldName(k)
 

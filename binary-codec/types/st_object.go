@@ -10,7 +10,7 @@ import (
 
 type STObject struct{}
 
-func (t *STObject) SerializeJson(json any) ([]byte, error) {
+func (t *STObject) FromJson(json any) ([]byte, error) {
 	s := serdes.NewSerializer()
 	if _, ok := json.(map[string]any); !ok {
 		return nil, fmt.Errorf("not a valid json node")
@@ -24,13 +24,12 @@ func (t *STObject) SerializeJson(json any) ([]byte, error) {
 	sk := getSortedKeys(fimap)
 
 	for _, v := range sk {
-
 		if !v.IsSerialized {
 			continue
 		}
 
 		st := GetSerializedType(v.Type)
-		b, err := st.SerializeJson(fimap[v])
+		b, err := st.FromJson(fimap[v])
 		if err != nil {
 			return nil, err
 		}
@@ -40,6 +39,16 @@ func (t *STObject) SerializeJson(json any) ([]byte, error) {
 		}
 	}
 	return s.GetSink(), nil
+}
+
+func (t *STObject) FromParser(p *serdes.BinaryParser) ([]byte, error) {
+	f, err := p.ReadField()
+	// st := GetSerializedType(f.Type)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println(f)
+	return nil, nil
 }
 
 // nolint
