@@ -36,8 +36,7 @@ func EncodeForMultisigning(json map[string]any, xrpAccountID string) (string, er
 
 	st := &types.AccountID{}
 
-	// remove the SigningPubKey field because any existing signing keys
-	// shouldn't be signed over again.
+	// SigningPubKey is required for multi-signing but should be set to empty string.
 
 	json["SigningPubKey"] = ""
 
