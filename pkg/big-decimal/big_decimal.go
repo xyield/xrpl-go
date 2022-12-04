@@ -1,6 +1,7 @@
 package bigdecimal
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -14,8 +15,8 @@ const (
 
 var (
 	ErrInvalidCharacter = fmt.Errorf("value contains invalid characters. Only the following are allowed: %q", AllowedCharacters)
-	ErrInvalidZeroValue = fmt.Errorf("value cannot be zero")
-	ErrInvalidScale     = fmt.Errorf("scale too large")
+	ErrInvalidZeroValue = errors.New("value cannot be zero")
+	ErrInvalidScale     = errors.New("scale too large")
 )
 
 type BigDecimal struct {
@@ -37,13 +38,13 @@ func NewBigDecimal(value string) (bd *BigDecimal, err error) {
 	bd = new(BigDecimal)
 
 	// check if the value is negative and set the sign accordingly
-	bd.Sign, v = checkAndSetSign(v)
+	bd.Sign, v = handleSign(v)
 
 	// check if the value contains the 'e' character and split the string into prefix and suffix accordingly
 	p, s, eFound := strings.Cut(v, "e")
-	trimP := strings.Trim(p, "0")
 
 	// if the prefix without trailing & leading zeros is empty or only contains a decimal character, return an error
+	trimP := strings.Trim(p, "0")
 	if trimP == "" || trimP == "." {
 		return nil, ErrInvalidZeroValue
 	}
@@ -110,7 +111,7 @@ func valNoDecimalHasE(scale int, prefix, decP string) (sc int, uv string) {
 
 }
 
-func checkAndSetSign(value string) (int, string) {
+func handleSign(value string) (int, string) {
 	if strings.HasPrefix(value, "-") {
 		return 1, strings.TrimPrefix(value, "-")
 	}
