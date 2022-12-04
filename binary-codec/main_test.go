@@ -349,3 +349,60 @@ func TestEncodeForSigningClaim(t *testing.T) {
 		})
 	}
 }
+
+func TestEncodeForSigning(t *testing.T) {
+	tt := []struct {
+		description string
+		input       map[string]any
+		output      string
+		expectedErr error
+	}{
+		{
+			description: "serialize STObject for signing correctly",
+			input: map[string]any{
+				"Memo": map[string]any{
+					"MemoType": "04C4D46544659A2D58525043686174",
+				},
+			},
+			output:      "53545800EA7C0F04C4D46544659A2D58525043686174E1",
+			expectedErr: nil,
+		},
+		{
+			description: "serialize tx1 for signing correctly",
+			input: map[string]any{
+				"Account":       "rMBzp8CgpE441cp5PVyA9rpVV7oT8hP3ys",
+				"Expiration":    595640108,
+				"Fee":           "10",
+				"Flags":         524288,
+				"OfferSequence": 1752791,
+				"Sequence":      1752792,
+				"SigningPubKey": "03EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3",
+				"TakerGets":     "15000000000",
+				"TakerPays": map[string]any{
+					"currency": "USD",
+					"issuer":   "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+					"value":    "7072.8",
+				},
+				"TransactionType": "OfferCreate",
+				"TxnSignature":    "30440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C",
+				"hash":            "73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C",
+			},
+			output:      "53545800120007220008000024001ABED82A2380BF2C2019001ABED764D55920AC9391400000000000000000000000000055534400000000000A20B3C85F482532A9578DBB3950B85CA06594D165400000037E11D60068400000000000000A732103EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE38114DD76483FACDEE26E60D8A586BB58D09F27045C46",
+			expectedErr: nil,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.description, func(t *testing.T) {
+			got, err := EncodeForSigning(tc.input)
+
+			if tc.expectedErr != nil {
+				require.EqualError(t, err, tc.expectedErr.Error())
+				require.Empty(t, got)
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, tc.output, got)
+			}
+		})
+	}
+}
