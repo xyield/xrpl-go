@@ -7,23 +7,23 @@ complex elements of the XRP Ledger. A full library of models for all transaction
 This library is still in development and not yet intended for use.
 
 ## Installation
-The latest version can be installed using **TODO**
+The latest version can be installed using - **TODO**
 
 Requiring Go version `1.18.0` and later.
-[Golang](https://go.dev/dl/)
+[Download latest Go version](https://go.dev/dl/)
 
-Pre-requisites:
+#### Pre-requisites:
 </br>
-Install pre-commit
+Install [pre-commit](https://github.com/pre-commit/pre-commit-hooks)
 </br>
 
 ## Features
 * Binary Codec
 * Address Codec
-* Keypairs Generation **to finish**
-* Go Models **to finish**
-* Json Rpc Client **to finish**
-* Webhook Client **todo**
+* Keypairs Generation - **to finish**
+* Go Models - **to finish**
+* Json Rpc Client - **to finish**
+* Webhook Client - **todo**
 
 ## Usage
 * Keys and Wallets
