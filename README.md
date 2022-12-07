@@ -28,7 +28,7 @@ Install [pre-commit](https://github.com/pre-commit/pre-commit-hooks)
 ## Usage
 * Keys and Wallets
 * Serialize and sign transactions
-* Encode addresses into and from classic address **no support for X-addresses**
+* Encode addresses into and from classic address (***no support for X-addresses***)
 * How to use with JsonRpc Client
 * How to use Webhooks
 
