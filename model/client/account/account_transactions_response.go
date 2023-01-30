@@ -14,13 +14,3 @@ type AccountTransactionsResponse struct {
 	Transactions   []AccountTransaction `json:"transactions"`
 	Validated      bool                 `json:"validated"`
 }
-
-type AccountTransaction struct {
-	LedgerIndex uint64              `json:"ledger_index"`
-	Meta        TransactionMetadata `json:"meta"`
-	// TODO parsing of interfaces via json.RawMessage intermediary
-	//TxJson      json.RawMessage `json:"tx"`
-	Tx        Tx     `json:"tx"`
-	TxBlob    string `json:"tx_blob"`
-	Validated bool   `json:"validated"`
-}

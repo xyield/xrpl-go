@@ -1,5 +1,7 @@
 package ledger
 
+import "fmt"
+
 type LedgerEntryType string
 
 const (
@@ -22,4 +24,9 @@ const (
 
 type LedgerObject interface {
 	LedgerEntryType() LedgerEntryType
+}
+
+func UnmarshalLedgerObject(data []byte) (LedgerObject, error) {
+	// TODO
+	return nil, fmt.Errorf("LedgerObject parsing unimplmeneted")
 }

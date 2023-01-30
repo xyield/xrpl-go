@@ -1,6 +1,8 @@
 package account
 
 import (
+	"fmt"
+
 	. "github.com/xyield/xrpl-go/model/client/common"
 	. "github.com/xyield/xrpl-go/model/ledger"
 	. "github.com/xyield/xrpl-go/model/transactions"
@@ -15,4 +17,9 @@ type AccountObjectsResponse struct {
 	Limit              int            `json:"limit"`
 	Marker             interface{}    `json:"marker"`
 	Validated          bool           `json:"validated"`
+}
+
+func (r *AccountObjectsResponse) UnmarshalJSON(data []byte) error {
+	// TODO Unmrashal LedgerObject interface
+	return fmt.Errorf("unimplemeneted")
 }
