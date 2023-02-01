@@ -11,12 +11,13 @@ type Hash256 []byte
 
 type Hash128 []byte
 
+// TODO XrpCurrencyAmount goes to/from rippled as string
 type XrpCurrencyAmount uint64
 
 type Marker any
 
-type NfTokenID string
+type NFTokenID Hash256
 
-type NfTokenUri string
+type NFTokenURI string
 
 type TransferFee uint
