@@ -1,5 +1,9 @@
 package transactions
 
+import (
+	. "github.com/xyield/xrpl-go/model/transactions/types"
+)
+
 type DepositPreauth struct {
 	BaseTx
 	Authorize   Address `json:",omitempty"`

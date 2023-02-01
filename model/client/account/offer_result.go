@@ -1,7 +1,7 @@
 package account
 
 import (
-	. "github.com/xyield/xrpl-go/model/transactions"
+	. "github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 type OfferFlags uint

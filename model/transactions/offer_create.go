@@ -1,5 +1,9 @@
 package transactions
 
+import (
+	. "github.com/xyield/xrpl-go/model/transactions/types"
+)
+
 type OfferCreate struct {
 	BaseTx
 	Expiration    uint `json:",omitempty"`

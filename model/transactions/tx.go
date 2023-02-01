@@ -3,6 +3,8 @@ package transactions
 import (
 	"encoding/json"
 	"fmt"
+
+	. "github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 type Tx interface {

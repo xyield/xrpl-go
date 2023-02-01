@@ -7,7 +7,7 @@ import (
 	. "github.com/xyield/xrpl-go/model/client/common"
 	"github.com/xyield/xrpl-go/model/ledger"
 	. "github.com/xyield/xrpl-go/model/ledger"
-	. "github.com/xyield/xrpl-go/model/transactions"
+	. "github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 const (

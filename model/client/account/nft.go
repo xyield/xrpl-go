@@ -1,7 +1,7 @@
 package account
 
 import (
-	. "github.com/xyield/xrpl-go/model/transactions"
+	. "github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 const (
@@ -16,8 +16,8 @@ type NFTokenFlag uint
 type Nft struct {
 	Flags        NFTokenFlag
 	Issuer       Address
-	NFTokenID    NfTokenID
+	NFTokenID    NFTokenID
 	NFTokenTaxon uint
-	URI          NfTokenUri
+	URI          NFTokenURI
 	NftSerial    uint `json:"nft_serial"`
 }

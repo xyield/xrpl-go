@@ -1,5 +1,9 @@
 package transactions
 
+import (
+	. "github.com/xyield/xrpl-go/model/transactions/types"
+)
+
 type TransactionMetadata struct {
 	AffectedNodes          []AffectedNode `json:"AffectedNodes"`
 	PartialDeliveredAmount CurrencyAmount `json:"DeliveredAmount"`
