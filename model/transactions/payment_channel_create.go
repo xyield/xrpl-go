@@ -1,6 +1,8 @@
 package transactions
 
 import (
+	"encoding/json"
+
 	. "github.com/xyield/xrpl-go/model/transactions/types"
 )
 
@@ -16,4 +18,12 @@ type PaymentChannelCreate struct {
 
 func (*PaymentChannelCreate) TxType() TxType {
 	return PaymentChannelCreateTx
+}
+
+func UnmarshalPaymentChannelCreateTx(data json.RawMessage) (Tx, error) {
+	var ret PaymentChannelCreate
+	if err := json.Unmarshal(data, &ret); err != nil {
+		return nil, err
+	}
+	return &ret, nil
 }
