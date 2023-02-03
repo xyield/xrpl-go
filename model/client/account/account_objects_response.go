@@ -41,14 +41,15 @@ func (r *AccountObjectsResponse) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &values); err != nil {
 		return fmt.Errorf("%s: %w", AccountObjectUnmarshalErr, err)
 	}
-	r.Account = values.Account
-	r.LedgerHash = values.LedgerHash
-	r.LedgerIndex = values.LedgerIndex
-	r.LedgerCurrentIndex = values.LedgerCurrentIndex
-	r.Limit = values.Limit
-	r.Marker = values.Marker
-	r.Validated = values.Validated
-
+	*r = AccountObjectsResponse{
+		Account:            values.Account,
+		LedgerHash:         values.LedgerHash,
+		LedgerIndex:        values.LedgerIndex,
+		LedgerCurrentIndex: values.LedgerCurrentIndex,
+		Limit:              values.Limit,
+		Marker:             values.Marker,
+		Validated:          values.Validated,
+	}
 	r.AccountObjects = make([]LedgerObject, len(values.AccountObjects))
 	for i, v := range values.AccountObjects {
 		var err error
