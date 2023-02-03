@@ -21,8 +21,31 @@ func (*CheckCreate) TxType() TxType {
 
 func UnmarshalCheckCreateTx(data json.RawMessage) (Tx, error) {
 	var ret CheckCreate
-	if err := json.Unmarshal(data, &ret); err != nil {
+	type ccHelper struct {
+		BaseTx
+		Destination    Address
+		SendMax        json.RawMessage
+		DestinationTag uint    `json:",omitempty"`
+		Expiration     uint    `json:",omitempty"`
+		InvoiceID      Hash256 `json:",omitempty"`
+	}
+	var h ccHelper
+	if err := json.Unmarshal(data, &h); err != nil {
 		return nil, err
 	}
+	ret = CheckCreate{
+		BaseTx:         h.BaseTx,
+		Destination:    h.Destination,
+		DestinationTag: h.DestinationTag,
+		Expiration:     h.Expiration,
+		InvoiceID:      h.InvoiceID,
+	}
+
+	max, err := UnmarshalCurrencyAmount(h.SendMax)
+	if err != nil {
+		return nil, err
+	}
+	ret.SendMax = max
+
 	return &ret, nil
 }

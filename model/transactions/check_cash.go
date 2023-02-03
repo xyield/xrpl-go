@@ -18,9 +18,34 @@ func (*CheckCash) TxType() TxType {
 }
 
 func UnmarshalCheckCashTx(data json.RawMessage) (Tx, error) {
+	type ccHelper struct {
+		BaseTx
+		CheckID    Hash256
+		Amount     json.RawMessage `json:",omitempty"`
+		DeliverMin json.RawMessage `json:",omitempty"`
+	}
 	var ret CheckCash
-	if err := json.Unmarshal(data, &ret); err != nil {
+	var h ccHelper
+	if err := json.Unmarshal(data, &h); err != nil {
 		return nil, err
 	}
+	ret = CheckCash{
+		BaseTx:  h.BaseTx,
+		CheckID: h.CheckID,
+	}
+
+	var amount, min CurrencyAmount
+	var err error
+	amount, err = UnmarshalCurrencyAmount(h.Amount)
+	if err != nil {
+		return nil, err
+	}
+	min, err = UnmarshalCurrencyAmount(h.DeliverMin)
+	if err != nil {
+		return nil, err
+	}
+	ret.Amount = amount
+	ret.DeliverMin = min
+
 	return &ret, nil
 }

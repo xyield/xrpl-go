@@ -21,8 +21,30 @@ func (*NFTokenCreateOffer) TxType() TxType {
 
 func UnmarshalNFTokenCreateOfferTx(data json.RawMessage) (Tx, error) {
 	var ret NFTokenCreateOffer
-	if err := json.Unmarshal(data, &ret); err != nil {
+	type ncoHelper struct {
+		BaseTx
+		Owner       Address `json:",omitempty"`
+		NFTokenID   NFTokenID
+		Amount      json.RawMessage
+		Expiration  uint    `json:",omitempty"`
+		Destination Address `json:",omitempty"`
+	}
+	var h ncoHelper
+	if err := json.Unmarshal(data, &h); err != nil {
 		return nil, err
 	}
+	ret = NFTokenCreateOffer{
+		BaseTx:      h.BaseTx,
+		Owner:       h.Owner,
+		NFTokenID:   h.NFTokenID,
+		Expiration:  h.Expiration,
+		Destination: h.Destination,
+	}
+
+	amount, err := UnmarshalCurrencyAmount(h.Amount)
+	if err != nil {
+		return nil, err
+	}
+	ret.Amount = amount
 	return &ret, nil
 }
