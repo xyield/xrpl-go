@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
-
-	. "github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 type LedgerSpecifier interface {
@@ -55,4 +53,4 @@ func (l LedgerTitle) Ledger() string {
 	return string(l)
 }
 
-type LedgerHash Hash256
+type LedgerHash string
