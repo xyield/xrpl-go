@@ -14,6 +14,10 @@ type AccountCurrenciesRequest struct {
 	Strict      bool            `json:"strict,omitempty"`
 }
 
+func (*AccountCurrenciesRequest) Method() string {
+	return "account_currencies"
+}
+
 func (r *AccountCurrenciesRequest) UnmarshalJSON(data []byte) error {
 	type acrHelper struct {
 		Account     Address         `json:"account"`

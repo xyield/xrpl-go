@@ -16,6 +16,10 @@ type AccountInfoRequest struct {
 	Strict      bool            `json:"strict,omitempty"`
 }
 
+func (*AccountInfoRequest) Method() string {
+	return "account_info"
+}
+
 func (r *AccountInfoRequest) UnmarshalJSON(data []byte) error {
 	type airHelper struct {
 		Account     Address         `json:"account"`

@@ -16,6 +16,10 @@ type AccountLinesRequest struct {
 	Marker      interface{}     `json:"marker,omitempty"`
 }
 
+func (*AccountLinesRequest) Method() string {
+	return "account_lines"
+}
+
 func (r *AccountLinesRequest) UnmarshalJSON(data []byte) error {
 	type alrHelper struct {
 		Account     Address         `json:"account"`

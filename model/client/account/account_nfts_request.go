@@ -15,6 +15,10 @@ type AccountNftsRequest struct {
 	Marker      interface{}     `json:"marker,omitempty"`
 }
 
+func (*AccountNftsRequest) Method() string {
+	return "account_nfts"
+}
+
 func (r *AccountNftsRequest) UnmarshalJSON(data []byte) error {
 	type anrHelper struct {
 		Account     Address         `json:"account"`

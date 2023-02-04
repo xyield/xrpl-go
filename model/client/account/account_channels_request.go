@@ -16,6 +16,10 @@ type AccountChannelsRequest struct {
 	Marker             interface{}     `json:"marker,omitempty"`
 }
 
+func (*AccountChannelsRequest) Method() string {
+	return "account_channels"
+}
+
 func (r *AccountChannelsRequest) UnmarshalJSON(data []byte) error {
 	type acrHelper struct {
 		Account            Address         `json:"account"`

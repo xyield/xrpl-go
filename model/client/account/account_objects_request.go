@@ -30,6 +30,10 @@ type AccountObjectsRequest struct {
 	Marker               interface{}       `json:"marker,omitempty"`
 }
 
+func (*AccountObjectsRequest) Method() string {
+	return "account_objects"
+}
+
 func (r *AccountObjectsRequest) UnmarshalJSON(data []byte) error {
 	type aorHelper struct {
 		Account              Address           `json:"account"`

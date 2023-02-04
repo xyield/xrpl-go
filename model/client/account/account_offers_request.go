@@ -16,6 +16,10 @@ type AccountOffersRequest struct {
 	Strict      bool            `json:"strict,omitempty"`
 }
 
+func (*AccountOffersRequest) Method() string {
+	return "account_offers"
+}
+
 func (r *AccountOffersRequest) UnmarshalJSON(data []byte) error {
 	type aorHelper struct {
 		Account     Address         `json:"address"`

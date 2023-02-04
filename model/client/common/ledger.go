@@ -2,6 +2,7 @@ package common
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 
 	. "github.com/xyield/xrpl-go/model/transactions/types"
@@ -14,11 +15,19 @@ type LedgerSpecifier interface {
 func UnmarshalLedgerSpecifier(data []byte) (LedgerSpecifier, error) {
 	switch data[0] {
 	case '"':
-		var t LedgerTitle
-		if err := json.Unmarshal(data, &t); err != nil {
+		var s string
+		if err := json.Unmarshal(data, &s); err != nil {
 			return nil, err
 		}
-		return t, nil
+		switch s {
+		case CURRENT.Ledger():
+			return CURRENT, nil
+		case VALIDATED.Ledger():
+			return VALIDATED, nil
+		case CLOSED.Ledger():
+			return CLOSED, nil
+		}
+		return nil, fmt.Errorf("Error decoding LedgerTitle: invalid string %s", s)
 	default:
 		var i LedgerIndex
 		if err := json.Unmarshal(data, &i); err != nil {
@@ -38,8 +47,8 @@ type LedgerTitle string
 
 const (
 	CURRENT   LedgerTitle = "current"
-	VALIDATED             = "validated"
-	CLOSED                = "closed"
+	VALIDATED LedgerTitle = "validated"
+	CLOSED    LedgerTitle = "closed"
 )
 
 func (l LedgerTitle) Ledger() string {
@@ -47,7 +56,3 @@ func (l LedgerTitle) Ledger() string {
 }
 
 type LedgerHash Hash256
-
-func (l LedgerHash) Ledger() string {
-	return string(l)
-}
