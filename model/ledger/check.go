@@ -19,3 +19,7 @@ type Check struct {
 	Sequence          uint
 	SourceTag         uint
 }
+
+func (*Check) EntryType() LedgerEntryType {
+	return CheckEntry
+}

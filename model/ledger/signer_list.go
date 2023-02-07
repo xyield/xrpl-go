@@ -16,3 +16,7 @@ type SignerList struct {
 	SignerListId      uint64          `json:"SignerListID"`
 	SignerQuorum      uint64          `json:"SignerQuorum"`
 }
+
+func (*SignerList) EntryType() LedgerEntryType {
+	return SignerListEntry
+}

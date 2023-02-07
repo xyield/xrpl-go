@@ -1,8 +1,10 @@
 package ledger
 
-import . "github.com/xyield/xrpl-go/model/transactions/types"
+import (
+	"encoding/json"
 
-//TODO Unmarshal CurrencyAmounts
+	. "github.com/xyield/xrpl-go/model/transactions/types"
+)
 
 type AMM struct {
 	Asset          AMMAsset
@@ -12,6 +14,38 @@ type AMM struct {
 	LPTokenBalance CurrencyAmount
 	TradingFee     uint16
 	VoteSlots      []AMMVoteEntry
+}
+
+func (a *AMM) UnmarshalJSON(data []byte) error {
+	type ammHelper struct {
+		Asset          AMMAsset
+		Asset2         AMMAsset
+		AMMAccount     Address
+		AuctionSlot    AMMAuctionSlot
+		LPTokenBalance json.RawMessage
+		TradingFee     uint16
+		VoteSlots      []AMMVoteEntry
+	}
+	var h ammHelper
+	var err error
+	if err = json.Unmarshal(data, &h); err != nil {
+		return err
+	}
+	*a = AMM{
+		Asset:       h.Asset,
+		Asset2:      h.Asset2,
+		AMMAccount:  h.AMMAccount,
+		AuctionSlot: h.AuctionSlot,
+		TradingFee:  h.TradingFee,
+		VoteSlots:   h.VoteSlots,
+	}
+
+	a.LPTokenBalance, err = UnmarshalCurrencyAmount(h.LPTokenBalance)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 type AMMAsset struct {
@@ -25,6 +59,33 @@ type AMMAuctionSlot struct {
 	DiscountedFee int
 	Price         CurrencyAmount
 	Expiration    uint
+}
+
+func (s *AMMAuctionSlot) UnmarshalJSON(data []byte) error {
+	type aasHelper struct {
+		Account       Address
+		AuthAccounts  []AMMAuthAccount
+		DiscountedFee int
+		Price         json.RawMessage
+		Expiration    uint
+	}
+	var h aasHelper
+	var err error
+	if err = json.Unmarshal(data, &h); err != nil {
+		return err
+	}
+	*s = AMMAuctionSlot{
+		Account:       h.Account,
+		AuthAccounts:  h.AuthAccounts,
+		DiscountedFee: h.DiscountedFee,
+		Expiration:    h.Expiration,
+	}
+
+	s.Price, err = UnmarshalCurrencyAmount(h.Price)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 type AMMAuthAccount struct {
