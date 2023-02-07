@@ -1,3 +1,3 @@
 package types
 
-type Hash128 []byte
+type Hash128 string

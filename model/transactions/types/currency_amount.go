@@ -25,7 +25,7 @@ func UnmarshalCurrencyAmount(data []byte) (CurrencyAmount, error) {
 		}
 		return i, nil
 	default:
-		var x XrpCurrencyAmount
+		var x XRPCurrencyAmount
 		if err := json.Unmarshal(data, &x); err != nil {
 			return nil, err
 		}
@@ -43,24 +43,24 @@ func (IssuedCurrencyAmount) Kind() CurrencyKind {
 	return ISSUED
 }
 
-type XrpCurrencyAmount uint64
+type XRPCurrencyAmount uint64
 
-func (XrpCurrencyAmount) Kind() CurrencyKind {
+func (XRPCurrencyAmount) Kind() CurrencyKind {
 	return XRP
 }
 
-func (a XrpCurrencyAmount) MarshalJSON() ([]byte, error) {
+func (a XRPCurrencyAmount) MarshalJSON() ([]byte, error) {
 	s := strconv.FormatUint(uint64(a), 10)
 	return json.Marshal(s)
 }
 
-func (a *XrpCurrencyAmount) UnmarshalJSON(data []byte) error {
+func (a *XRPCurrencyAmount) UnmarshalJSON(data []byte) error {
 	var s string
 	json.Unmarshal(data, &s)
 	v, err := strconv.ParseUint(s, 10, 64)
 	if err != nil {
 		return err
 	}
-	*a = XrpCurrencyAmount(v)
+	*a = XRPCurrencyAmount(v)
 	return nil
 }

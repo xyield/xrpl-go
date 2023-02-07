@@ -1,3 +1,3 @@
 package types
 
-type Hash256 []byte
+type Hash256 string

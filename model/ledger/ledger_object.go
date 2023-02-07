@@ -15,6 +15,7 @@ const (
 	LedgerHashesEntry                   = "LedgerHashes"
 	NegativeUNLEntry                    = "NegativeUNL"
 	NFTokenOfferEntry                   = "NFTokenOffer"
+	NFTokenPageEntry                    = "NFTokenPage"
 	OfferEntry                          = "Offer"
 	PayChannelEntry                     = "PayChannel"
 	RippleStateEntry                    = "RippleState"
@@ -23,7 +24,7 @@ const (
 )
 
 type LedgerObject interface {
-	LedgerEntryType() LedgerEntryType
+	EntryType() LedgerEntryType
 }
 
 func UnmarshalLedgerObject(data []byte) (LedgerObject, error) {

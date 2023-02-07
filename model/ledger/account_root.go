@@ -26,3 +26,7 @@ type AccountRoot struct {
 	TransferRate      uint32  `json:"TransferRate"`
 	Index             Hash256 `json:"index"`
 }
+
+func (*AccountRoot) EntryType() LedgerEntryType {
+	return AccountRootEntry
+}
