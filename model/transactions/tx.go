@@ -73,6 +73,9 @@ func (*AMMWithdraw) TxType() TxType {
 }
 
 func UnmarshalTx(data json.RawMessage) (Tx, error) {
+	if data == nil || len(data) == 0 {
+		return nil, nil
+	}
 	// TODO AMM endpoint support
 	type txTypeParser struct {
 		TransactionType TxType
