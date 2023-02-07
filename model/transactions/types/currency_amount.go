@@ -17,6 +17,9 @@ type CurrencyAmount interface {
 }
 
 func UnmarshalCurrencyAmount(data []byte) (CurrencyAmount, error) {
+	if data == nil || len(data) == 0 {
+		return nil, nil
+	}
 	switch data[0] {
 	case '{':
 		var i IssuedCurrencyAmount

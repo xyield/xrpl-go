@@ -17,8 +17,7 @@ func (*TrustSet) TxType() TxType {
 	return TrustSetTx
 }
 
-func UnmarshalTrustSetTx(data json.RawMessage) (Tx, error) {
-	var ret TrustSet
+func (t *TrustSet) UnmarshalJSON(data []byte) error {
 	type tsHelper struct {
 		BaseTx
 		LimitAmount json.RawMessage
@@ -27,18 +26,18 @@ func UnmarshalTrustSetTx(data json.RawMessage) (Tx, error) {
 	}
 	var h tsHelper
 	if err := json.Unmarshal(data, &h); err != nil {
-		return nil, err
+		return err
 	}
-	ret = TrustSet{
+	*t = TrustSet{
 		BaseTx:     h.BaseTx,
 		QualityIn:  h.QualityIn,
 		QualityOut: h.QualityOut,
 	}
 	limit, err := UnmarshalCurrencyAmount(h.LimitAmount)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	ret.LimitAmount = limit
+	t.LimitAmount = limit
 
-	return &ret, nil
+	return nil
 }

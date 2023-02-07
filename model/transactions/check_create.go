@@ -19,8 +19,7 @@ func (*CheckCreate) TxType() TxType {
 	return CheckCreateTx
 }
 
-func UnmarshalCheckCreateTx(data json.RawMessage) (Tx, error) {
-	var ret CheckCreate
+func (c *CheckCreate) UnmarshalJSON(data []byte) error {
 	type ccHelper struct {
 		BaseTx
 		Destination    Address
@@ -31,9 +30,9 @@ func UnmarshalCheckCreateTx(data json.RawMessage) (Tx, error) {
 	}
 	var h ccHelper
 	if err := json.Unmarshal(data, &h); err != nil {
-		return nil, err
+		return err
 	}
-	ret = CheckCreate{
+	*c = CheckCreate{
 		BaseTx:         h.BaseTx,
 		Destination:    h.Destination,
 		DestinationTag: h.DestinationTag,
@@ -43,9 +42,9 @@ func UnmarshalCheckCreateTx(data json.RawMessage) (Tx, error) {
 
 	max, err := UnmarshalCurrencyAmount(h.SendMax)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	ret.SendMax = max
+	c.SendMax = max
 
-	return &ret, nil
+	return nil
 }

@@ -14,7 +14,7 @@ type Tx interface {
 type BaseTx struct {
 	Account            Address
 	TransactionType    TxType
-	Fee                XrpCurrencyAmount
+	Fee                XRPCurrencyAmount
 	Sequence           uint
 	AccountTxnID       Hash256  `json:",omitempty"`
 	Flags              uint     `json:",omitempty"`
@@ -79,56 +79,61 @@ func UnmarshalTx(data json.RawMessage) (Tx, error) {
 	}
 	var txType txTypeParser
 	json.Unmarshal(data, &txType)
+	var tx Tx
 	switch txType.TransactionType {
 	case AccountSetTx:
-		return UnmarshalAccountSetTx(data)
+		tx = &AccountSet{}
 	case AccountDeleteTx:
-		return UnmarshalAccountDeleteTx(data)
+		tx = &AccountDelete{}
 	case CheckCancelTx:
-		return UnmarshalCheckCancelTx(data)
+		tx = &CheckCancel{}
 	case CheckCashTx:
-		return UnmarshalCheckCashTx(data)
+		tx = &CheckCash{}
 	case CheckCreateTx:
-		return UnmarshalCheckCreateTx(data)
+		tx = &CheckCreate{}
 	case DepositPreauthTx:
-		return UnmarshalDepositPreauthTx(data)
+		tx = &DepositPreauth{}
 	case EscrowCancelTx:
-		return UnmarshalEscrowCancelTx(data)
+		tx = &EscrowCancel{}
 	case EscrowCreateTx:
-		return UnmarshalEscrowCreateTx(data)
+		tx = &EscrowCreate{}
 	case EscrowFinishTx:
-		return UnmarshalEscrowFinishTx(data)
+		tx = &EscrowFinish{}
 	case NFTokenAcceptOfferTx:
-		return UnmarshalNFTokenAcceptOfferTx(data)
+		tx = &NFTokenAcceptOffer{}
 	case NFTokenBurnTx:
-		return UnmarshalNFTokenBurnTx(data)
+		tx = &NFTokenBurn{}
 	case NFTokenCancelOfferTx:
-		return UnmarshalNFTokenCancelOfferTx(data)
+		tx = &NFTokenCancelOffer{}
 	case NFTokenCreateOfferTx:
-		return UnmarshalNFTokenCreateOfferTx(data)
+		tx = &NFTokenCreateOffer{}
 	case NFTokenMintTx:
-		return UnmarshalNFTokenMintTx(data)
+		tx = &NFTokenMint{}
 	case OfferCreateTx:
-		return UnmarshalOfferCreateTx(data)
+		tx = &OfferCreate{}
 	case OfferCancelTx:
-		return UnmarshalOfferCancelTx(data)
+		tx = &OfferCancel{}
 	case PaymentTx:
-		return UnmarshalPaymentTx(data)
+		tx = &Payment{}
 	case PaymentChannelClaimTx:
-		return UnmarshalPaymentChannelClaimTx(data)
+		tx = &PaymentChannelClaim{}
 	case PaymentChannelCreateTx:
-		return UnmarshalPaymentChannelCreateTx(data)
+		tx = &PaymentChannelCreate{}
 	case PaymentChannelFundTx:
-		return UnmarshalPaymentChannelFundTx(data)
+		tx = &PaymentChannelFund{}
 	case SetRegularKeyTx:
-		return UnmarshalSetRegularKeyTx(data)
+		tx = &SetRegularKey{}
 	case SignerListSetTx:
-		return UnmarshalSignerListSetTx(data)
+		tx = &SignerListSet{}
 	case TrustSetTx:
-		return UnmarshalTrustSetTx(data)
+		tx = &TrustSet{}
 	case TicketCreateTx:
-		return UnmarshalTicketCreateTx(data)
+		tx = &TicketCreate{}
+	default:
+		return nil, fmt.Errorf("Unsupported transaction type %s", txType.TransactionType)
 	}
-
-	return nil, fmt.Errorf("Unsupported transaction type %s", txType.TransactionType)
+	if err := json.Unmarshal(data, tx); err != nil {
+		return nil, err
+	}
+	return tx, nil
 }

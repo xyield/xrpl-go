@@ -17,8 +17,7 @@ func (*NFTokenAcceptOffer) TxType() TxType {
 	return NFTokenAcceptOfferTx
 }
 
-func UnmarshalNFTokenAcceptOfferTx(data json.RawMessage) (Tx, error) {
-	var ret NFTokenAcceptOffer
+func (n *NFTokenAcceptOffer) UnmarshalJSON(data []byte) error {
 	type naoHelper struct {
 		BaseTx
 		NFTokenSellOffer Hash256         `json:",omitempty"`
@@ -27,9 +26,9 @@ func UnmarshalNFTokenAcceptOfferTx(data json.RawMessage) (Tx, error) {
 	}
 	var h naoHelper
 	if err := json.Unmarshal(data, &h); err != nil {
-		return nil, err
+		return err
 	}
-	ret = NFTokenAcceptOffer{
+	*n = NFTokenAcceptOffer{
 		BaseTx:           h.BaseTx,
 		NFTokenSellOffer: h.NFTokenSellOffer,
 		NFTokenBuyOffer:  h.NFTokenBuyOffer,
@@ -37,8 +36,8 @@ func UnmarshalNFTokenAcceptOfferTx(data json.RawMessage) (Tx, error) {
 
 	fee, err := UnmarshalCurrencyAmount(h.NFTokenBrokerFee)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	ret.NFTokenBrokerFee = fee
-	return &ret, nil
+	n.NFTokenBrokerFee = fee
+	return nil
 }

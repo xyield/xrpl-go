@@ -21,8 +21,7 @@ func (*Payment) TxType() TxType {
 	return PaymentTx
 }
 
-func UnmarshalPaymentTx(data json.RawMessage) (Tx, error) {
-	var ret Payment
+func (p *Payment) UnmarshalJSON(data []byte) error {
 	type pHelper struct {
 		BaseTx
 		Amount         json.RawMessage
@@ -35,9 +34,9 @@ func UnmarshalPaymentTx(data json.RawMessage) (Tx, error) {
 	}
 	var h pHelper
 	if err := json.Unmarshal(data, &h); err != nil {
-		return nil, err
+		return err
 	}
-	ret = Payment{
+	*p = Payment{
 		BaseTx:         h.BaseTx,
 		Destination:    h.Destination,
 		DestinationTag: h.DestinationTag,
@@ -48,19 +47,19 @@ func UnmarshalPaymentTx(data json.RawMessage) (Tx, error) {
 	var err error
 	amount, err = UnmarshalCurrencyAmount(h.Amount)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	max, err = UnmarshalCurrencyAmount(h.SendMax)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	min, err = UnmarshalCurrencyAmount(h.DeliverMin)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	ret.Amount = amount
-	ret.DeliverMin = min
-	ret.SendMax = max
+	p.Amount = amount
+	p.DeliverMin = min
+	p.SendMax = max
 
-	return &ret, nil
+	return nil
 }

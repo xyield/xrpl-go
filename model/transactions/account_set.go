@@ -1,8 +1,6 @@
 package transactions
 
 import (
-	"encoding/json"
-
 	. "github.com/xyield/xrpl-go/model/transactions/types"
 )
 
@@ -22,12 +20,4 @@ type AccountSet struct {
 
 func (*AccountSet) TxType() TxType {
 	return AccountSetTx
-}
-
-func UnmarshalAccountSetTx(data json.RawMessage) (Tx, error) {
-	var ret AccountSet
-	if err := json.Unmarshal(data, &ret); err != nil {
-		return nil, err
-	}
-	return &ret, nil
 }

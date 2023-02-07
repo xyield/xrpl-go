@@ -18,8 +18,7 @@ func (*OfferCreate) TxType() TxType {
 	return OfferCreateTx
 }
 
-func UnmarshalOfferCreateTx(data json.RawMessage) (Tx, error) {
-	var ret OfferCreate
+func (o *OfferCreate) UnmarshalJSON(data []byte) error {
 	type ocHelper struct {
 		BaseTx
 		Expiration    uint `json:",omitempty"`
@@ -29,9 +28,9 @@ func UnmarshalOfferCreateTx(data json.RawMessage) (Tx, error) {
 	}
 	var h ocHelper
 	if err := json.Unmarshal(data, &h); err != nil {
-		return nil, err
+		return err
 	}
-	ret = OfferCreate{
+	*o = OfferCreate{
 		BaseTx:        h.BaseTx,
 		Expiration:    h.Expiration,
 		OfferSequence: h.OfferSequence,
@@ -41,14 +40,14 @@ func UnmarshalOfferCreateTx(data json.RawMessage) (Tx, error) {
 	var err error
 	gets, err = UnmarshalCurrencyAmount(h.TakerGets)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	pays, err = UnmarshalCurrencyAmount(h.TakerPays)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	ret.TakerGets = gets
-	ret.TakerPays = pays
+	o.TakerGets = gets
+	o.TakerPays = pays
 
-	return &ret, nil
+	return nil
 }
