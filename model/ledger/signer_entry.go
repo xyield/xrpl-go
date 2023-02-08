@@ -5,7 +5,7 @@ import (
 )
 
 type SignerEntry struct {
-	Account       Address `json:"Account"`
-	SignerWeight  uint64  `json:"SignerWeight"`
-	WalletLocator Hash256 `json:"WalletLocator"`
+	Account       Address
+	SignerWeight  uint64
+	WalletLocator Hash256 `json:",omitempty"`
 }

@@ -5,26 +5,26 @@ import (
 )
 
 type AccountRoot struct {
-	Account           Address `json:"Account"`
-	AccountTxnID      Hash256 `json:"AccountTxnID"`
-	Balance           string  `json:"Balance"`
-	BurnedNFTokens    uint32  `json:"BurnedNFTokens"`
-	Domain            string  `json:"Domain"`
-	EmailHash         Hash128 `json:"EmailHash"`
-	Flags             uint64  `json:"Flags"`
-	LedgerEntryType   string  `json:"LedgerEntryType"`
-	MessageKey        string  `json:"MessageKey"`
-	MintedNFTokens    uint32  `json:"MintedNFTokens"`
-	NFTokenMinter     Address `json:"NFTokenMinter"`
-	OwnerCount        uint64  `json:"OwnerCount"`
-	PreviousTxnID     Hash256 `json:"PreviousTxnID"`
-	PreviousTxnLgrSeq uint64  `json:"PreviousTxnLgrSeq"`
-	RegularKey        Address `json:"RegularKey"`
-	Sequence          uint64  `json:"Sequence"`
-	TicketCount       uint32  `json:"TicketCount"`
-	TickSize          uint8   `json:"TickSize"`
-	TransferRate      uint32  `json:"TransferRate"`
-	Index             Hash256 `json:"index"`
+	Account           Address
+	AccountTxnID      Hash256 `json:",omitempty"`
+	Balance           string  `json:",omitempty"`
+	BurnedNFTokens    uint32  `json:",omitempty"`
+	Domain            string  `json:",omitempty"`
+	EmailHash         Hash128 `json:",omitempty"`
+	Flags             uint64
+	LedgerEntryType   string
+	MessageKey        string  `json:",omitempty"`
+	MintedNFTokens    uint32  `json:",omitempty"`
+	NFTokenMinter     Address `json:",omitempty"`
+	OwnerCount        uint64
+	PreviousTxnID     Hash256
+	PreviousTxnLgrSeq uint64
+	RegularKey        Address `json:",omitempty"`
+	Sequence          uint64
+	TicketCount       uint32  `json:",omitempty"`
+	TickSize          uint8   `json:",omitempty"`
+	TransferRate      uint32  `json:",omitempty"`
+	Index             Hash256 `json:"index,omitempty"`
 }
 
 func (*AccountRoot) EntryType() LedgerEntryType {

@@ -12,6 +12,8 @@ func SerializeAndDeserialize(s interface{}, d string) error {
 		return err
 	}
 	if string(j) != d {
+		fmt.Println(string(j))
+		fmt.Println(d)
 		return fmt.Errorf("json encoding does not match expected string")
 	}
 	decode := reflect.New(reflect.TypeOf(s))

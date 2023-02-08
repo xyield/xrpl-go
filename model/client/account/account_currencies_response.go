@@ -4,7 +4,7 @@ import (
 	. "github.com/xyield/xrpl-go/model/client/common"
 )
 
-type AccountCurrenceisResponse struct {
+type AccountCurrenciesResponse struct {
 	LedgerHash        LedgerHash  `json:"ledger_hash,omitempty"`
 	LedgerIndex       LedgerIndex `json:"ledger_index"`
 	ReceiveCurrencies []string    `json:"receive_currencies"`

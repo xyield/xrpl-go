@@ -17,7 +17,7 @@ type Offer struct {
 	Account           Address
 	BookDirectory     Hash256
 	BookNode          string
-	Expiration        uint
+	Expiration        uint `json:",omitempty"`
 	Flags             OfferFlags
 	LedgerEntryType   LedgerEntryType
 	OwnerNode         string

@@ -7,14 +7,14 @@ const (
 )
 
 type SignerList struct {
-	LedgerEntryType   string          `json:"LedgerEntryType"`
-	Flags             SignerListFlags `json:"Flags"`
-	PreviousTxnID     string          `json:"PreviousTxnID"`
-	PreviousTxnLgrSeq uint64          `json:"PreviousTxnLgrSeq"`
-	OwnerNode         string          `json:"OwnerNode"`
-	SignerEntries     []SignerEntry   `json:"SignerEntries"`
-	SignerListId      uint64          `json:"SignerListID"`
-	SignerQuorum      uint64          `json:"SignerQuorum"`
+	LedgerEntryType   string
+	Flags             SignerListFlags
+	PreviousTxnID     string
+	PreviousTxnLgrSeq uint64
+	OwnerNode         string
+	SignerEntries     []SignerEntry
+	SignerListId      uint64
+	SignerQuorum      uint64
 }
 
 func (*SignerList) EntryType() LedgerEntryType {

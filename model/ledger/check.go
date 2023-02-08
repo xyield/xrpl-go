@@ -6,18 +6,18 @@ import . "github.com/xyield/xrpl-go/model/transactions/types"
 type Check struct {
 	Account           Address
 	Destination       Address
-	DestinationNode   string
-	DestinationTag    uint
-	Expiration        uint
+	DestinationNode   string `json:",omitempty"`
+	DestinationTag    uint   `json:",omitempty"`
+	Expiration        uint   `json:",omitempty"`
 	Flags             uint
-	InvoiceID         Hash256
+	InvoiceID         Hash256 `json:",omitempty"`
 	LedgerEntryType   string
 	OwnerNode         string
 	PreviousTxnID     Hash256
 	PreviousTxnLgrSeq uint
 	SendMax           string
 	Sequence          uint
-	SourceTag         uint
+	SourceTag         uint `json:",omitempty"`
 }
 
 func (*Check) EntryType() LedgerEntryType {

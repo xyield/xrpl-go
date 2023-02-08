@@ -1,11 +1,11 @@
 package ledger
 
 type NegativeUNL struct {
-	DisabledValidators  []DisabledValidator
+	DisabledValidators  []DisabledValidator `json:",omitempty"`
 	Flags               uint
 	LedgerEntryType     LedgerEntryType
-	ValidatorToDisable  string
-	ValidatorToReEnable string
+	ValidatorToDisable  string `json:",omitempty"`
+	ValidatorToReEnable string `json:",omitempty"`
 }
 
 func (*NegativeUNL) EntryType() LedgerEntryType {

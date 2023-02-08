@@ -4,13 +4,13 @@ import . "github.com/xyield/xrpl-go/model/transactions/types"
 
 type PayChannel struct {
 	Account           Address
-	Destination       Address
-	DestinationTag    uint
 	Amount            XRPCurrencyAmount
 	Balance           XRPCurrencyAmount
-	CancelAfter       uint
-	DestinationNode   string
-	Expiration        uint
+	CancelAfter       uint `json:",omitempty"`
+	Destination       Address
+	DestinationTag    uint   `json:",omitempty"`
+	DestinationNode   string `json:",omitempty"`
+	Expiration        uint   `json:",omitempty"`
 	Flags             uint
 	LedgerEntryType   LedgerEntryType
 	OwnerNode         string
@@ -18,7 +18,7 @@ type PayChannel struct {
 	PreviousTxnLgrSeq uint
 	PublicKey         string
 	SettleDelay       uint
-	SourceTag         uint
+	SourceTag         uint `json:",omitempty"`
 }
 
 func (*PayChannel) EntryType() LedgerEntryType {

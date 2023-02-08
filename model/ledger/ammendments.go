@@ -5,10 +5,10 @@ import (
 )
 
 type Amendments struct {
-	Amendments      []Hash256
+	Amendments      []Hash256 `json:",omitempty"`
 	Flags           uint
 	LedgerEntryType string
-	Majorities      []Majority
+	Majorities      []Majority `json:",omitempty"`
 }
 
 func (*Amendments) EntryType() LedgerEntryType {

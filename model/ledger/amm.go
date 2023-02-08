@@ -10,10 +10,10 @@ type AMM struct {
 	Asset          AMMAsset
 	Asset2         AMMAsset
 	AMMAccount     Address
-	AuctionSlot    AMMAuctionSlot
+	AuctionSlot    AMMAuctionSlot `json:",omitempty"`
 	LPTokenBalance CurrencyAmount
 	TradingFee     uint16
-	VoteSlots      []AMMVoteEntry
+	VoteSlots      []AMMVoteEntry `json:",omitempty"`
 }
 
 func (a *AMM) UnmarshalJSON(data []byte) error {
@@ -55,7 +55,7 @@ type AMMAsset struct {
 
 type AMMAuctionSlot struct {
 	Account       Address
-	AuthAccounts  []AMMAuthAccount
+	AuthAccounts  []AMMAuthAccount `json:",omitempty"`
 	DiscountedFee int
 	Price         CurrencyAmount
 	Expiration    uint

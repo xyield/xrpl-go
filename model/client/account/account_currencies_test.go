@@ -23,3 +23,35 @@ func TestAccountCurrenciesRequest(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestAccountCurrenciesResponse(t *testing.T) {
+	s := AccountCurrenciesResponse{
+		LedgerHash:  "abc",
+		LedgerIndex: 123,
+		ReceiveCurrencies: []string{
+			"USD",
+			"JPY",
+		},
+		SendCurrencies: []string{
+			"USD",
+			"CAD",
+		},
+		Validated: true,
+	}
+	j := `{
+	"ledger_hash": "abc",
+	"ledger_index": 123,
+	"receive_currencies": [
+		"USD",
+		"JPY"
+	],
+	"send_currencies": [
+		"USD",
+		"CAD"
+	],
+	"validated": true
+}`
+	if err := test.SerializeAndDeserialize(s, j); err != nil {
+		t.Error(err)
+	}
+}

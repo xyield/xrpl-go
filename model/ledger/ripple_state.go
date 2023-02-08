@@ -9,13 +9,13 @@ type RippleState struct {
 	Flags             uint
 	HighLimit         IssuedCurrencyAmount
 	HighNode          string
-	HighQualityIn     uint
-	HighQualityOut    uint
+	HighQualityIn     uint `json:",omitempty"`
+	HighQualityOut    uint `json:",omitempty"`
 	LedgerEntryType   LedgerEntryType
 	LowLimit          IssuedCurrencyAmount
 	LowNode           string
-	LowQualityIn      uint
-	LowQualityOut     uint
+	LowQualityIn      uint `json:",omitempty"`
+	LowQualityOut     uint `json:",omitempty"`
 	PreviousTxnID     Hash256
 	PreviousTxnLgrSeq uint
 }
