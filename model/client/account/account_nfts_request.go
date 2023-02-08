@@ -7,7 +7,7 @@ import (
 	. "github.com/xyield/xrpl-go/model/transactions/types"
 )
 
-type AccountNftsRequest struct {
+type AccountNFTsRequest struct {
 	Account     Address         `json:"account"`
 	LedgerIndex LedgerSpecifier `json:"ledger_index,omitempty"`
 	LedgerHash  LedgerHash      `json:"ledger_hash,omitempty"`
@@ -15,11 +15,11 @@ type AccountNftsRequest struct {
 	Marker      interface{}     `json:"marker,omitempty"`
 }
 
-func (*AccountNftsRequest) Method() string {
+func (*AccountNFTsRequest) Method() string {
 	return "account_nfts"
 }
 
-func (r *AccountNftsRequest) UnmarshalJSON(data []byte) error {
+func (r *AccountNFTsRequest) UnmarshalJSON(data []byte) error {
 	type anrHelper struct {
 		Account     Address         `json:"account"`
 		LedgerIndex json.RawMessage `json:"ledger_index,omitempty"`
@@ -31,7 +31,7 @@ func (r *AccountNftsRequest) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &h); err != nil {
 		return err
 	}
-	*r = AccountNftsRequest{
+	*r = AccountNFTsRequest{
 		Account:    h.Account,
 		LedgerHash: h.LedgerHash,
 		Limit:      h.Limit,

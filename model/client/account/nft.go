@@ -13,11 +13,11 @@ const (
 
 type NFTokenFlag uint
 
-type Nft struct {
+type NFT struct {
 	Flags        NFTokenFlag
 	Issuer       Address
 	NFTokenID    NFTokenID
 	NFTokenTaxon uint
 	URI          NFTokenURI
-	NftSerial    uint `json:"nft_serial"`
+	NFTSerial    uint `json:"nft_serial"`
 }

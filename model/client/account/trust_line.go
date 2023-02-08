@@ -12,10 +12,10 @@ type TrustLine struct {
 	LimitPeer      string  `json:"limit_peer"`
 	QualityIn      uint    `json:"quality_in"`
 	QualityOut     uint    `json:"quality_out"`
-	NoRipple       bool    `json:"no_ripple"`
-	NoRipplePeer   bool    `json:"no_ripple_peer"`
-	Authorized     bool    `json:"authorized"`
-	PeerAuthorized bool    `json:"peer_authorized"`
-	Freeze         bool    `json:"freeze"`
-	FreezePeer     bool    `json:"freeze_peer"`
+	NoRipple       bool    `json:"no_ripple,omitempty"`
+	NoRipplePeer   bool    `json:"no_ripple_peer,omitempty"`
+	Authorized     bool    `json:"authorized,omitempty"`
+	PeerAuthorized bool    `json:"peer_authorized,omitempty"`
+	Freeze         bool    `json:"freeze,omitempty"`
+	FreezePeer     bool    `json:"freeze_peer,omitempty"`
 }
