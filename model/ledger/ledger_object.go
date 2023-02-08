@@ -8,22 +8,22 @@ import (
 type LedgerEntryType string
 
 const (
-	AccountRootEntry    LedgerEntryType = "AccountRoot"
-	AmendmentsEntry                     = "Amendments"
-	CheckEntry                          = "Check"
-	DepositPreauthEntry                 = "DepositPreauth"
-	DirectoryNodeEntry                  = "DirectoryNode"
-	EscrowEntry                         = "Escrow"
-	FeeSettingsEntry                    = "FeeSettings"
-	LedgerHashesEntry                   = "LedgerHashes"
-	NegativeUNLEntry                    = "NegativeUNL"
-	NFTokenOfferEntry                   = "NFTokenOffer"
-	NFTokenPageEntry                    = "NFTokenPage"
-	OfferEntry                          = "Offer"
-	PayChannelEntry                     = "PayChannel"
-	RippleStateEntry                    = "RippleState"
-	SignerListEntry                     = "SignerList"
-	TicketEntry                         = "Ticket"
+	AccountRootEntry       LedgerEntryType = "AccountRoot"
+	AmendmentsEntry                        = "Amendments"
+	CheckEntry                             = "Check"
+	DepositPreauthObjEntry                 = "DepositPreauth"
+	DirectoryNodeEntry                     = "DirectoryNode"
+	EscrowEntry                            = "Escrow"
+	FeeSettingsEntry                       = "FeeSettings"
+	LedgerHashesEntry                      = "LedgerHashes"
+	NegativeUNLEntry                       = "NegativeUNL"
+	NFTokenOfferEntry                      = "NFTokenOffer"
+	NFTokenPageEntry                       = "NFTokenPage"
+	OfferEntry                             = "Offer"
+	PayChannelEntry                        = "PayChannel"
+	RippleStateEntry                       = "RippleState"
+	SignerListEntry                        = "SignerList"
+	TicketEntry                            = "Ticket"
 )
 
 type LedgerObject interface {
@@ -49,8 +49,8 @@ func UnmarshalLedgerObject(data []byte) (LedgerObject, error) {
 		o = &Amendments{}
 	case CheckEntry:
 		o = &Check{}
-	case DepositPreauthEntry:
-		o = &DepositPreauth{}
+	case DepositPreauthObjEntry:
+		o = &DepositPreauthObj{}
 	case DirectoryNodeEntry:
 		o = &DirectoryNode{}
 	case EscrowEntry:

@@ -4,7 +4,7 @@ import (
 	. "github.com/xyield/xrpl-go/model/transactions/types"
 )
 
-type DepositPreauth struct {
+type DepositPreauthObj struct {
 	Account           Address
 	Authorize         Address
 	Flags             uint
@@ -14,6 +14,6 @@ type DepositPreauth struct {
 	PreviousTxnLgrSeq uint
 }
 
-func (*DepositPreauth) EntryType() LedgerEntryType {
-	return DepositPreauthEntry
+func (*DepositPreauthObj) EntryType() LedgerEntryType {
+	return DepositPreauthObjEntry
 }
