@@ -30,6 +30,44 @@ type LedgerObject interface {
 	EntryType() LedgerEntryType
 }
 
+func EmptyLedgerObject(t string) (LedgerObject, error) {
+	switch LedgerEntryType(t) {
+	case AccountRootEntry:
+		return &AccountRoot{}, nil
+	case AmendmentsEntry:
+		return &Amendments{}, nil
+	case CheckEntry:
+		return &Check{}, nil
+	case DepositPreauthObjEntry:
+		return &DepositPreauthObj{}, nil
+	case DirectoryNodeEntry:
+		return &DirectoryNode{}, nil
+	case EscrowEntry:
+		return &Escrow{}, nil
+	case FeeSettingsEntry:
+		return &FeeSettings{}, nil
+	case LedgerHashesEntry:
+		return &LedgerHashes{}, nil
+	case NegativeUNLEntry:
+		return &NegativeUNL{}, nil
+	case NFTokenOfferEntry:
+		return &NFTokenOffer{}, nil
+	case NFTokenPageEntry:
+		return &NFTokenPage{}, nil
+	case OfferEntry:
+		return &Offer{}, nil
+	case PayChannelEntry:
+		return &PayChannel{}, nil
+	case RippleStateEntry:
+		return &RippleState{}, nil
+	case SignerListEntry:
+		return &SignerList{}, nil
+	case TicketEntry:
+		return &Ticket{}, nil
+	}
+	return nil, fmt.Errorf("Unrecognized LedgerObject type \"%s\"", t)
+}
+
 func UnmarshalLedgerObject(data []byte) (LedgerObject, error) {
 	if data == nil || len(data) == 0 {
 		return nil, nil

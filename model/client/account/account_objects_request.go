@@ -13,11 +13,12 @@ const (
 	CheckObject          AccountObjectType = "check"
 	DepositPreauthObject                   = "deposit_preauth"
 	EscrowObject                           = "escrow"
+	NFTOfferObject                         = "nft_offer"
 	OfferObject                            = "offer"
 	PaymentChannelObject                   = "payment_channel"
 	SignerListObject                       = "signer_list"
-	TicketObject                           = "ticket"
 	StateObject                            = "state"
+	TicketObject                           = "ticket"
 )
 
 type AccountObjectsRequest struct {

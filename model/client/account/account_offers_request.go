@@ -8,7 +8,7 @@ import (
 )
 
 type AccountOffersRequest struct {
-	Account     Address         `json:"address"`
+	Account     Address         `json:"account"`
 	LedgerHash  LedgerHash      `json:"ledger_hash,omitempty"`
 	LedgerIndex LedgerSpecifier `json:"ledger_index,omitempty"`
 	Limit       int             `json:"limit,omitempty"`
@@ -22,7 +22,7 @@ func (*AccountOffersRequest) Method() string {
 
 func (r *AccountOffersRequest) UnmarshalJSON(data []byte) error {
 	type aorHelper struct {
-		Account     Address         `json:"address"`
+		Account     Address         `json:"account"`
 		LedgerHash  LedgerHash      `json:"ledger_hash,omitempty"`
 		LedgerIndex json.RawMessage `json:"ledger_index,omitempty"`
 		Limit       int             `json:"limit,omitempty"`

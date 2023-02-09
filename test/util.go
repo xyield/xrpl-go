@@ -22,6 +22,8 @@ func SerializeAndDeserialize(s interface{}, d string) error {
 		return err
 	}
 	if !reflect.DeepEqual(s, decode.Elem().Interface()) {
+		fmt.Printf("%+v\n", s)
+		fmt.Printf("%+v\n", decode.Elem().Interface())
 		return fmt.Errorf("json decoding does not match expected struct")
 	}
 	return nil

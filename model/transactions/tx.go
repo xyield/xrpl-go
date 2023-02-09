@@ -22,9 +22,9 @@ type BaseTx struct {
 	Memos              []Memo   `json:",omitempty"`
 	Signers            []Signer `json:",omitempty"`
 	SourceTag          uint     `json:",omitempty"`
-	SigningPubKey      []byte
+	SigningPubKey      string
 	TicketSequence     uint `json:",omitempty"`
-	TxnSignature       []byte
+	TxnSignature       string
 }
 
 func (tx *BaseTx) TxType() TxType {

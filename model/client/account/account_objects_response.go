@@ -17,16 +17,15 @@ const (
 type AccountObjectsResponse struct {
 	Account            Address        `json:"account"`
 	AccountObjects     []LedgerObject `json:"account_objects"`
-	LedgerHash         LedgerHash     `json:"ledger_hash"`
-	LedgerIndex        LedgerIndex    `json:"ledger_index"`
-	LedgerCurrentIndex LedgerIndex    `json:"ledger_current_index"`
-	Limit              int            `json:"limit"`
-	Marker             interface{}    `json:"marker"`
-	Validated          bool           `json:"validated"`
+	LedgerHash         LedgerHash     `json:"ledger_hash,omitempty"`
+	LedgerIndex        LedgerIndex    `json:"ledger_index,omitempty"`
+	LedgerCurrentIndex LedgerIndex    `json:"ledger_current_index,omitempty"`
+	Limit              int            `json:"limit,omitempty"`
+	Marker             interface{}    `json:"marker,omitempty"`
+	Validated          bool           `json:"validated,omitempty"`
 }
 
 func (r *AccountObjectsResponse) UnmarshalJSON(data []byte) error {
-	// TODO Unmrashal LedgerObject interface
 	type accountObjectDecodeHelper struct {
 		Account            Address           `json:"account"`
 		AccountObjects     []json.RawMessage `json:"account_objects"`
