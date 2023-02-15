@@ -8,7 +8,13 @@ require (
 )
 
 require (
+	github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421 // indirect
+	github.com/modern-go/reflect2 v1.0.2 // indirect
+)
+
+require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/json-iterator/go v1.1.12
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e

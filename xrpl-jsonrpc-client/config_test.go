@@ -1,0 +1,59 @@
+package jsonrpcclient
+
+import (
+	"net/http"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
+type customHttpClient struct{}
+
+func (c customHttpClient) Do(req *http.Request) (*http.Response, error) {
+	return nil, nil
+}
+
+func TestConfigCreation(t *testing.T) {
+
+	t.Run("Set config with valid port + ip", func(t *testing.T) {
+		cfg, _ := NewConfig("http://s1.ripple.com:51234/")
+
+		req, err := http.NewRequest(http.MethodPost, "http://s1.ripple.com:51234/", nil)
+		headers := map[string][]string{
+			"Content-Type": {"application/json"},
+		}
+		req.Header = headers
+		assert.Equal(t, "http://s1.ripple.com:51234/", cfg.Url)
+		assert.NoError(t, err)
+	})
+	t.Run("No port + IP provided", func(t *testing.T) {
+		cfg, err := NewConfig("")
+
+		assert.Nil(t, cfg)
+		assert.EqualError(t, err, "Empty port and IP provided")
+	})
+	t.Run("Format root path - add /", func(t *testing.T) {
+		cfg, _ := NewConfig("http://s1.ripple.com:51234")
+
+		req, err := http.NewRequest(http.MethodPost, "http://s1.ripple.com:51234/", nil)
+		headers := map[string][]string{
+			"Content-Type": {"application/json"},
+		}
+		req.Header = headers
+		assert.Equal(t, "http://s1.ripple.com:51234/", cfg.Url)
+		assert.NoError(t, err)
+	})
+	t.Run("Pass in custom HTTP client", func(t *testing.T) {
+
+		c := customHttpClient{}
+		cfg, _ := NewConfigWithHttpClient("http://s1.ripple.com:51234", c)
+
+		req, err := http.NewRequest(http.MethodPost, "http://s1.ripple.com:51234/", nil)
+		headers := map[string][]string{
+			"Content-Type": {"application/json"},
+		}
+		req.Header = headers
+		assert.Equal(t, &Config{HTTPClient: customHttpClient{}, Url: "http://s1.ripple.com:51234/"}, cfg)
+		assert.NoError(t, err)
+	})
+}
