@@ -44,11 +44,11 @@ type TxObjMeta struct {
 
 func (m *TxObjMeta) UnmarshalJSON(data []byte) error {
 	var h struct {
-		AffectedNodes          []AffectedNode  `json:"AffectedNodes"`
-		PartialDeliveredAmount json.RawMessage `json:"DeliveredAmount"`
-		TransactionIndex       uint64          `json:"TransactionIndex"`
-		TransactionResult      string          `json:"TransactionResult"`
-		DeliveredAmount        json.RawMessage `json:"delivered_amount"`
+		AffectedNodes          []AffectedNode  `json:"AffectedNodes,omitempty"`
+		PartialDeliveredAmount json.RawMessage `json:"DeliveredAmount,omitempty"`
+		TransactionIndex       uint64          `json:"TransactionIndex,omitempty"`
+		TransactionResult      string          `json:"TransactionResult,omitempty"`
+		DeliveredAmount        json.RawMessage `json:"delivered_amount,omitempty"`
 	}
 	if err := json.Unmarshal(data, &h); err != nil {
 		return err
