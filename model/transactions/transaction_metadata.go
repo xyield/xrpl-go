@@ -35,10 +35,10 @@ type TxBinMeta string
 func (TxBinMeta) TxMeta() {}
 
 type TxObjMeta struct {
-	AffectedNodes          []AffectedNode       `json:"AffectedNodes"`
+	AffectedNodes          []AffectedNode       `json:"AffectedNodes,omitempty"`
 	PartialDeliveredAmount types.CurrencyAmount `json:"DeliveredAmount,omitempty"`
-	TransactionIndex       uint64               `json:"TransactionIndex"`
-	TransactionResult      string               `json:"TransactionResult"`
+	TransactionIndex       uint64               `json:"TransactionIndex,omitempty"`
+	TransactionResult      string               `json:"TransactionResult,omitempty"`
 	DeliveredAmount        types.CurrencyAmount `json:"delivered_amount,omitempty"`
 }
 
