@@ -5,7 +5,11 @@ import (
 )
 
 type Signer struct {
+	SignerData SignerData `json:"Signer"`
+}
+
+type SignerData struct {
 	Account       Address
-	TxnSignature  []byte
-	SigningPubKey []byte
+	TxnSignature  string
+	SigningPubKey string
 }

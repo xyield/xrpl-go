@@ -25,6 +25,7 @@ type BaseTx struct {
 	SigningPubKey      string
 	TicketSequence     uint `json:",omitempty"`
 	TxnSignature       string
+	Hash               string `json:"hash,omitempty"`
 }
 
 func (tx *BaseTx) TxType() TxType {
