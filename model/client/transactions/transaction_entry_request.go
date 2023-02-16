@@ -12,6 +12,10 @@ type TransactionEntryRequest struct {
 	TxHash      string                 `json:"tx_hash"`
 }
 
+func (*TransactionEntryRequest) Method() string {
+	return "transaction_entry"
+}
+
 func (t *TransactionEntryRequest) UnmarshalJSON(data []byte) error {
 	type terHelper struct {
 		LedgerHash  common.LedgerHash `json:"ledger_hash,omitempty"`
