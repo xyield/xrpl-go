@@ -7,10 +7,10 @@ import (
 type AccountSet struct {
 	BaseTx
 	ClearFlag     uint          `json:",omitempty"`
-	Domain        []byte        `json:",omitempty"`
+	Domain        string        `json:",omitempty"`
 	EmailHash     types.Hash128 `json:",omitempty"`
-	MessageKey    []byte        `json:",omitempty"`
-	NFTokenMinter []byte        `json:",omitempty"`
+	MessageKey    string        `json:",omitempty"`
+	NFTokenMinter string        `json:",omitempty"`
 	SetFlag       uint          `json:",omitempty"`
 	TransferRate  uint          `json:",omitempty"`
 	TickSize      uint8         `json:",omitempty"`
