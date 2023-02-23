@@ -8,8 +8,8 @@ type EscrowFinish struct {
 	BaseTx
 	Owner         types.Address
 	OfferSequence uint
-	Condition     []byte `json:",omitempty"`
-	Fulfillment   []byte `json:",omitempty"`
+	Condition     string `json:",omitempty"`
+	Fulfillment   string `json:",omitempty"`
 }
 
 func (*EscrowFinish) TxType() TxType {
