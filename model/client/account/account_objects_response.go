@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	AccountObjectUnmarshalErr string = "Unmarshal JSON AccountObjects"
+	ErrAccountObjectUnmarshal string = "Unmarshal JSON AccountObjects"
 )
 
 type AccountObjectsResponse struct {
@@ -38,7 +38,7 @@ func (r *AccountObjectsResponse) UnmarshalJSON(data []byte) error {
 	}
 	var values accountObjectDecodeHelper
 	if err := json.Unmarshal(data, &values); err != nil {
-		return fmt.Errorf("%s: %w", AccountObjectUnmarshalErr, err)
+		return fmt.Errorf("%s: %w", ErrAccountObjectUnmarshal, err)
 	}
 	*r = AccountObjectsResponse{
 		Account:            values.Account,
@@ -54,7 +54,7 @@ func (r *AccountObjectsResponse) UnmarshalJSON(data []byte) error {
 		var err error
 		r.AccountObjects[i], err = ledger.UnmarshalLedgerObject(v)
 		if err != nil {
-			return fmt.Errorf("%s: %w", AccountObjectUnmarshalErr, err)
+			return fmt.Errorf("%s: %w", ErrAccountObjectUnmarshal, err)
 		}
 	}
 

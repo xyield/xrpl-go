@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	AccountTxUnmarshalErr string = "Unmarshal JSON AccountTransaction"
+	ErrAccountTxUnmarshal string = "Unmarshal JSON AccountTransaction"
 )
 
 type AccountTransaction struct {
@@ -29,7 +29,7 @@ func (at *AccountTransaction) UnmarshalJSON(data []byte) error {
 	}
 	var values accountTxDecodeHelper
 	if err := json.Unmarshal(data, &values); err != nil {
-		return fmt.Errorf("%s: %w", AccountTxUnmarshalErr, err)
+		return fmt.Errorf("%s: %w", ErrAccountTxUnmarshal, err)
 	}
 	at.LedgerIndex = values.LedgerIndex
 	at.TxBlob = values.TxBlob
@@ -38,11 +38,11 @@ func (at *AccountTransaction) UnmarshalJSON(data []byte) error {
 	var err error
 	at.Tx, err = UnmarshalTx(values.Tx)
 	if err != nil {
-		return fmt.Errorf("%s: %w", AccountTxUnmarshalErr, err)
+		return fmt.Errorf("%s: %w", ErrAccountTxUnmarshal, err)
 	}
 	at.Meta, err = UnmarshalTxMeta(values.Meta)
 	if err != nil {
-		return fmt.Errorf("%s: %w", AccountTxUnmarshalErr, err)
+		return fmt.Errorf("%s: %w", ErrAccountTxUnmarshal, err)
 	}
 
 	return nil
