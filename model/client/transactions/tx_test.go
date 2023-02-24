@@ -12,7 +12,6 @@ import (
 )
 
 func TestTxResponse(t *testing.T) {
-
 	s := TxResponse{
 		Tx: &transactions.OfferCreate{
 			BaseTx: transactions.BaseTx{
@@ -57,7 +56,7 @@ func TestTxResponse(t *testing.T) {
 					ModifiedNode: &transactions.ModifiedNode{
 						FinalFields: &ledger.AccountRoot{
 							Account:    "rhhh49pFH96roGyuC4E5P4CHaNjS1k8gzM",
-							Balance:    "10404767991",
+							Balance:    types.XRPCurrencyAmount(10404767991),
 							Flags:      0,
 							OwnerCount: 3,
 							Sequence:   5037711,
@@ -65,7 +64,7 @@ func TestTxResponse(t *testing.T) {
 						LedgerEntryType: ledger.AccountRootEntry,
 						LedgerIndex:     "1DECD9844E95FFBA273F1B94BA0BF2564DDF69F2804497A6D7837B52050174A2",
 						PreviousFields: &ledger.AccountRoot{
-							Balance:  "10404768003",
+							Balance:  types.XRPCurrencyAmount(10404768003),
 							Sequence: 5037710,
 						},
 						PreviousTxnID:     "4DC47B246B5EB9CCE92ABA8C482479E3BF1F946CABBEF74CA4DE36521D5F9008",

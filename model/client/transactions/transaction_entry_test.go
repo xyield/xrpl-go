@@ -21,7 +21,7 @@ func TestTransactionEntryRequest(t *testing.T) {
 	"ledger_index": "closed",
 	"tx_hash": "def"
 }`
-	if err := test.SerializeAndDeserialize(s, j); err != nil {
+	if err := test.SerializeAndDeserialize(t, s, j); err != nil {
 		t.Error(err)
 	}
 
@@ -87,7 +87,7 @@ func TestTransactionEntryResponse(t *testing.T) {
 	}
 }`
 
-	if err := test.SerializeAndDeserialize(s, j); err != nil {
+	if err := test.SerializeAndDeserialize(t, s, j); err != nil {
 		t.Error(err)
 	}
 

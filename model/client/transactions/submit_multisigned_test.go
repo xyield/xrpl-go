@@ -80,7 +80,7 @@ func TestSubmitMultisignedRequest(t *testing.T) {
 	},
 	"fail_hard": true
 }`
-	if err := test.SerializeAndDeserialize(s, j); err != nil {
+	if err := test.SerializeAndDeserialize(t, s, j); err != nil {
 		t.Error(err)
 	}
 
@@ -164,7 +164,7 @@ func TestSubmitMultisignedResponse(t *testing.T) {
 	}
 }`
 
-	if err := test.SerializeAndDeserialize(s, j); err != nil {
+	if err := test.SerializeAndDeserialize(t, s, j); err != nil {
 		t.Error(err)
 	}
 
