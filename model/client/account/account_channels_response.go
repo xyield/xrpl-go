@@ -12,5 +12,5 @@ type AccountChannelsResponse struct {
 	LedgerHash  LedgerHash      `json:"ledger_hash,omitempty"`
 	Validated   bool            `json:"validated,omitempty"`
 	Limit       int             `json:"limit,omitempty"`
-	Marker      interface{}     `json:"marker,omitempty"`
+	Marker      any             `json:"marker,omitempty"`
 }

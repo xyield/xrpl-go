@@ -13,7 +13,7 @@ type AccountLinesRequest struct {
 	LedgerIndex LedgerSpecifier `json:"ledger_index,omitempty"`
 	Peer        Address         `json:"peer,omitempty"`
 	Limit       int             `json:"limit,omitempty"`
-	Marker      interface{}     `json:"marker,omitempty"`
+	Marker      any             `json:"marker,omitempty"`
 }
 
 func (*AccountLinesRequest) Method() string {
@@ -27,7 +27,7 @@ func (r *AccountLinesRequest) UnmarshalJSON(data []byte) error {
 		LedgerIndex json.RawMessage `json:"ledger_index,omitempty"`
 		Peer        Address         `json:"peer,omitempty"`
 		Limit       int             `json:"limit,omitempty"`
-		Marker      interface{}     `json:"marker,omitempty"`
+		Marker      any             `json:"marker,omitempty"`
 	}
 	var h alrHelper
 	if err := json.Unmarshal(data, &h); err != nil {

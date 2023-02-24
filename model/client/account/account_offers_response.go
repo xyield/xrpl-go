@@ -11,5 +11,5 @@ type AccountOffersResponse struct {
 	LedgerCurrentIndex LedgerIndex   `json:"ledger_current_index,omitempty"`
 	LedgerIndex        LedgerIndex   `json:"ledger_index,omitempty"`
 	LedgerHash         LedgerHash    `json:"ledger_hash,omitempty"`
-	Marker             interface{}   `json:"marker,omitempty"`
+	Marker             any           `json:"marker,omitempty"`
 }

@@ -16,7 +16,7 @@ type AccountTransactionsRequest struct {
 	Binary         bool            `json:"binary,omitempty"`
 	Forward        bool            `json:"forward,omitempty"`
 	Limit          int             `json:"limit,omitempty"`
-	Marker         interface{}     `json:"marker,omitempty"`
+	Marker         any             `json:"marker,omitempty"`
 }
 
 func (*AccountTransactionsRequest) Method() string {
@@ -33,7 +33,7 @@ func (r *AccountTransactionsRequest) UnmarshalJSON(data []byte) error {
 		Binary         bool            `json:"binary,omitempty"`
 		Forward        bool            `json:"forward,omitempty"`
 		Limit          int             `json:"limit,omitempty"`
-		Marker         interface{}     `json:"marker,omitempty"`
+		Marker         any             `json:"marker,omitempty"`
 	}
 	var h atrHelper
 	if err := json.Unmarshal(data, &h); err != nil {

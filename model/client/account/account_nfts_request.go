@@ -12,7 +12,7 @@ type AccountNFTsRequest struct {
 	LedgerIndex LedgerSpecifier `json:"ledger_index,omitempty"`
 	LedgerHash  LedgerHash      `json:"ledger_hash,omitempty"`
 	Limit       int             `json:"limit,omitempty"`
-	Marker      interface{}     `json:"marker,omitempty"`
+	Marker      any             `json:"marker,omitempty"`
 }
 
 func (*AccountNFTsRequest) Method() string {
@@ -25,7 +25,7 @@ func (r *AccountNFTsRequest) UnmarshalJSON(data []byte) error {
 		LedgerIndex json.RawMessage `json:"ledger_index,omitempty"`
 		LedgerHash  LedgerHash      `json:"ledger_hash,omitempty"`
 		Limit       int             `json:"limit,omitempty"`
-		Marker      interface{}     `json:"marker,omitempty"`
+		Marker      any             `json:"marker,omitempty"`
 	}
 	var h anrHelper
 	if err := json.Unmarshal(data, &h); err != nil {

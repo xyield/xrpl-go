@@ -1,18 +1,19 @@
 package ledger
 
 import (
+	"github.com/xyield/xrpl-go/model/transactions/types"
 	. "github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 type AccountRoot struct {
 	Account           Address
-	AccountTxnID      Hash256 `json:",omitempty"`
-	Balance           string  `json:",omitempty"`
-	BurnedNFTokens    uint32  `json:",omitempty"`
-	Domain            string  `json:",omitempty"`
-	EmailHash         Hash128 `json:",omitempty"`
+	AccountTxnID      Hash256                 `json:",omitempty"`
+	Balance           types.XRPCurrencyAmount `json:",omitempty"`
+	BurnedNFTokens    uint32                  `json:",omitempty"`
+	Domain            string                  `json:",omitempty"`
+	EmailHash         Hash128                 `json:",omitempty"`
 	Flags             uint64
-	LedgerEntryType   string
+	LedgerEntryType   LedgerEntryType
 	MessageKey        string  `json:",omitempty"`
 	MintedNFTokens    uint32  `json:",omitempty"`
 	NFTokenMinter     Address `json:",omitempty"`

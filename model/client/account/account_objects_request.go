@@ -28,7 +28,7 @@ type AccountObjectsRequest struct {
 	LedgerHash           LedgerHash        `json:"ledger_hash,omitempty"`
 	LedgerIndex          LedgerSpecifier   `json:"ledger_index,omitempty"`
 	Limit                int               `json:"limit,omitempty"`
-	Marker               interface{}       `json:"marker,omitempty"`
+	Marker               any               `json:"marker,omitempty"`
 }
 
 func (*AccountObjectsRequest) Method() string {
@@ -43,7 +43,7 @@ func (r *AccountObjectsRequest) UnmarshalJSON(data []byte) error {
 		LedgerHash           LedgerHash        `json:"ledger_hash,omitempty"`
 		LedgerIndex          json.RawMessage   `json:"ledger_index,omitempty"`
 		Limit                int               `json:"limit,omitempty"`
-		Marker               interface{}       `json:"marker,omitempty"`
+		Marker               any               `json:"marker,omitempty"`
 	}
 	var h aorHelper
 	if err := json.Unmarshal(data, &h); err != nil {

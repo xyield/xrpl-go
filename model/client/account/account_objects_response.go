@@ -21,7 +21,7 @@ type AccountObjectsResponse struct {
 	LedgerIndex        LedgerIndex    `json:"ledger_index,omitempty"`
 	LedgerCurrentIndex LedgerIndex    `json:"ledger_current_index,omitempty"`
 	Limit              int            `json:"limit,omitempty"`
-	Marker             interface{}    `json:"marker,omitempty"`
+	Marker             any            `json:"marker,omitempty"`
 	Validated          bool           `json:"validated,omitempty"`
 }
 
@@ -33,7 +33,7 @@ func (r *AccountObjectsResponse) UnmarshalJSON(data []byte) error {
 		LedgerIndex        LedgerIndex       `json:"ledger_index"`
 		LedgerCurrentIndex LedgerIndex       `json:"ledger_current_index"`
 		Limit              int               `json:"limit"`
-		Marker             interface{}       `json:"marker"`
+		Marker             any               `json:"marker"`
 		Validated          bool              `json:"validated"`
 	}
 	var values accountObjectDecodeHelper

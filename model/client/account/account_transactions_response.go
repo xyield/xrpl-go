@@ -10,7 +10,7 @@ type AccountTransactionsResponse struct {
 	LedgerIndexMin LedgerIndex          `json:"ledger_index_min"`
 	LedgerIndexMax LedgerIndex          `json:"ledger_index_max"`
 	Limit          int                  `json:"limit"`
-	Marker         interface{}          `json:"marker,omitempty"`
+	Marker         any                  `json:"marker,omitempty"`
 	Transactions   []AccountTransaction `json:"transactions"`
 	Validated      bool                 `json:"validated"`
 }

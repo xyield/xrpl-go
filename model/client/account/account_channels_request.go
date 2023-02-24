@@ -9,11 +9,11 @@ import (
 
 type AccountChannelsRequest struct {
 	Account            Address         `json:"account"`
-	DestinationAccount Address         `json:"destination_account"`
+	DestinationAccount Address         `json:"destination_account,omitempty"`
 	LedgerIndex        LedgerSpecifier `json:"ledger_index,omitempty"`
 	LedgerHash         LedgerHash      `json:"ledger_hash,omitempty"`
 	Limit              int             `json:"limit,omitempty"`
-	Marker             interface{}     `json:"marker,omitempty"`
+	Marker             any             `json:"marker,omitempty"`
 }
 
 func (*AccountChannelsRequest) Method() string {
@@ -27,7 +27,7 @@ func (r *AccountChannelsRequest) UnmarshalJSON(data []byte) error {
 		LedgerIndex        json.RawMessage `json:"ledger_index,omitempty"`
 		LedgerHash         LedgerHash      `json:"ledger_hash,omitempty"`
 		Limit              int             `json:"limit,omitempty"`
-		Marker             interface{}     `json:"marker,omitempty"`
+		Marker             any             `json:"marker,omitempty"`
 	}
 	var h acrHelper
 	if err := json.Unmarshal(data, &h); err != nil {

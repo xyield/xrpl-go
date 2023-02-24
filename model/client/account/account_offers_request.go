@@ -12,7 +12,7 @@ type AccountOffersRequest struct {
 	LedgerHash  LedgerHash      `json:"ledger_hash,omitempty"`
 	LedgerIndex LedgerSpecifier `json:"ledger_index,omitempty"`
 	Limit       int             `json:"limit,omitempty"`
-	Marker      interface{}     `json:"marker,omitempty"`
+	Marker      any             `json:"marker,omitempty"`
 	Strict      bool            `json:"strict,omitempty"`
 }
 
@@ -26,7 +26,7 @@ func (r *AccountOffersRequest) UnmarshalJSON(data []byte) error {
 		LedgerHash  LedgerHash      `json:"ledger_hash,omitempty"`
 		LedgerIndex json.RawMessage `json:"ledger_index,omitempty"`
 		Limit       int             `json:"limit,omitempty"`
-		Marker      interface{}     `json:"marker,omitempty"`
+		Marker      any             `json:"marker,omitempty"`
 		Strict      bool            `json:"strict,omitempty"`
 	}
 	var h aorHelper
