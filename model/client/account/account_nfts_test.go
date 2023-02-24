@@ -21,7 +21,7 @@ func TestAccountNFTsRequest(t *testing.T) {
 	"ledger_hash": "123",
 	"limit": 2
 }`
-	if err := test.SerializeAndDeserialize(s, j); err != nil {
+	if err := test.SerializeAndDeserialize(t, s, j); err != nil {
 		t.Error(err)
 	}
 }
@@ -61,7 +61,7 @@ func TestAccountNFTsResponse(t *testing.T) {
 	"ledger_current_index": 1234,
 	"validated": true
 }`
-	if err := test.SerializeAndDeserialize(s, j); err != nil {
+	if err := test.SerializeAndDeserialize(t, s, j); err != nil {
 		t.Error(err)
 	}
 }

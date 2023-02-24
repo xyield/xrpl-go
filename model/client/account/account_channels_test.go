@@ -19,7 +19,7 @@ func TestAccountChannelRequest(t *testing.T) {
 	"destination_account": "rnZvsWuLem5Ha46AZs61jLWR9R5esinkG3",
 	"ledger_index": "validated"
 }`
-	if err := test.SerializeAndDeserialize(s, j); err != nil {
+	if err := test.SerializeAndDeserialize(t, s, j); err != nil {
 		t.Error(err)
 	}
 
@@ -59,7 +59,7 @@ func TestAccountChannelsResponse(t *testing.T) {
 	"validated": true,
 	"limit": 1
 }`
-	if err := test.SerializeAndDeserialize(s, j); err != nil {
+	if err := test.SerializeAndDeserialize(t, s, j); err != nil {
 		t.Error(err)
 	}
 }

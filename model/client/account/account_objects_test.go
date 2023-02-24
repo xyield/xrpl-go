@@ -21,7 +21,7 @@ func TestAccountObjectsRequest(t *testing.T) {
 	"type": "signer_list",
 	"ledger_index": 123
 }`
-	if err := test.SerializeAndDeserialize(s, j); err != nil {
+	if err := test.SerializeAndDeserialize(t, s, j); err != nil {
 		t.Error(err)
 	}
 }
@@ -92,7 +92,7 @@ func TestAccountObjectsResponse(t *testing.T) {
 	"limit": 1,
 	"validated": true
 }`
-	if err := test.SerializeAndDeserialize(s, j); err != nil {
+	if err := test.SerializeAndDeserialize(t, s, j); err != nil {
 		t.Error(err)
 	}
 }
