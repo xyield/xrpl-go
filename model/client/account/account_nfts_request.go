@@ -3,16 +3,16 @@ package account
 import (
 	"encoding/json"
 
-	. "github.com/xyield/xrpl-go/model/client/common"
-	. "github.com/xyield/xrpl-go/model/transactions/types"
+	"github.com/xyield/xrpl-go/model/client/common"
+	"github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 type AccountNFTsRequest struct {
-	Account     Address         `json:"account"`
-	LedgerIndex LedgerSpecifier `json:"ledger_index,omitempty"`
-	LedgerHash  LedgerHash      `json:"ledger_hash,omitempty"`
-	Limit       int             `json:"limit,omitempty"`
-	Marker      any             `json:"marker,omitempty"`
+	Account     types.Address          `json:"account"`
+	LedgerIndex common.LedgerSpecifier `json:"ledger_index,omitempty"`
+	LedgerHash  common.LedgerHash      `json:"ledger_hash,omitempty"`
+	Limit       int                    `json:"limit,omitempty"`
+	Marker      any                    `json:"marker,omitempty"`
 }
 
 func (*AccountNFTsRequest) Method() string {
@@ -21,11 +21,11 @@ func (*AccountNFTsRequest) Method() string {
 
 func (r *AccountNFTsRequest) UnmarshalJSON(data []byte) error {
 	type anrHelper struct {
-		Account     Address         `json:"account"`
-		LedgerIndex json.RawMessage `json:"ledger_index,omitempty"`
-		LedgerHash  LedgerHash      `json:"ledger_hash,omitempty"`
-		Limit       int             `json:"limit,omitempty"`
-		Marker      any             `json:"marker,omitempty"`
+		Account     types.Address     `json:"account"`
+		LedgerIndex json.RawMessage   `json:"ledger_index,omitempty"`
+		LedgerHash  common.LedgerHash `json:"ledger_hash,omitempty"`
+		Limit       int               `json:"limit,omitempty"`
+		Marker      any               `json:"marker,omitempty"`
 	}
 	var h anrHelper
 	if err := json.Unmarshal(data, &h); err != nil {
@@ -38,7 +38,7 @@ func (r *AccountNFTsRequest) UnmarshalJSON(data []byte) error {
 		Marker:     h.Marker,
 	}
 
-	i, err := UnmarshalLedgerSpecifier(h.LedgerIndex)
+	i, err := common.UnmarshalLedgerSpecifier(h.LedgerIndex)
 	if err != nil {
 		return err
 	}

@@ -3,32 +3,32 @@ package account
 import (
 	"encoding/json"
 
-	. "github.com/xyield/xrpl-go/model/client/common"
-	. "github.com/xyield/xrpl-go/model/transactions/types"
+	"github.com/xyield/xrpl-go/model/client/common"
+	"github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 type AccountObjectType string
 
 const (
 	CheckObject          AccountObjectType = "check"
-	DepositPreauthObject                   = "deposit_preauth"
-	EscrowObject                           = "escrow"
-	NFTOfferObject                         = "nft_offer"
-	OfferObject                            = "offer"
-	PaymentChannelObject                   = "payment_channel"
-	SignerListObject                       = "signer_list"
-	StateObject                            = "state"
-	TicketObject                           = "ticket"
+	DepositPreauthObject AccountObjectType = "deposit_preauth"
+	EscrowObject         AccountObjectType = "escrow"
+	NFTOfferObject       AccountObjectType = "nft_offer"
+	OfferObject          AccountObjectType = "offer"
+	PaymentChannelObject AccountObjectType = "payment_channel"
+	SignerListObject     AccountObjectType = "signer_list"
+	StateObject          AccountObjectType = "state"
+	TicketObject         AccountObjectType = "ticket"
 )
 
 type AccountObjectsRequest struct {
-	Account              Address           `json:"account"`
-	Type                 AccountObjectType `json:"type,omitempty"`
-	DeletionBlockersOnly bool              `json:"deletion_blockers_only,omitempty"`
-	LedgerHash           LedgerHash        `json:"ledger_hash,omitempty"`
-	LedgerIndex          LedgerSpecifier   `json:"ledger_index,omitempty"`
-	Limit                int               `json:"limit,omitempty"`
-	Marker               any               `json:"marker,omitempty"`
+	Account              types.Address          `json:"account"`
+	Type                 AccountObjectType      `json:"type,omitempty"`
+	DeletionBlockersOnly bool                   `json:"deletion_blockers_only,omitempty"`
+	LedgerHash           common.LedgerHash      `json:"ledger_hash,omitempty"`
+	LedgerIndex          common.LedgerSpecifier `json:"ledger_index,omitempty"`
+	Limit                int                    `json:"limit,omitempty"`
+	Marker               any                    `json:"marker,omitempty"`
 }
 
 func (*AccountObjectsRequest) Method() string {
@@ -37,10 +37,10 @@ func (*AccountObjectsRequest) Method() string {
 
 func (r *AccountObjectsRequest) UnmarshalJSON(data []byte) error {
 	type aorHelper struct {
-		Account              Address           `json:"account"`
+		Account              types.Address     `json:"account"`
 		Type                 AccountObjectType `json:"type,omitempty"`
 		DeletionBlockersOnly bool              `json:"deletion_blockers_only,omitempty"`
-		LedgerHash           LedgerHash        `json:"ledger_hash,omitempty"`
+		LedgerHash           common.LedgerHash `json:"ledger_hash,omitempty"`
 		LedgerIndex          json.RawMessage   `json:"ledger_index,omitempty"`
 		Limit                int               `json:"limit,omitempty"`
 		Marker               any               `json:"marker,omitempty"`
@@ -58,7 +58,7 @@ func (r *AccountObjectsRequest) UnmarshalJSON(data []byte) error {
 		Marker:               h.Marker,
 	}
 
-	i, err := UnmarshalLedgerSpecifier(h.LedgerIndex)
+	i, err := common.UnmarshalLedgerSpecifier(h.LedgerIndex)
 	if err != nil {
 		return err
 	}

@@ -3,12 +3,12 @@ package transactions
 import (
 	"encoding/json"
 
-	. "github.com/xyield/xrpl-go/model/transactions/types"
+	"github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 type TrustSet struct {
 	BaseTx
-	LimitAmount CurrencyAmount
+	LimitAmount types.CurrencyAmount
 	QualityIn   uint `json:",omitempty"`
 	QualityOut  uint `json:",omitempty"`
 }
@@ -33,7 +33,7 @@ func (t *TrustSet) UnmarshalJSON(data []byte) error {
 		QualityIn:  h.QualityIn,
 		QualityOut: h.QualityOut,
 	}
-	limit, err := UnmarshalCurrencyAmount(h.LimitAmount)
+	limit, err := types.UnmarshalCurrencyAmount(h.LimitAmount)
 	if err != nil {
 		return err
 	}

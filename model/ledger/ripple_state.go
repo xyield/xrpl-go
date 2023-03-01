@@ -1,22 +1,22 @@
 package ledger
 
-import . "github.com/xyield/xrpl-go/model/transactions/types"
+import "github.com/xyield/xrpl-go/model/transactions/types"
 
 // TODO flags
 
 type RippleState struct {
-	Balance           IssuedCurrencyAmount
+	Balance           types.IssuedCurrencyAmount
 	Flags             uint
-	HighLimit         IssuedCurrencyAmount
+	HighLimit         types.IssuedCurrencyAmount
 	HighNode          string
 	HighQualityIn     uint `json:",omitempty"`
 	HighQualityOut    uint `json:",omitempty"`
 	LedgerEntryType   LedgerEntryType
-	LowLimit          IssuedCurrencyAmount
+	LowLimit          types.IssuedCurrencyAmount
 	LowNode           string
 	LowQualityIn      uint `json:",omitempty"`
 	LowQualityOut     uint `json:",omitempty"`
-	PreviousTxnID     Hash256
+	PreviousTxnID     types.Hash256
 	PreviousTxnLgrSeq uint
 }
 

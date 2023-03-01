@@ -1,12 +1,12 @@
 package transactions
 
 import (
-	. "github.com/xyield/xrpl-go/model/transactions/types"
+	"github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 type CheckCancel struct {
 	BaseTx
-	CheckID Hash256
+	CheckID types.Hash256
 }
 
 func (*CheckCancel) TxType() TxType {

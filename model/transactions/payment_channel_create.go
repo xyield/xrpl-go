@@ -1,13 +1,13 @@
 package transactions
 
 import (
-	. "github.com/xyield/xrpl-go/model/transactions/types"
+	"github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 type PaymentChannelCreate struct {
 	BaseTx
-	Amount         XRPCurrencyAmount
-	Destination    Address
+	Amount         types.XRPCurrencyAmount
+	Destination    types.Address
 	SettleDelay    uint
 	PublicKey      []byte
 	CancelAfter    uint `json:",omitempty"`

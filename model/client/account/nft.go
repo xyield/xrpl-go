@@ -1,23 +1,23 @@
 package account
 
 import (
-	. "github.com/xyield/xrpl-go/model/transactions/types"
+	"github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 const (
 	Burnable     NFTokenFlag = 0x0001
-	OnlyXRP                  = 0x0002
-	Transferable             = 0x0008
-	ReservedFlag             = 0x8000
+	OnlyXRP      NFTokenFlag = 0x0002
+	Transferable NFTokenFlag = 0x0008
+	ReservedFlag NFTokenFlag = 0x8000
 )
 
 type NFTokenFlag uint
 
 type NFT struct {
 	Flags        NFTokenFlag
-	Issuer       Address
-	NFTokenID    NFTokenID
+	Issuer       types.Address
+	NFTokenID    types.NFTokenID
 	NFTokenTaxon uint
-	URI          NFTokenURI
+	URI          types.NFTokenURI
 	NFTSerial    uint `json:"nft_serial"`
 }

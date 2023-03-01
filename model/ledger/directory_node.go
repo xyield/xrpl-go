@@ -1,17 +1,17 @@
 package ledger
 
 import (
-	. "github.com/xyield/xrpl-go/model/transactions/types"
+	"github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 type DirectoryNode struct {
 	Flags             uint
-	Indexes           []Hash256
+	Indexes           []types.Hash256
 	IndexNext         uint64 `json:",omitempty"`
 	IndexPrevious     uint64 `json:",omitempty"`
-	LedgerEntryType   string
-	Owner             Address `json:",omitempty"`
-	RootIndex         Hash256
+	LedgerEntryType   LedgerEntryType
+	Owner             types.Address `json:",omitempty"`
+	RootIndex         types.Hash256
 	TakerGetsCurrency string `json:",omitempty"`
 	TakerGetsIssuer   string `json:",omitempty"`
 	TakerPaysCurrency string `json:",omitempty"`

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	. "github.com/xyield/xrpl-go/model/transactions"
+	"github.com/xyield/xrpl-go/model/transactions"
 )
 
 const (
@@ -12,11 +12,11 @@ const (
 )
 
 type AccountTransaction struct {
-	LedgerIndex uint64 `json:"ledger_index"`
-	Meta        TxMeta `json:"meta"`
-	Tx          Tx     `json:"tx"`
-	TxBlob      string `json:"tx_blob"`
-	Validated   bool   `json:"validated"`
+	LedgerIndex uint64              `json:"ledger_index"`
+	Meta        transactions.TxMeta `json:"meta"`
+	Tx          transactions.Tx     `json:"tx"`
+	TxBlob      string              `json:"tx_blob"`
+	Validated   bool                `json:"validated"`
 }
 
 func (at *AccountTransaction) UnmarshalJSON(data []byte) error {
@@ -36,11 +36,11 @@ func (at *AccountTransaction) UnmarshalJSON(data []byte) error {
 	at.Validated = values.Validated
 
 	var err error
-	at.Tx, err = UnmarshalTx(values.Tx)
+	at.Tx, err = transactions.UnmarshalTx(values.Tx)
 	if err != nil {
 		return fmt.Errorf("%s: %w", ErrAccountTxUnmarshal, err)
 	}
-	at.Meta, err = UnmarshalTxMeta(values.Meta)
+	at.Meta, err = transactions.UnmarshalTxMeta(values.Meta)
 	if err != nil {
 		return fmt.Errorf("%s: %w", ErrAccountTxUnmarshal, err)
 	}

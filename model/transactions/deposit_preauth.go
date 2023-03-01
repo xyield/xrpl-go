@@ -1,13 +1,13 @@
 package transactions
 
 import (
-	. "github.com/xyield/xrpl-go/model/transactions/types"
+	"github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 type DepositPreauth struct {
 	BaseTx
-	Authorize   Address `json:",omitempty"`
-	Unauthorize Address `json:",omitempty"`
+	Authorize   types.Address `json:",omitempty"`
+	Unauthorize types.Address `json:",omitempty"`
 }
 
 func (*DepositPreauth) TxType() TxType {

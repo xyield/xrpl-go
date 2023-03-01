@@ -1,13 +1,13 @@
 package ledger
 
 import (
-	. "github.com/xyield/xrpl-go/model/transactions/types"
+	"github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 type Amendments struct {
-	Amendments      []Hash256 `json:",omitempty"`
+	Amendments      []types.Hash256 `json:",omitempty"`
 	Flags           uint
-	LedgerEntryType string
+	LedgerEntryType LedgerEntryType
 	Majorities      []Majority `json:",omitempty"`
 }
 
@@ -16,6 +16,6 @@ func (*Amendments) EntryType() LedgerEntryType {
 }
 
 type Majority struct {
-	Amendment Hash256
+	Amendment types.Hash256
 	CloseTime uint
 }

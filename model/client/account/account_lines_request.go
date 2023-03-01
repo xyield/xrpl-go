@@ -3,17 +3,17 @@ package account
 import (
 	"encoding/json"
 
-	. "github.com/xyield/xrpl-go/model/client/common"
-	. "github.com/xyield/xrpl-go/model/transactions/types"
+	"github.com/xyield/xrpl-go/model/client/common"
+	"github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 type AccountLinesRequest struct {
-	Account     Address         `json:"account"`
-	LedgerHash  LedgerHash      `json:"ledger_hash,omitempty"`
-	LedgerIndex LedgerSpecifier `json:"ledger_index,omitempty"`
-	Peer        Address         `json:"peer,omitempty"`
-	Limit       int             `json:"limit,omitempty"`
-	Marker      any             `json:"marker,omitempty"`
+	Account     types.Address          `json:"account"`
+	LedgerHash  common.LedgerHash      `json:"ledger_hash,omitempty"`
+	LedgerIndex common.LedgerSpecifier `json:"ledger_index,omitempty"`
+	Peer        types.Address          `json:"peer,omitempty"`
+	Limit       int                    `json:"limit,omitempty"`
+	Marker      any                    `json:"marker,omitempty"`
 }
 
 func (*AccountLinesRequest) Method() string {
@@ -22,12 +22,12 @@ func (*AccountLinesRequest) Method() string {
 
 func (r *AccountLinesRequest) UnmarshalJSON(data []byte) error {
 	type alrHelper struct {
-		Account     Address         `json:"account"`
-		LedgerHash  LedgerHash      `json:"ledger_hash,omitempty"`
-		LedgerIndex json.RawMessage `json:"ledger_index,omitempty"`
-		Peer        Address         `json:"peer,omitempty"`
-		Limit       int             `json:"limit,omitempty"`
-		Marker      any             `json:"marker,omitempty"`
+		Account     types.Address     `json:"account"`
+		LedgerHash  common.LedgerHash `json:"ledger_hash,omitempty"`
+		LedgerIndex json.RawMessage   `json:"ledger_index,omitempty"`
+		Peer        types.Address     `json:"peer,omitempty"`
+		Limit       int               `json:"limit,omitempty"`
+		Marker      any               `json:"marker,omitempty"`
 	}
 	var h alrHelper
 	if err := json.Unmarshal(data, &h); err != nil {
@@ -41,7 +41,7 @@ func (r *AccountLinesRequest) UnmarshalJSON(data []byte) error {
 		Marker:     h.Marker,
 	}
 
-	i, err := UnmarshalLedgerSpecifier(h.LedgerIndex)
+	i, err := common.UnmarshalLedgerSpecifier(h.LedgerIndex)
 	if err != nil {
 		return err
 	}

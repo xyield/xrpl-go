@@ -1,13 +1,13 @@
 package transactions
 
 import (
-	. "github.com/xyield/xrpl-go/model/transactions/types"
+	"github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 type PaymentChannelFund struct {
 	BaseTx
-	Channel    Hash256
-	Amount     XRPCurrencyAmount
+	Channel    types.Hash256
+	Amount     types.XRPCurrencyAmount
 	Expiration uint `json:",omitempty"`
 }
 

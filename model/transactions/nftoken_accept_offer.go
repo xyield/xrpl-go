@@ -3,14 +3,14 @@ package transactions
 import (
 	"encoding/json"
 
-	. "github.com/xyield/xrpl-go/model/transactions/types"
+	"github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 type NFTokenAcceptOffer struct {
 	BaseTx
-	NFTokenSellOffer Hash256        `json:",omitempty"`
-	NFTokenBuyOffer  Hash256        `json:",omitempty"`
-	NFTokenBrokerFee CurrencyAmount `json:",omitempty"`
+	NFTokenSellOffer types.Hash256        `json:",omitempty"`
+	NFTokenBuyOffer  types.Hash256        `json:",omitempty"`
+	NFTokenBrokerFee types.CurrencyAmount `json:",omitempty"`
 }
 
 func (*NFTokenAcceptOffer) TxType() TxType {
@@ -20,8 +20,8 @@ func (*NFTokenAcceptOffer) TxType() TxType {
 func (n *NFTokenAcceptOffer) UnmarshalJSON(data []byte) error {
 	type naoHelper struct {
 		BaseTx
-		NFTokenSellOffer Hash256         `json:",omitempty"`
-		NFTokenBuyOffer  Hash256         `json:",omitempty"`
+		NFTokenSellOffer types.Hash256   `json:",omitempty"`
+		NFTokenBuyOffer  types.Hash256   `json:",omitempty"`
 		NFTokenBrokerFee json.RawMessage `json:",omitempty"`
 	}
 	var h naoHelper
@@ -34,7 +34,7 @@ func (n *NFTokenAcceptOffer) UnmarshalJSON(data []byte) error {
 		NFTokenBuyOffer:  h.NFTokenBuyOffer,
 	}
 
-	fee, err := UnmarshalCurrencyAmount(h.NFTokenBrokerFee)
+	fee, err := types.UnmarshalCurrencyAmount(h.NFTokenBrokerFee)
 	if err != nil {
 		return err
 	}

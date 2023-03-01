@@ -3,17 +3,17 @@ package account
 import (
 	"encoding/json"
 
-	. "github.com/xyield/xrpl-go/model/client/common"
-	. "github.com/xyield/xrpl-go/model/transactions/types"
+	"github.com/xyield/xrpl-go/model/client/common"
+	"github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 type AccountChannelsRequest struct {
-	Account            Address         `json:"account"`
-	DestinationAccount Address         `json:"destination_account,omitempty"`
-	LedgerIndex        LedgerSpecifier `json:"ledger_index,omitempty"`
-	LedgerHash         LedgerHash      `json:"ledger_hash,omitempty"`
-	Limit              int             `json:"limit,omitempty"`
-	Marker             any             `json:"marker,omitempty"`
+	Account            types.Address          `json:"account"`
+	DestinationAccount types.Address          `json:"destination_account,omitempty"`
+	LedgerIndex        common.LedgerSpecifier `json:"ledger_index,omitempty"`
+	LedgerHash         common.LedgerHash      `json:"ledger_hash,omitempty"`
+	Limit              int                    `json:"limit,omitempty"`
+	Marker             any                    `json:"marker,omitempty"`
 }
 
 func (*AccountChannelsRequest) Method() string {
@@ -22,12 +22,12 @@ func (*AccountChannelsRequest) Method() string {
 
 func (r *AccountChannelsRequest) UnmarshalJSON(data []byte) error {
 	type acrHelper struct {
-		Account            Address         `json:"account"`
-		DestinationAccount Address         `json:"destination_account"`
-		LedgerIndex        json.RawMessage `json:"ledger_index,omitempty"`
-		LedgerHash         LedgerHash      `json:"ledger_hash,omitempty"`
-		Limit              int             `json:"limit,omitempty"`
-		Marker             any             `json:"marker,omitempty"`
+		Account            types.Address     `json:"account"`
+		DestinationAccount types.Address     `json:"destination_account"`
+		LedgerIndex        json.RawMessage   `json:"ledger_index,omitempty"`
+		LedgerHash         common.LedgerHash `json:"ledger_hash,omitempty"`
+		Limit              int               `json:"limit,omitempty"`
+		Marker             any               `json:"marker,omitempty"`
 	}
 	var h acrHelper
 	if err := json.Unmarshal(data, &h); err != nil {
@@ -41,7 +41,7 @@ func (r *AccountChannelsRequest) UnmarshalJSON(data []byte) error {
 		Marker:             h.Marker,
 	}
 
-	i, err := UnmarshalLedgerSpecifier(h.LedgerIndex)
+	i, err := common.UnmarshalLedgerSpecifier(h.LedgerIndex)
 	if err != nil {
 		return err
 	}

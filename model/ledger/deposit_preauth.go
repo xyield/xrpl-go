@@ -1,16 +1,16 @@
 package ledger
 
 import (
-	. "github.com/xyield/xrpl-go/model/transactions/types"
+	"github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 type DepositPreauthObj struct {
-	Account           Address
-	Authorize         Address
+	Account           types.Address
+	Authorize         types.Address
 	Flags             uint
-	LedgerEntryType   string
+	LedgerEntryType   LedgerEntryType
 	OwnerNode         string
-	PreviousTxnID     Hash256
+	PreviousTxnID     types.Hash256
 	PreviousTxnLgrSeq uint
 }
 

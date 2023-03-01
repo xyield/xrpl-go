@@ -6,7 +6,6 @@ import (
 
 	"github.com/xyield/xrpl-go/model/ledger"
 	"github.com/xyield/xrpl-go/model/transactions/types"
-	. "github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 type TxMeta interface {
@@ -14,7 +13,7 @@ type TxMeta interface {
 }
 
 func UnmarshalTxMeta(data []byte) (TxMeta, error) {
-	if data == nil || len(data) == 0 {
+	if len(data) == 0 {
 		return nil, nil
 	}
 	switch data[0] {
@@ -36,11 +35,11 @@ type TxBinMeta string
 func (TxBinMeta) TxMeta() {}
 
 type TxObjMeta struct {
-	AffectedNodes          []AffectedNode `json:"AffectedNodes"`
-	PartialDeliveredAmount CurrencyAmount `json:"DeliveredAmount"`
-	TransactionIndex       uint64         `json:"TransactionIndex"`
-	TransactionResult      string         `json:"TransactionResult"`
-	DeliveredAmount        CurrencyAmount `json:"delivered_amount"`
+	AffectedNodes          []AffectedNode       `json:"AffectedNodes"`
+	PartialDeliveredAmount types.CurrencyAmount `json:"DeliveredAmount"`
+	TransactionIndex       uint64               `json:"TransactionIndex"`
+	TransactionResult      string               `json:"TransactionResult"`
+	DeliveredAmount        types.CurrencyAmount `json:"delivered_amount"`
 }
 
 func (m *TxObjMeta) UnmarshalJSON(data []byte) error {
@@ -81,14 +80,14 @@ type AffectedNode struct {
 }
 
 type CreatedNode struct {
-	LedgerEntryType string              `json:"LedgerEntryType,omitempty"`
-	LedgerIndex     string              `json:"LedgerIndex,omitempty"`
-	NewFields       ledger.LedgerObject `json:"NewFields,omitempty"`
+	LedgerEntryType ledger.LedgerEntryType `json:"LedgerEntryType,omitempty"`
+	LedgerIndex     string                 `json:"LedgerIndex,omitempty"`
+	NewFields       ledger.LedgerObject    `json:"NewFields,omitempty"`
 }
 
 func (n *CreatedNode) UnmarshalJSON(data []byte) error {
 	var h struct {
-		LedgerEntryType string
+		LedgerEntryType ledger.LedgerEntryType
 		LedgerIndex     string
 		NewFields       json.RawMessage
 	}
@@ -97,7 +96,7 @@ func (n *CreatedNode) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	var obj ledger.LedgerObject
-	if obj, err = ledger.EmptyLedgerObject(h.LedgerEntryType); err != nil {
+	if obj, err = ledger.EmptyLedgerObject(string(h.LedgerEntryType)); err != nil {
 		return err
 	}
 	if err = json.Unmarshal(h.NewFields, obj); err != nil {
@@ -112,17 +111,17 @@ func (n *CreatedNode) UnmarshalJSON(data []byte) error {
 }
 
 type ModifiedNode struct {
-	LedgerEntryType   string              `json:"LedgerEntryType"`
-	LedgerIndex       string              `json:"LedgerIndex"`
-	FinalFields       ledger.LedgerObject `json:"FinalFields"`
-	PreviousFields    ledger.LedgerObject `json:"PreviousFields"`
-	PreviousTxnID     string              `json:"PreviousTxnID,omitempty"`
-	PreviousTxnLgrSeq uint64              `json:"PreviousTxnLgrSeq,omitempty"`
+	LedgerEntryType   ledger.LedgerEntryType `json:"LedgerEntryType"`
+	LedgerIndex       string                 `json:"LedgerIndex"`
+	FinalFields       ledger.LedgerObject    `json:"FinalFields"`
+	PreviousFields    ledger.LedgerObject    `json:"PreviousFields"`
+	PreviousTxnID     string                 `json:"PreviousTxnID,omitempty"`
+	PreviousTxnLgrSeq uint64                 `json:"PreviousTxnLgrSeq,omitempty"`
 }
 
 func (n *ModifiedNode) UnmarshalJSON(data []byte) error {
 	var h struct {
-		LedgerEntryType   string
+		LedgerEntryType   ledger.LedgerEntryType
 		LedgerIndex       string
 		FinalFields       json.RawMessage
 		PreviousFields    json.RawMessage
@@ -134,7 +133,7 @@ func (n *ModifiedNode) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	var prev, fin ledger.LedgerObject
-	if prev, err = ledger.EmptyLedgerObject(h.LedgerEntryType); err != nil {
+	if prev, err = ledger.EmptyLedgerObject(string(h.LedgerEntryType)); err != nil {
 		return err
 	}
 	if err = json.Unmarshal(h.PreviousFields, prev); err != nil {
@@ -155,14 +154,14 @@ func (n *ModifiedNode) UnmarshalJSON(data []byte) error {
 }
 
 type DeletedNode struct {
-	LedgerEntryType string              `json:"LedgerEntryType"`
-	LedgerIndex     string              `json:"LedgerIndex"`
-	FinalFields     ledger.LedgerObject `json:"FinalFields"`
+	LedgerEntryType ledger.LedgerEntryType `json:"LedgerEntryType"`
+	LedgerIndex     string                 `json:"LedgerIndex"`
+	FinalFields     ledger.LedgerObject    `json:"FinalFields"`
 }
 
 func (n *DeletedNode) UnmarshalJSON(data []byte) error {
 	var h struct {
-		LedgerEntryType string
+		LedgerEntryType ledger.LedgerEntryType
 		LedgerIndex     string
 		FinalFields     json.RawMessage
 	}
@@ -171,7 +170,7 @@ func (n *DeletedNode) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	var obj ledger.LedgerObject
-	if obj, err = ledger.EmptyLedgerObject(h.LedgerEntryType); err != nil {
+	if obj, err = ledger.EmptyLedgerObject(string(h.LedgerEntryType)); err != nil {
 		return err
 	}
 	if err = json.Unmarshal(h.FinalFields, obj); err != nil {

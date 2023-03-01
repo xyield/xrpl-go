@@ -9,21 +9,21 @@ type LedgerEntryType string
 
 const (
 	AccountRootEntry       LedgerEntryType = "AccountRoot"
-	AmendmentsEntry                        = "Amendments"
-	CheckEntry                             = "Check"
-	DepositPreauthObjEntry                 = "DepositPreauth"
-	DirectoryNodeEntry                     = "DirectoryNode"
-	EscrowEntry                            = "Escrow"
-	FeeSettingsEntry                       = "FeeSettings"
-	LedgerHashesEntry                      = "LedgerHashes"
-	NegativeUNLEntry                       = "NegativeUNL"
-	NFTokenOfferEntry                      = "NFTokenOffer"
-	NFTokenPageEntry                       = "NFTokenPage"
-	OfferEntry                             = "Offer"
-	PayChannelEntry                        = "PayChannel"
-	RippleStateEntry                       = "RippleState"
-	SignerListEntry                        = "SignerList"
-	TicketEntry                            = "Ticket"
+	AmendmentsEntry        LedgerEntryType = "Amendments"
+	CheckEntry             LedgerEntryType = "Check"
+	DepositPreauthObjEntry LedgerEntryType = "DepositPreauth"
+	DirectoryNodeEntry     LedgerEntryType = "DirectoryNode"
+	EscrowEntry            LedgerEntryType = "Escrow"
+	FeeSettingsEntry       LedgerEntryType = "FeeSettings"
+	LedgerHashesEntry      LedgerEntryType = "LedgerHashes"
+	NegativeUNLEntry       LedgerEntryType = "NegativeUNL"
+	NFTokenOfferEntry      LedgerEntryType = "NFTokenOffer"
+	NFTokenPageEntry       LedgerEntryType = "NFTokenPage"
+	OfferEntry             LedgerEntryType = "Offer"
+	PayChannelEntry        LedgerEntryType = "PayChannel"
+	RippleStateEntry       LedgerEntryType = "RippleState"
+	SignerListEntry        LedgerEntryType = "SignerList"
+	TicketEntry            LedgerEntryType = "Ticket"
 )
 
 type LedgerObject interface {
@@ -69,11 +69,11 @@ func EmptyLedgerObject(t string) (LedgerObject, error) {
 }
 
 func UnmarshalLedgerObject(data []byte) (LedgerObject, error) {
-	if data == nil || len(data) == 0 {
+	if len(data) == 0 {
 		return nil, nil
 	}
 	type helper struct {
-		LedgerEntryType
+		LedgerEntryType LedgerEntryType
 	}
 	var h helper
 	if err := json.Unmarshal(data, &h); err != nil {

@@ -3,15 +3,15 @@ package ledger
 import (
 	"encoding/json"
 
-	. "github.com/xyield/xrpl-go/model/transactions/types"
+	"github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 type AMM struct {
 	Asset          AMMAsset
 	Asset2         AMMAsset
-	AMMAccount     Address
+	AMMAccount     types.Address
 	AuctionSlot    AMMAuctionSlot `json:",omitempty"`
-	LPTokenBalance CurrencyAmount
+	LPTokenBalance types.CurrencyAmount
 	TradingFee     uint16
 	VoteSlots      []AMMVoteEntry `json:",omitempty"`
 }
@@ -20,7 +20,7 @@ func (a *AMM) UnmarshalJSON(data []byte) error {
 	type ammHelper struct {
 		Asset          AMMAsset
 		Asset2         AMMAsset
-		AMMAccount     Address
+		AMMAccount     types.Address
 		AuctionSlot    AMMAuctionSlot
 		LPTokenBalance json.RawMessage
 		TradingFee     uint16
@@ -40,7 +40,7 @@ func (a *AMM) UnmarshalJSON(data []byte) error {
 		VoteSlots:   h.VoteSlots,
 	}
 
-	a.LPTokenBalance, err = UnmarshalCurrencyAmount(h.LPTokenBalance)
+	a.LPTokenBalance, err = types.UnmarshalCurrencyAmount(h.LPTokenBalance)
 	if err != nil {
 		return err
 	}
@@ -50,20 +50,20 @@ func (a *AMM) UnmarshalJSON(data []byte) error {
 
 type AMMAsset struct {
 	Currency string
-	Issuer   Address
+	Issuer   types.Address
 }
 
 type AMMAuctionSlot struct {
-	Account       Address
+	Account       types.Address
 	AuthAccounts  []AMMAuthAccount `json:",omitempty"`
 	DiscountedFee int
-	Price         CurrencyAmount
+	Price         types.CurrencyAmount
 	Expiration    uint
 }
 
 func (s *AMMAuctionSlot) UnmarshalJSON(data []byte) error {
 	type aasHelper struct {
-		Account       Address
+		Account       types.Address
 		AuthAccounts  []AMMAuthAccount
 		DiscountedFee int
 		Price         json.RawMessage
@@ -81,7 +81,7 @@ func (s *AMMAuctionSlot) UnmarshalJSON(data []byte) error {
 		Expiration:    h.Expiration,
 	}
 
-	s.Price, err = UnmarshalCurrencyAmount(h.Price)
+	s.Price, err = types.UnmarshalCurrencyAmount(h.Price)
 	if err != nil {
 		return err
 	}
@@ -89,11 +89,11 @@ func (s *AMMAuctionSlot) UnmarshalJSON(data []byte) error {
 }
 
 type AMMAuthAccount struct {
-	Account Address
+	Account types.Address
 }
 
 type AMMVoteEntry struct {
-	Account     Address
+	Account     types.Address
 	TradingFee  uint
 	VoteWeither uint
 }

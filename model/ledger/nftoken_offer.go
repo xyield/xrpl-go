@@ -3,20 +3,20 @@ package ledger
 import (
 	"encoding/json"
 
-	. "github.com/xyield/xrpl-go/model/transactions/types"
+	"github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 type NFTokenOffer struct {
-	Amount            CurrencyAmount
-	Destination       Address `json:",omitempty"`
-	Expiration        uint    `json:",omitempty"`
+	Amount            types.CurrencyAmount
+	Destination       types.Address `json:",omitempty"`
+	Expiration        uint          `json:",omitempty"`
 	Flags             uint
 	LedgerEntryType   LedgerEntryType
-	NFTokenID         Hash256
+	NFTokenID         types.Hash256
 	NFTokenOfferNode  string `json:",omitempty"`
-	Owner             Address
+	Owner             types.Address
 	OwnerNode         string `json:",omitempty"`
-	PreviousTxnID     Hash256
+	PreviousTxnID     types.Hash256
 	PreviousTxnLgrSeq uint
 }
 
@@ -28,15 +28,15 @@ func (*NFTokenOffer) EntryType() LedgerEntryType {
 func (n *NFTokenOffer) UnmarshalJSON(data []byte) error {
 	type nftHelper struct {
 		Amount            json.RawMessage
-		Destination       Address
+		Destination       types.Address
 		Expiration        uint
 		Flags             uint
 		LedgerEntryType   LedgerEntryType
-		NFTokenID         Hash256
+		NFTokenID         types.Hash256
 		NFTokenOfferNode  string
-		Owner             Address
+		Owner             types.Address
 		OwnerNode         string
-		PreviousTxnID     Hash256
+		PreviousTxnID     types.Hash256
 		PreviousTxnLgrSeq uint
 	}
 	var h nftHelper
@@ -55,7 +55,7 @@ func (n *NFTokenOffer) UnmarshalJSON(data []byte) error {
 		PreviousTxnID:     h.PreviousTxnID,
 		PreviousTxnLgrSeq: h.PreviousTxnLgrSeq,
 	}
-	amnt, err := UnmarshalCurrencyAmount(h.Amount)
+	amnt, err := types.UnmarshalCurrencyAmount(h.Amount)
 	if err != nil {
 		return err
 	}

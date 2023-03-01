@@ -1,13 +1,13 @@
 package transactions
 
 import (
-	. "github.com/xyield/xrpl-go/model/transactions/types"
+	"github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 type EscrowCreate struct {
 	BaseTx
-	Amount         XRPCurrencyAmount
-	Destination    Address
+	Amount         types.XRPCurrencyAmount
+	Destination    types.Address
 	CancelAfter    uint   `json:",omitempty"`
 	FinishAfter    uint   `json:",omitempty"`
 	Condition      []byte `json:",omitempty"`

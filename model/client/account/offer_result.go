@@ -3,18 +3,18 @@ package account
 import (
 	"encoding/json"
 
-	. "github.com/xyield/xrpl-go/model/transactions/types"
+	"github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 type OfferResultFlags uint
 
 type OfferResult struct {
-	Flags      OfferResultFlags `json:"flags"`
-	Sequence   uint             `json:"seq"`
-	TakerGets  CurrencyAmount   `json:"taker_gets"`
-	TakerPays  CurrencyAmount   `json:"taker_pays"`
-	Quality    string           `json:"quality"`
-	Expiration uint             `json:"expiration,omitempty"`
+	Flags      OfferResultFlags     `json:"flags"`
+	Sequence   uint                 `json:"seq"`
+	TakerGets  types.CurrencyAmount `json:"taker_gets"`
+	TakerPays  types.CurrencyAmount `json:"taker_pays"`
+	Quality    string               `json:"quality"`
+	Expiration uint                 `json:"expiration,omitempty"`
 }
 
 func (r *OfferResult) UnmarshalJSON(data []byte) error {
@@ -37,13 +37,13 @@ func (r *OfferResult) UnmarshalJSON(data []byte) error {
 		Expiration: h.Expiration,
 	}
 
-	var gets, pays CurrencyAmount
+	var gets, pays types.CurrencyAmount
 	var err error
-	gets, err = UnmarshalCurrencyAmount(h.TakerGets)
+	gets, err = types.UnmarshalCurrencyAmount(h.TakerGets)
 	if err != nil {
 		return err
 	}
-	pays, err = UnmarshalCurrencyAmount(h.TakerPays)
+	pays, err = types.UnmarshalCurrencyAmount(h.TakerPays)
 	if err != nil {
 		return err
 	}

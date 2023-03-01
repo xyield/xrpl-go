@@ -1,13 +1,13 @@
 package transactions
 
 import (
-	. "github.com/xyield/xrpl-go/model/transactions/types"
+	"github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 type NFTokenBurn struct {
 	BaseTx
-	NFTokenID NFTokenID
-	Owner     Address `json:",omitempty"`
+	NFTokenID types.NFTokenID
+	Owner     types.Address `json:",omitempty"`
 }
 
 func (*NFTokenBurn) TxType() TxType {

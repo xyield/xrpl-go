@@ -7,7 +7,7 @@ const (
 )
 
 type SignerList struct {
-	LedgerEntryType   string
+	LedgerEntryType   LedgerEntryType
 	Flags             SignerListFlags
 	PreviousTxnID     string
 	PreviousTxnLgrSeq uint64

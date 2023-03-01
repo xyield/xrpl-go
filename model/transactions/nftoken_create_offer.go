@@ -3,16 +3,16 @@ package transactions
 import (
 	"encoding/json"
 
-	. "github.com/xyield/xrpl-go/model/transactions/types"
+	"github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 type NFTokenCreateOffer struct {
 	BaseTx
-	Owner       Address `json:",omitempty"`
-	NFTokenID   NFTokenID
-	Amount      CurrencyAmount
-	Expiration  uint    `json:",omitempty"`
-	Destination Address `json:",omitempty"`
+	Owner       types.Address `json:",omitempty"`
+	NFTokenID   types.NFTokenID
+	Amount      types.CurrencyAmount
+	Expiration  uint          `json:",omitempty"`
+	Destination types.Address `json:",omitempty"`
 }
 
 func (*NFTokenCreateOffer) TxType() TxType {
@@ -22,11 +22,11 @@ func (*NFTokenCreateOffer) TxType() TxType {
 func (n *NFTokenCreateOffer) UnmarshalJSON(data []byte) error {
 	type ncoHelper struct {
 		BaseTx
-		Owner       Address `json:",omitempty"`
-		NFTokenID   NFTokenID
+		Owner       types.Address `json:",omitempty"`
+		NFTokenID   types.NFTokenID
 		Amount      json.RawMessage
-		Expiration  uint    `json:",omitempty"`
-		Destination Address `json:",omitempty"`
+		Expiration  uint          `json:",omitempty"`
+		Destination types.Address `json:",omitempty"`
 	}
 	var h ncoHelper
 	if err := json.Unmarshal(data, &h); err != nil {
@@ -40,7 +40,7 @@ func (n *NFTokenCreateOffer) UnmarshalJSON(data []byte) error {
 		Destination: h.Destination,
 	}
 
-	amount, err := UnmarshalCurrencyAmount(h.Amount)
+	amount, err := types.UnmarshalCurrencyAmount(h.Amount)
 	if err != nil {
 		return err
 	}

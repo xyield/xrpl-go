@@ -3,15 +3,15 @@ package transactions
 import (
 	"encoding/json"
 
-	. "github.com/xyield/xrpl-go/model/transactions/types"
+	"github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 type OfferCreate struct {
 	BaseTx
 	Expiration    uint `json:",omitempty"`
 	OfferSequence uint `json:",omitempty"`
-	TakerGets     CurrencyAmount
-	TakerPays     CurrencyAmount
+	TakerGets     types.CurrencyAmount
+	TakerPays     types.CurrencyAmount
 }
 
 func (*OfferCreate) TxType() TxType {
@@ -36,13 +36,13 @@ func (o *OfferCreate) UnmarshalJSON(data []byte) error {
 		OfferSequence: h.OfferSequence,
 	}
 
-	var gets, pays CurrencyAmount
+	var gets, pays types.CurrencyAmount
 	var err error
-	gets, err = UnmarshalCurrencyAmount(h.TakerGets)
+	gets, err = types.UnmarshalCurrencyAmount(h.TakerGets)
 	if err != nil {
 		return err
 	}
-	pays, err = UnmarshalCurrencyAmount(h.TakerPays)
+	pays, err = types.UnmarshalCurrencyAmount(h.TakerPays)
 	if err != nil {
 		return err
 	}

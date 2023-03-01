@@ -1,13 +1,13 @@
 package ledger
 
-import . "github.com/xyield/xrpl-go/model/transactions/types"
+import "github.com/xyield/xrpl-go/model/transactions/types"
 
 type Ticket struct {
-	Account           Address
+	Account           types.Address
 	Flags             uint
 	LedgerEntryType   LedgerEntryType
 	OwnerNode         string
-	PreviousTxnID     Hash256
+	PreviousTxnID     types.Hash256
 	PreviousTxnLgrSeq uint
 	TicketSequence    uint
 }

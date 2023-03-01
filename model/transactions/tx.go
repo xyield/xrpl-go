@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	. "github.com/xyield/xrpl-go/model/transactions/types"
+	"github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 type Tx interface {
@@ -12,16 +12,16 @@ type Tx interface {
 }
 
 type BaseTx struct {
-	Account            Address
+	Account            types.Address
 	TransactionType    TxType
-	Fee                XRPCurrencyAmount
+	Fee                types.XRPCurrencyAmount
 	Sequence           uint
-	AccountTxnID       Hash256  `json:",omitempty"`
-	Flags              uint     `json:",omitempty"`
-	LastLedgerSequence uint     `json:",omitempty"`
-	Memos              []Memo   `json:",omitempty"`
-	Signers            []Signer `json:",omitempty"`
-	SourceTag          uint     `json:",omitempty"`
+	AccountTxnID       types.Hash256 `json:",omitempty"`
+	Flags              uint          `json:",omitempty"`
+	LastLedgerSequence uint          `json:",omitempty"`
+	Memos              []Memo        `json:",omitempty"`
+	Signers            []Signer      `json:",omitempty"`
+	SourceTag          uint          `json:",omitempty"`
 	SigningPubKey      string
 	TicketSequence     uint `json:",omitempty"`
 	TxnSignature       string
@@ -73,7 +73,7 @@ func (*AMMWithdraw) TxType() TxType {
 }
 
 func UnmarshalTx(data json.RawMessage) (Tx, error) {
-	if data == nil || len(data) == 0 {
+	if len(data) == 0 {
 		return nil, nil
 	}
 	// TODO AMM endpoint support
@@ -81,7 +81,9 @@ func UnmarshalTx(data json.RawMessage) (Tx, error) {
 		TransactionType TxType
 	}
 	var txType txTypeParser
-	json.Unmarshal(data, &txType)
+	if err := json.Unmarshal(data, &txType); err != nil {
+		return nil, err
+	}
 	var tx Tx
 	switch txType.TransactionType {
 	case AccountSetTx:

@@ -17,7 +17,7 @@ type CurrencyAmount interface {
 }
 
 func UnmarshalCurrencyAmount(data []byte) (CurrencyAmount, error) {
-	if data == nil || len(data) == 0 {
+	if len(data) == 0 {
 		return nil, nil
 	}
 	switch data[0] {
@@ -59,7 +59,9 @@ func (a XRPCurrencyAmount) MarshalJSON() ([]byte, error) {
 
 func (a *XRPCurrencyAmount) UnmarshalJSON(data []byte) error {
 	var s string
-	json.Unmarshal(data, &s)
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
 	v, err := strconv.ParseUint(s, 10, 64)
 	if err != nil {
 		return err

@@ -3,29 +3,29 @@ package ledger
 import (
 	"encoding/json"
 
-	. "github.com/xyield/xrpl-go/model/transactions/types"
+	"github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 type OfferFlags uint
 
 const (
 	PassiveOffer OfferFlags = 0x00010000
-	SellOffer               = 0x00020000
+	SellOffer    OfferFlags = 0x00020000
 )
 
 type Offer struct {
-	Account           Address
-	BookDirectory     Hash256
+	Account           types.Address
+	BookDirectory     types.Hash256
 	BookNode          string
 	Expiration        uint `json:",omitempty"`
 	Flags             OfferFlags
 	LedgerEntryType   LedgerEntryType
 	OwnerNode         string
-	PreviousTxnID     Hash256
+	PreviousTxnID     types.Hash256
 	PreviousTxnLgrSeq uint
 	Sequence          uint
-	TakerPays         CurrencyAmount
-	TakerGets         CurrencyAmount
+	TakerPays         types.CurrencyAmount
+	TakerGets         types.CurrencyAmount
 }
 
 func (*Offer) EntryType() LedgerEntryType {
@@ -34,14 +34,14 @@ func (*Offer) EntryType() LedgerEntryType {
 
 func (o *Offer) UnmarshalJSON(data []byte) error {
 	type offerHelper struct {
-		Account           Address
-		BookDirectory     Hash256
+		Account           types.Address
+		BookDirectory     types.Hash256
 		BookNode          string
 		Expiration        uint
 		Flags             OfferFlags
 		LedgerEntryType   LedgerEntryType
 		OwnerNode         string
-		PreviousTxnID     Hash256
+		PreviousTxnID     types.Hash256
 		PreviousTxnLgrSeq uint
 		Sequence          uint
 		TakerPays         json.RawMessage
@@ -63,11 +63,11 @@ func (o *Offer) UnmarshalJSON(data []byte) error {
 		PreviousTxnLgrSeq: h.PreviousTxnLgrSeq,
 		Sequence:          h.Sequence,
 	}
-	pays, err := UnmarshalCurrencyAmount(h.TakerPays)
+	pays, err := types.UnmarshalCurrencyAmount(h.TakerPays)
 	if err != nil {
 		return err
 	}
-	gets, err := UnmarshalCurrencyAmount(h.TakerGets)
+	gets, err := types.UnmarshalCurrencyAmount(h.TakerGets)
 	if err != nil {
 		return err
 	}

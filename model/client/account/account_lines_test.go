@@ -3,7 +3,7 @@ package account
 import (
 	"testing"
 
-	. "github.com/xyield/xrpl-go/model/client/common"
+	"github.com/xyield/xrpl-go/model/client/common"
 	"github.com/xyield/xrpl-go/test"
 )
 
@@ -12,7 +12,7 @@ func TestAccountLinesRequest(t *testing.T) {
 		Account:     "rLHmBn4fT92w4F6ViyYbjoizLTo83tHTHu",
 		Peer:        "rnZvsWuLem5Ha46AZs61jLWR9R5esinkG3",
 		LedgerHash:  "1EDBBA3C793863366DF5B31C2174B6B5E6DF6DB89A7212B86838489148E2A581",
-		LedgerIndex: LedgerIndex(256),
+		LedgerIndex: common.LedgerIndex(256),
 		Limit:       10,
 		Marker:      map[string]interface{}{"abc": "def"},
 	}

@@ -1,11 +1,11 @@
 package transactions
 
 import (
-	. "github.com/xyield/xrpl-go/model/transactions/types"
+	"github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 type Signer struct {
-	Account       Address
+	Account       types.Address
 	TxnSignature  []byte
 	SigningPubKey []byte
 }

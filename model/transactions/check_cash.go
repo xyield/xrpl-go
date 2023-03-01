@@ -3,14 +3,14 @@ package transactions
 import (
 	"encoding/json"
 
-	. "github.com/xyield/xrpl-go/model/transactions/types"
+	"github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 type CheckCash struct {
 	BaseTx
-	CheckID    Hash256
-	Amount     CurrencyAmount `json:",omitempty"`
-	DeliverMin CurrencyAmount `json:",omitempty"`
+	CheckID    types.Hash256
+	Amount     types.CurrencyAmount `json:",omitempty"`
+	DeliverMin types.CurrencyAmount `json:",omitempty"`
 }
 
 func (*CheckCash) TxType() TxType {
@@ -20,7 +20,7 @@ func (*CheckCash) TxType() TxType {
 func (tx *CheckCash) UnmarshalJSON(data []byte) error {
 	type ccHelper struct {
 		BaseTx
-		CheckID    Hash256
+		CheckID    types.Hash256
 		Amount     json.RawMessage `json:",omitempty"`
 		DeliverMin json.RawMessage `json:",omitempty"`
 	}
@@ -33,13 +33,13 @@ func (tx *CheckCash) UnmarshalJSON(data []byte) error {
 		CheckID: h.CheckID,
 	}
 
-	var amount, min CurrencyAmount
+	var amount, min types.CurrencyAmount
 	var err error
-	amount, err = UnmarshalCurrencyAmount(h.Amount)
+	amount, err = types.UnmarshalCurrencyAmount(h.Amount)
 	if err != nil {
 		return err
 	}
-	min, err = UnmarshalCurrencyAmount(h.DeliverMin)
+	min, err = types.UnmarshalCurrencyAmount(h.DeliverMin)
 	if err != nil {
 		return err
 	}
