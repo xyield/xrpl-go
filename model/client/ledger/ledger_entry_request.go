@@ -37,53 +37,53 @@ type DirectoryEntryReq struct {
 	Owner    string `json:"owner,omitempty"`
 }
 
-func (DirectoryEntryReq) LedgerEntryRequestField() {}
+func (*DirectoryEntryReq) LedgerEntryRequestField() {}
 
 type OfferEntryReq struct {
 	Account types.Address `json:"account"`
 	Seq     uint          `json:"seq"`
 }
 
-func (OfferEntryReq) LedgerEntryRequestField() {}
+func (*OfferEntryReq) LedgerEntryRequestField() {}
 
 type RippleStateEntryReq struct {
 	Accounts []types.Address `json:"accounts"`
 	Currency string          `json:"currency"`
 }
 
-func (RippleStateEntryReq) LedgerEntryRequestField() {}
+func (*RippleStateEntryReq) LedgerEntryRequestField() {}
 
 type EscrowEntryReq struct {
 	Owner types.Address `json:"owner"`
 	Seq   uint          `json:"seq"`
 }
 
-func (EscrowEntryReq) LedgerEntryRequestField() {}
+func (*EscrowEntryReq) LedgerEntryRequestField() {}
 
 type DepositPreauthEntryReq struct {
 	Owner      types.Address `json:"owner"`
 	Authorized types.Address `json:"authorized"`
 }
 
-func (DepositPreauthEntryReq) LedgerEntryRequestField() {}
+func (*DepositPreauthEntryReq) LedgerEntryRequestField() {}
 
 type TicketEntryReq struct {
 	Account   types.Address `json:"account"`
 	TicketSeq int           `json:"ticket_seq"`
 }
 
-func (TicketEntryReq) LedgerEntryRequestField() {}
+func (*TicketEntryReq) LedgerEntryRequestField() {}
 
 func parseEntryRequestField(data []byte, target EntryRequestOrString) (EntryRequestOrString, error) {
 	if data == nil || len(data) == 0 {
-		return EntryString(""), nil
+		return nil, nil
 	}
 	if data[0] == '"' {
 		var s EntryString
 		err := json.Unmarshal(data, &s)
 		return s, err
 	}
-	err := json.Unmarshal(data, &target)
+	err := json.Unmarshal(data, target)
 	return target, err
 }
 
@@ -120,27 +120,27 @@ func (r *LedgerEntryRequest) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
-	r.Directory, err = parseEntryRequestField(h.Directory, DirectoryEntryReq{})
+	r.Directory, err = parseEntryRequestField(h.Directory, &DirectoryEntryReq{})
 	if err != nil {
 		return err
 	}
-	r.Offer, err = parseEntryRequestField(h.Offer, OfferEntryReq{})
+	r.Offer, err = parseEntryRequestField(h.Offer, &OfferEntryReq{})
 	if err != nil {
 		return err
 	}
-	r.RippleState, err = parseEntryRequestField(h.RippleState, RippleStateEntryReq{})
+	r.RippleState, err = parseEntryRequestField(h.RippleState, &RippleStateEntryReq{})
 	if err != nil {
 		return err
 	}
-	r.Escrow, err = parseEntryRequestField(h.Escrow, EscrowEntryReq{})
+	r.Escrow, err = parseEntryRequestField(h.Escrow, &EscrowEntryReq{})
 	if err != nil {
 		return err
 	}
-	r.DepositPreauth, err = parseEntryRequestField(h.DepositPreauth, DepositPreauthEntryReq{})
+	r.DepositPreauth, err = parseEntryRequestField(h.DepositPreauth, &DepositPreauthEntryReq{})
 	if err != nil {
 		return err
 	}
-	r.Ticket, err = parseEntryRequestField(h.Ticket, TicketEntryReq{})
+	r.Ticket, err = parseEntryRequestField(h.Ticket, &TicketEntryReq{})
 
 	return err
 }
