@@ -41,7 +41,6 @@ func TestAccountInfoResponse(t *testing.T) {
 			PreviousTxnID:     "4294BEBE5B569A18C0A2702387C9B1E7146DC3A5850C1E87204951C6FDAA4C42",
 			PreviousTxnLgrSeq: 3,
 			Sequence:          6,
-			Index:             "92FA6A9FC8EA6018D5D16532D7795C91BFB0831355BDFDA177E86C8BF997985F",
 		},
 		LedgerCurrentIndex: 4,
 		QueueData: QueueData{
@@ -79,8 +78,7 @@ func TestAccountInfoResponse(t *testing.T) {
 		"OwnerCount": 0,
 		"PreviousTxnID": "4294BEBE5B569A18C0A2702387C9B1E7146DC3A5850C1E87204951C6FDAA4C42",
 		"PreviousTxnLgrSeq": 3,
-		"Sequence": 6,
-		"index": "92FA6A9FC8EA6018D5D16532D7795C91BFB0831355BDFDA177E86C8BF997985F"
+		"Sequence": 6
 	},
 	"ledger_current_index": 4,
 	"queue_data": {
