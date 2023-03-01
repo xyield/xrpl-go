@@ -11,6 +11,12 @@ type Tx interface {
 	TxType() TxType
 }
 
+type TxHash string
+
+func (*TxHash) TxType() TxType {
+	return HashedTx
+}
+
 type BaseTx struct {
 	Account            types.Address
 	TransactionType    TxType
@@ -75,6 +81,16 @@ func (*AMMWithdraw) TxType() TxType {
 func UnmarshalTx(data json.RawMessage) (Tx, error) {
 	if len(data) == 0 {
 		return nil, nil
+	}
+	if data[0] == '"' {
+		var ret TxHash
+		if err := json.Unmarshal(data, &ret); err != nil {
+			return nil, err
+		}
+		return &ret, nil
+	} else if data[0] != '{' {
+		// TODO error verbosity/record failed json
+		return nil, fmt.Errorf("Unexpected tx format; Must be tx object or hash string")
 	}
 	// TODO AMM endpoint support
 	type txTypeParser struct {

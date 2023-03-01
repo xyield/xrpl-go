@@ -32,4 +32,5 @@ const (
 	SignerListSetTx        TxType = "SignerListSet"
 	TrustSetTx             TxType = "TrustSet"
 	TicketCreateTx         TxType = "TicketCreate"
+	HashedTx               TxType = "HASH" // TX stored as a string, rather than complete tx obj
 )

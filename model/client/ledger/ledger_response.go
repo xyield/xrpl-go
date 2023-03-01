@@ -3,15 +3,18 @@ package ledger
 import (
 	"encoding/json"
 
+	"github.com/xyield/xrpl-go/model/client/common"
 	"github.com/xyield/xrpl-go/model/ledger"
 	"github.com/xyield/xrpl-go/model/transactions"
 	"github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 type LedgerResponse struct {
-	Ledger    LedgerHeader      `json:"ledger"`
-	Validated bool              `json:"validated,omitempty"`
-	QueueData []LedgerQueueData `json:"queue_data,omitempty"`
+	Ledger      LedgerHeader       `json:"ledger"`
+	LedgerHash  string             `json:"ledger_hash"`
+	LedgerIndex common.LedgerIndex `json:"ledger_index"`
+	Validated   bool               `json:"validated,omitempty"`
+	QueueData   []LedgerQueueData  `json:"queue_data,omitempty"`
 }
 
 type LedgerHeader struct {
