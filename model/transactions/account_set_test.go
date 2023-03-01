@@ -33,7 +33,7 @@ func TestAccountSetTransaction(t *testing.T) {
 	"SetFlag": 10
 }`
 
-	if err := test.SerializeAndDeserialize(s, j); err != nil {
+	if err := test.SerializeAndDeserialize(t, s, j); err != nil {
 		t.Error(err)
 	}
 

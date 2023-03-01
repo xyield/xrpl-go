@@ -6,7 +6,7 @@ import (
 
 type NFTokenCancelOffer struct {
 	BaseTx
-	NFTokenOffer []types.Hash256
+	NFTokenOffers []types.Hash256
 }
 
 func (*NFTokenCancelOffer) TxType() TxType {

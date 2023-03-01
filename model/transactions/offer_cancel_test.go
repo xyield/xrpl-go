@@ -28,7 +28,7 @@ func TestOfferCancelTx(t *testing.T) {
 	"LastLedgerSequence": 7108629,
 	"OfferSequence": 6
 }`
-	if err := test.SerializeAndDeserialize(s, j); err != nil {
+	if err := test.SerializeAndDeserialize(t, s, j); err != nil {
 		t.Error(err)
 	}
 

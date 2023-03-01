@@ -36,10 +36,10 @@ func (TxBinMeta) TxMeta() {}
 
 type TxObjMeta struct {
 	AffectedNodes          []AffectedNode       `json:"AffectedNodes"`
-	PartialDeliveredAmount types.CurrencyAmount `json:"DeliveredAmount"`
+	PartialDeliveredAmount types.CurrencyAmount `json:"DeliveredAmount,omitempty"`
 	TransactionIndex       uint64               `json:"TransactionIndex"`
 	TransactionResult      string               `json:"TransactionResult"`
-	DeliveredAmount        types.CurrencyAmount `json:"delivered_amount"`
+	DeliveredAmount        types.CurrencyAmount `json:"delivered_amount,omitempty"`
 }
 
 func (m *TxObjMeta) UnmarshalJSON(data []byte) error {
@@ -148,7 +148,7 @@ func (n *ModifiedNode) UnmarshalJSON(data []byte) error {
 	}
 	// Get entry type before possible nullification
 	et := prev.EntryType()
-	if fin, err = ledger.EmptyLedgerObject(h.LedgerEntryType); err != nil {
+	if fin, err = ledger.EmptyLedgerObject(string(h.LedgerEntryType)); err != nil {
 		return fmt.Errorf("Unmarshal ModifiedNode: %w", err)
 	}
 	if h.PreviousFields != nil && len(h.PreviousFields) > 0 {

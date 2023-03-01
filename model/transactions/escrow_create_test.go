@@ -36,7 +36,7 @@ func TestEscrowCreateTransaction(t *testing.T) {
 	"CancelAfter": 9000000
 }`
 
-	if err := test.SerializeAndDeserialize(s, j); err != nil {
+	if err := test.SerializeAndDeserialize(t, s, j); err != nil {
 		t.Error(err)
 	}
 

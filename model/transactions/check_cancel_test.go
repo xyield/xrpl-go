@@ -31,7 +31,7 @@ func TestCheckCancelTransaction(t *testing.T) {
 	"CheckID": "A1B2C3D4A6D1"
 }`
 
-	if err := test.SerializeAndDeserialize(s, j); err != nil {
+	if err := test.SerializeAndDeserialize(t, s, j); err != nil {
 		t.Error(err)
 	}
 

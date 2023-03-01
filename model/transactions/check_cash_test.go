@@ -51,7 +51,7 @@ func TestCheckCashTransaction(t *testing.T) {
 	}
 }`
 
-	if err := test.SerializeAndDeserialize(s, j); err != nil {
+	if err := test.SerializeAndDeserialize(t, s, j); err != nil {
 		t.Error(err)
 	}
 

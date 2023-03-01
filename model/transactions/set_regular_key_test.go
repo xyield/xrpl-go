@@ -25,7 +25,7 @@ func TestSetRegularKeyTx(t *testing.T) {
 	"Fee": "10",
 	"RegularKey": "def"
 }`
-	if err := test.SerializeAndDeserialize(s, j); err != nil {
+	if err := test.SerializeAndDeserialize(t, s, j); err != nil {
 		t.Error(err)
 	}
 
