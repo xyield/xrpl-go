@@ -8,7 +8,7 @@ import (
 )
 
 type LedgerRequest struct {
-	LedgerHash   LedgerHash      `json:"ledger_hash,omitemtpy"`
+	LedgerHash   LedgerHash      `json:"ledger_hash,omitempty"`
 	LedgerIndex  LedgerSpecifier `json:"ledger_index,omitempty"`
 	Full         bool            `json:"full,omitempty"`
 	Accounts     bool            `json:"accounts,omitempty"`
@@ -25,7 +25,7 @@ func (*LedgerRequest) Method() string {
 
 func (r *LedgerRequest) UnmarshalJSON(data []byte) error {
 	type lrHelper struct {
-		LedgerHash   LedgerHash      `json:"ledger_hash,omitemtpy"`
+		LedgerHash   LedgerHash      `json:"ledger_hash,omitempty"`
 		LedgerIndex  json.RawMessage `json:"ledger_index,omitempty"`
 		Full         bool            `json:"full,omitempty"`
 		Accounts     bool            `json:"accounts,omitempty"`

@@ -75,7 +75,7 @@ type TicketEntryReq struct {
 func (*TicketEntryReq) LedgerEntryRequestField() {}
 
 func parseEntryRequestField(data []byte, target EntryRequestOrString) (EntryRequestOrString, error) {
-	if data == nil || len(data) == 0 {
+	if len(data) == 0 {
 		return nil, nil
 	}
 	if data[0] == '"' {
