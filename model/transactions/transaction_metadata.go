@@ -26,7 +26,7 @@ func UnmarshalTxMeta(data []byte) (TxMeta, error) {
 		err := json.Unmarshal(data, &o)
 		return o, err
 	default:
-		return nil, fmt.Errorf("Unrecognized TxMeta format")
+		return nil, fmt.Errorf("unrecognized TxMeta format")
 	}
 }
 

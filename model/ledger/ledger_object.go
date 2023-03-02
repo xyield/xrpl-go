@@ -65,7 +65,7 @@ func EmptyLedgerObject(t string) (LedgerObject, error) {
 	case TicketEntry:
 		return &Ticket{}, nil
 	}
-	return nil, fmt.Errorf("Unrecognized LedgerObject type \"%s\"", t)
+	return nil, fmt.Errorf("unrecognized LedgerObject type \"%s\"", t)
 }
 
 func UnmarshalLedgerObject(data []byte) (LedgerObject, error) {
@@ -114,7 +114,7 @@ func UnmarshalLedgerObject(data []byte) (LedgerObject, error) {
 	case TicketEntry:
 		o = &Ticket{}
 	default:
-		return nil, fmt.Errorf("Unsupported ledger object of type %s", h.LedgerEntryType)
+		return nil, fmt.Errorf("unsupported ledger object of type %s", h.LedgerEntryType)
 	}
 	if err := json.Unmarshal(data, o); err != nil {
 		return nil, err

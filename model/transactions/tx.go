@@ -135,7 +135,7 @@ func UnmarshalTx(data json.RawMessage) (Tx, error) {
 	case TicketCreateTx:
 		tx = &TicketCreate{}
 	default:
-		return nil, fmt.Errorf("Unsupported transaction type %s", txType.TransactionType)
+		return nil, fmt.Errorf("unsupported transaction type %s", txType.TransactionType)
 	}
 	if err := json.Unmarshal(data, tx); err != nil {
 		return nil, err
