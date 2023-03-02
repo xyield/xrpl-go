@@ -90,7 +90,7 @@ func UnmarshalTx(data json.RawMessage) (Tx, error) {
 		return &ret, nil
 	} else if data[0] != '{' {
 		// TODO error verbosity/record failed json
-		return nil, fmt.Errorf("Unexpected tx format; Must be tx object or hash string")
+		return nil, fmt.Errorf("unexpected tx format; must be tx object or hash string")
 	}
 	// TODO AMM endpoint support
 	type txTypeParser struct {

@@ -3,20 +3,20 @@ package ledger
 import (
 	"encoding/json"
 
-	. "github.com/xyield/xrpl-go/model/client/common"
-	. "github.com/xyield/xrpl-go/model/ledger"
+	"github.com/xyield/xrpl-go/model/client/common"
+	"github.com/xyield/xrpl-go/model/ledger"
 )
 
 type LedgerRequest struct {
-	LedgerHash   LedgerHash      `json:"ledger_hash,omitempty"`
-	LedgerIndex  LedgerSpecifier `json:"ledger_index,omitempty"`
-	Full         bool            `json:"full,omitempty"`
-	Accounts     bool            `json:"accounts,omitempty"`
-	Transactions bool            `json:"transactions,omitempty"`
-	OwnerFunds   bool            `json:"owner_funds,omitempty"`
-	Binary       bool            `json:"binary,omitempty"`
-	Queue        bool            `json:"queue,omitempty"`
-	Type         LedgerEntryType `json:"type,omitempty"`
+	LedgerHash   common.LedgerHash      `json:"ledger_hash,omitempty"`
+	LedgerIndex  common.LedgerSpecifier `json:"ledger_index,omitempty"`
+	Full         bool                   `json:"full,omitempty"`
+	Accounts     bool                   `json:"accounts,omitempty"`
+	Transactions bool                   `json:"transactions,omitempty"`
+	OwnerFunds   bool                   `json:"owner_funds,omitempty"`
+	Binary       bool                   `json:"binary,omitempty"`
+	Queue        bool                   `json:"queue,omitempty"`
+	Type         ledger.LedgerEntryType `json:"type,omitempty"`
 }
 
 func (*LedgerRequest) Method() string {
@@ -25,15 +25,15 @@ func (*LedgerRequest) Method() string {
 
 func (r *LedgerRequest) UnmarshalJSON(data []byte) error {
 	type lrHelper struct {
-		LedgerHash   LedgerHash      `json:"ledger_hash,omitempty"`
-		LedgerIndex  json.RawMessage `json:"ledger_index,omitempty"`
-		Full         bool            `json:"full,omitempty"`
-		Accounts     bool            `json:"accounts,omitempty"`
-		Transactions bool            `json:"transactions,omitempty"`
-		OwnerFunds   bool            `json:"owner_funds,omitempty"`
-		Binary       bool            `json:"binary,omitempty"`
-		Queue        bool            `json:"queue,omitempty"`
-		Type         LedgerEntryType `json:"type,omitempty"`
+		LedgerHash   common.LedgerHash      `json:"ledger_hash,omitempty"`
+		LedgerIndex  json.RawMessage        `json:"ledger_index,omitempty"`
+		Full         bool                   `json:"full,omitempty"`
+		Accounts     bool                   `json:"accounts,omitempty"`
+		Transactions bool                   `json:"transactions,omitempty"`
+		OwnerFunds   bool                   `json:"owner_funds,omitempty"`
+		Binary       bool                   `json:"binary,omitempty"`
+		Queue        bool                   `json:"queue,omitempty"`
+		Type         ledger.LedgerEntryType `json:"type,omitempty"`
 	}
 	var h lrHelper
 	if err := json.Unmarshal(data, &h); err != nil {
@@ -50,7 +50,7 @@ func (r *LedgerRequest) UnmarshalJSON(data []byte) error {
 		Type:         h.Type,
 	}
 
-	i, err := UnmarshalLedgerSpecifier(h.LedgerIndex)
+	i, err := common.UnmarshalLedgerSpecifier(h.LedgerIndex)
 	if err != nil {
 		return err
 	}
