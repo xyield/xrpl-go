@@ -37,9 +37,9 @@ func UnmarshalCurrencyAmount(data []byte) (CurrencyAmount, error) {
 }
 
 type IssuedCurrencyAmount struct {
-	Issuer   Address `json:"issuer"`
-	Currency string  `json:"currency"`
-	Value    string  `json:"value"`
+	Issuer   Address `json:"issuer,omitempty"`
+	Currency string  `json:"currency,omitempty"`
+	Value    string  `json:"value,omitempty"`
 }
 
 func (IssuedCurrencyAmount) Kind() CurrencyKind {
