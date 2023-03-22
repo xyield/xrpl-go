@@ -17,27 +17,31 @@ type BookOffersResponse struct {
 
 type BookOffer struct {
 	ledger.Offer
-	OwnerFunds      string               `json:"offer_funds"`
+	OwnerFunds      string               `json:"owner_funds,omitempty"`
 	TakerGetsFunded types.CurrencyAmount `json:"taker_gets_funded,omitempty"`
 	TakerPaysFunded types.CurrencyAmount `json:"taker_pays_funded,omitempty"`
-	Quality         string               `json:"quality"`
+	Quality         string               `json:"quality,omitempty"`
 }
 
 func (o *BookOffer) UnmarshalJSON(data []byte) error {
 	type boHelper struct {
-		ledger.Offer
-		OwnerFunds      string          `json:"offer_funds"`
+		OwnerFunds      string          `json:"offer_funds,omitempty"`
 		TakerGetsFunded json.RawMessage `json:"taker_gets_funded,omitempty"`
 		TakerPaysFunded json.RawMessage `json:"taker_pays_funded,omitempty"`
-		Quality         string          `json:"quality"`
+		Quality         string          `json:"quality,omitempty"`
 	}
 	var h boHelper
 	err := json.Unmarshal(data, &h)
 	if err != nil {
 		return err
 	}
+	var offer ledger.Offer
+	err = json.Unmarshal(data, &offer)
+	if err != nil {
+		return err
+	}
 	*o = BookOffer{
-		Offer:      h.Offer,
+		Offer:      offer,
 		OwnerFunds: h.OwnerFunds,
 		Quality:    h.Quality,
 	}
