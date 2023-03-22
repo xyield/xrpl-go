@@ -32,6 +32,12 @@ func (r *NFTokenBuyOffersRequest) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
+	*r = NFTokenBuyOffersRequest{
+		NFTokenID:  h.NFTokenID,
+		LedgerHash: h.LedgerHash,
+		Limit:      h.Limit,
+		Marker:     h.Marker,
+	}
 	var i common.LedgerSpecifier
 	i, err = common.UnmarshalLedgerSpecifier(h.LedgerIndex)
 	if err != nil {
