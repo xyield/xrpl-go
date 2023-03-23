@@ -51,7 +51,7 @@ func (r *PathFindResponse) UnmarshalJSON(data []byte) error {
 
 type PathAlternative struct {
 	PathsComputed     [][]transactions.PathStep `json:"paths_computed"`
-	SourceAmount      types.CurrencyAmount      `json:"source_amout"`
+	SourceAmount      types.CurrencyAmount      `json:"source_amount"`
 	DestinationAmount types.CurrencyAmount      `json:"destination_amount,omitempty"`
 }
 

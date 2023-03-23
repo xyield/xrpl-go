@@ -7,8 +7,16 @@ import (
 	"github.com/xyield/xrpl-go/model/transactions/types"
 )
 
+type PathSubCommand string
+
+const (
+	CREATE PathSubCommand = "create"
+	CLOSE  PathSubCommand = "close"
+	STATUS PathSubCommand = "status"
+)
+
 type PathFindRequest struct {
-	Subcommand         string                  `json:"subcommand"`
+	Subcommand         PathSubCommand          `json:"subcommand"`
 	SourceAccount      types.Address           `json:"source_account,omitempty"`
 	DestinationAccount types.Address           `json:"destination_account,omitempty"`
 	DestinationAmount  types.CurrencyAmount    `json:"destination_amount,omitempty"`
@@ -22,7 +30,7 @@ func (*PathFindRequest) Method() string {
 
 func (r *PathFindRequest) UnmarshalJSON(data []byte) error {
 	type pfrHelper struct {
-		Subcommand         string                  `json:"subcommand"`
+		Subcommand         PathSubCommand          `json:"subcommand"`
 		SourceAccount      types.Address           `json:"source_account,omitempty"`
 		DestinationAccount types.Address           `json:"destination_account,omitempty"`
 		DestinationAmount  json.RawMessage         `json:"destination_amount,omitempty"`
