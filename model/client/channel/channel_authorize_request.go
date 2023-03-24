@@ -27,8 +27,7 @@ func (c *ChannelAuthorizeRequest) Format(s fmt.State, v rune) {
 		KeyType   string                  `json:"key_type,omitempty"`
 		Amount    types.XRPCurrencyAmount `json:"amount"`
 	}
-	var h fHelper
-	h = fHelper{
+	h := fHelper{
 		ChannelID: c.ChannelID,
 		KeyType:   c.KeyType,
 		Amount:    c.Amount,
