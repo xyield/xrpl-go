@@ -17,6 +17,14 @@ func (*TxHash) TxType() TxType {
 	return HashedTx
 }
 
+type Binary struct {
+	TxBlob string `json:"tx_blob"`
+}
+
+func (tx *Binary) TxType() TxType {
+	return BinaryTx
+}
+
 type BaseTx struct {
 	Account            types.Address
 	TransactionType    TxType
@@ -95,10 +103,16 @@ func UnmarshalTx(data json.RawMessage) (Tx, error) {
 	// TODO AMM endpoint support
 	type txTypeParser struct {
 		TransactionType TxType
+		TxBlob          string `json:"tx_blob"`
 	}
 	var txType txTypeParser
 	if err := json.Unmarshal(data, &txType); err != nil {
 		return nil, err
+	}
+	if len(txType.TxBlob) > 0 && len(txType.TransactionType) == 0 {
+		return &Binary{
+			TxBlob: txType.TxBlob,
+		}, nil
 	}
 	var tx Tx
 	switch txType.TransactionType {

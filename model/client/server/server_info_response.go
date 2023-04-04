@@ -9,30 +9,30 @@ type ServerInfoResponse struct {
 type ServerInfo struct {
 	AmendmentBlocked        bool                            `json:"amendment_blocked,omitempty"`
 	BuildVersion            string                          `json:"build_version"`
-	ClosedLedger            ServerLedgerInfo                `json:"closed_ledger,omitempty"`
+	ClosedLedger            *ServerLedgerInfo               `json:"closed_ledger,omitempty"`
 	CompleteLedgers         string                          `json:"complete_ledgers"`
 	HostID                  string                          `json:"hostid"`
 	IOLatencyMS             uint                            `json:"io_latency_ms"`
 	JQTransOverflow         string                          `json:"jq_trans_overflow"`
-	LastClose               ServerClose                     `json:"last_close"`
-	Load                    ServerLoad                      `json:"load,omitempty"`
+	LastClose               *ServerClose                    `json:"last_close"`
+	Load                    *ServerLoad                     `json:"load,omitempty"`
 	LoadFactor              uint                            `json:"load_factor"`
 	LoadFactorLocal         uint                            `json:"load_factor_local,omitempty"`
 	LoadFactorNet           uint                            `json:"load_factor_net,omitempty"`
-	LoadFactorCluster       uint                            `json:"load_factor_cluster"`
+	LoadFactorCluster       uint                            `json:"load_factor_cluster,omitempty"`
 	LoadFactorFeeEscelation uint                            `json:"load_factor_fee_escelation,omitempty"`
 	LoadFactorFeeQueue      uint                            `json:"load_factor_fee_queue,omitempty"`
 	LoadFactorServer        uint                            `json:"load_factor_server,omitempty"`
 	Peers                   uint                            `json:"peers,omitempty"`
 	PubkeyNode              string                          `json:"pubkey_node"`
 	PubkeyValidator         string                          `json:"pubkey_validator,omitempty"`
-	Reporting               ServerReporting                 `json:"reporting,omitempty"`
+	Reporting               *ServerReporting                `json:"reporting,omitempty"`
 	ServerState             string                          `json:"server_state"`
 	ServerStateDurationUS   string                          `json:"server_state_duration_us"`
 	StateAccounting         map[string]ServerInfoAccounting `json:"state_accounting"`
 	Time                    string                          `json:"time"`
 	Uptime                  uint                            `json:"uptime"`
-	ValidatedLedger         ServerLedgerInfo                `json:"validated_ledger,omitempty"`
+	ValidatedLedger         *ServerLedgerInfo               `json:"validated_ledger,omitempty"`
 	ValidationQuorum        uint                            `json:"validation_quorum"`
 	ValidatorListExpires    string                          `json:"validator_list_expires,omitempty"`
 }
