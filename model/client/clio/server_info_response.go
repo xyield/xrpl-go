@@ -3,22 +3,22 @@ package clio
 import "github.com/xyield/xrpl-go/model/transactions/types"
 
 type ServerInfoResponse struct {
-	Info ClioLedgerInfo `json:"info"`
+	Info      ClioServerInfo `json:"info"`
+	Validated bool           `json:"validated"`
+	Status    string         `json:"status,omitempty"`
 }
 
 type ClioServerInfo struct {
-	CompletedLedgers     string         `json:"completed_ledgers"`
-	Counters             ClioCounters   `json:"counters,omitempty"`
-	LoadFactor           int            `json:"load_factor"`
-	ClioVersion          string         `json:"clio_version"`
-	ValidationQuorum     int            `json:"validation_quorum,omitempty"`
-	RippledVersion       string         `json:"rippled_version,omitempty"`
-	ValidatedLedger      ClioLedgerInfo `json:"validated_ledger,omitempty"`
-	ValidatorListExpires string         `json:"validator_list_expires,omitempty"`
-	Cache                ClioCache      `json:"cache"`
-	ETL                  ClioETL        `json:"etl,omitempty"`
-	Validated            bool           `json:"validated"`
-	Status               string         `json:"status,omitempty"`
+	CompleteLedgers      string          `json:"complete_ledgers"`
+	Counters             *ClioCounters   `json:"counters,omitempty"`
+	LoadFactor           int             `json:"load_factor"`
+	ClioVersion          string          `json:"clio_version"`
+	ValidationQuorum     int             `json:"validation_quorum,omitempty"`
+	RippledVersion       string          `json:"rippled_version,omitempty"`
+	ValidatedLedger      *ClioLedgerInfo `json:"validated_ledger,omitempty"`
+	ValidatorListExpires string          `json:"validator_list_expires,omitempty"`
+	Cache                ClioCache       `json:"cache"`
+	ETL                  *ClioETL        `json:"etl,omitempty"`
 }
 
 type ClioCounters struct {
@@ -27,11 +27,11 @@ type ClioCounters struct {
 }
 
 type ClioRPC struct {
-	Started    string `json:"started"`
-	Finished   string `json:"finished"`
-	Errored    string `json:"errored"`
-	Forwarded  string `json:"forwarded"`
-	DurationUS string `json:"duration_us"`
+	Started    string `json:"started,omitempty"`
+	Finished   string `json:"finished,omitempty"`
+	Errored    string `json:"errored,omitempty"`
+	Forwarded  string `json:"forwarded,omitempty"`
+	DurationUS string `json:"duration_us,omitempty"`
 }
 
 type ClioSubscriptions struct {
