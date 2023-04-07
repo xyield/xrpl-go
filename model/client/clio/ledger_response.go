@@ -10,7 +10,10 @@ import (
 )
 
 type LedgerResponse struct {
-	Ledger ClioLedger `json:"ledger"`
+	Ledger      ClioLedger         `json:"ledger"`
+	LedgerHash  common.LedgerHash  `json:"ledger_hash"`
+	LedgerIndex common.LedgerIndex `json:"ledger_index"`
+	Validated   bool               `json:"validated"`
 }
 
 type ClioLedger struct {
@@ -27,7 +30,7 @@ type ClioLedger struct {
 	ParentHash          string                  `json:"parent_hash"`
 	TotalCoins          types.XRPCurrencyAmount `json:"total_coins"`
 	TransactionHash     string                  `json:"transaction_hash"`
-	Transactions        []transactions.Tx       `json:"transactions"`
+	Transactions        []transactions.Tx       `json:"transactions,omitempty"`
 }
 
 func (l *ClioLedger) UnmarshalJSON(data []byte) error {
@@ -53,17 +56,18 @@ func (l *ClioLedger) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	*l = ClioLedger{
-		AccountHash:     h.AccountHash,
-		CloseFlags:      h.CloseFlags,
-		CloseTime:       h.CloseTime,
-		CloseTimeHuman:  h.CloseTimeHuman,
-		Closed:          h.Closed,
-		LedgerHash:      h.LedgerHash,
-		LedgerIndex:     h.LedgerIndex,
-		ParentCloseTime: h.ParentCloseTime,
-		ParentHash:      h.ParentHash,
-		TotalCoins:      h.TotalCoins,
-		TransactionHash: h.TransactionHash,
+		AccountHash:         h.AccountHash,
+		CloseFlags:          h.CloseFlags,
+		CloseTime:           h.CloseTime,
+		CloseTimeHuman:      h.CloseTimeHuman,
+		CloseTimeResolution: h.CloseTimeResolution,
+		Closed:              h.Closed,
+		LedgerHash:          h.LedgerHash,
+		LedgerIndex:         h.LedgerIndex,
+		ParentCloseTime:     h.ParentCloseTime,
+		ParentHash:          h.ParentHash,
+		TotalCoins:          h.TotalCoins,
+		TransactionHash:     h.TransactionHash,
 	}
 
 	for _, state := range h.AccountState {

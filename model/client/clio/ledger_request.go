@@ -7,8 +7,10 @@ import (
 )
 
 type LedgerRequest struct {
-	LedgerHash   common.LedgerHash      `json:"ledger_hash"`
-	LedgerIndex  common.LedgerSpecifier `json:"ledger_index"`
+	LedgerHash   common.LedgerHash      `json:"ledger_hash,omitempty"`
+	LedgerIndex  common.LedgerSpecifier `json:"ledger_index,omitempty"`
+	Full         bool                   `json:"full"`
+	Accounts     bool                   `json:"accounts"`
 	Transactions bool                   `json:"transactions"`
 	Expand       bool                   `json:"expand"`
 	OwnerFunds   bool                   `json:"owner_funds"`
@@ -25,6 +27,8 @@ func (r *LedgerRequest) UnmarshalJSON(data []byte) error {
 	type lrHelper struct {
 		LedgerHash   common.LedgerHash `json:"ledger_hash"`
 		LedgerIndex  json.RawMessage   `json:"ledger_index"`
+		Full         bool              `json:"full"`
+		Accounts     bool              `json:"accounts"`
 		Transactions bool              `json:"transactions"`
 		Expand       bool              `json:"expand"`
 		OwnerFunds   bool              `json:"owner_funds"`
@@ -39,6 +43,8 @@ func (r *LedgerRequest) UnmarshalJSON(data []byte) error {
 	}
 	*r = LedgerRequest{
 		LedgerHash:   h.LedgerHash,
+		Accounts:     h.Accounts,
+		Full:         h.Full,
 		Transactions: h.Transactions,
 		Expand:       h.Expand,
 		OwnerFunds:   h.OwnerFunds,
@@ -46,7 +52,7 @@ func (r *LedgerRequest) UnmarshalJSON(data []byte) error {
 		Queue:        h.Queue,
 		Diff:         h.Diff,
 	}
-	r.LedgerIndex, err = common.UnmarshalLedgerSpecifier(data)
+	r.LedgerIndex, err = common.UnmarshalLedgerSpecifier(h.LedgerIndex)
 	if err != nil {
 		return err
 	}
