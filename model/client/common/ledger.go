@@ -11,6 +11,9 @@ type LedgerSpecifier interface {
 }
 
 func UnmarshalLedgerSpecifier(data []byte) (LedgerSpecifier, error) {
+	if len(data) == 0 {
+		return nil, nil
+	}
 	switch data[0] {
 	case '"':
 		var s string
