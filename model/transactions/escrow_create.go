@@ -10,7 +10,7 @@ type EscrowCreate struct {
 	Destination    types.Address
 	CancelAfter    uint   `json:",omitempty"`
 	FinishAfter    uint   `json:",omitempty"`
-	Condition      []byte `json:",omitempty"`
+	Condition      string `json:",omitempty"`
 	DestinationTag uint   `json:",omitempty"`
 }
 

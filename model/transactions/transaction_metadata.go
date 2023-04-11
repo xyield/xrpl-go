@@ -36,19 +36,19 @@ func (TxBinMeta) TxMeta() {}
 
 type TxObjMeta struct {
 	AffectedNodes          []AffectedNode       `json:"AffectedNodes"`
-	PartialDeliveredAmount types.CurrencyAmount `json:"DeliveredAmount"`
+	PartialDeliveredAmount types.CurrencyAmount `json:"DeliveredAmount,omitempty"`
 	TransactionIndex       uint64               `json:"TransactionIndex"`
 	TransactionResult      string               `json:"TransactionResult"`
-	DeliveredAmount        types.CurrencyAmount `json:"delivered_amount"`
+	DeliveredAmount        types.CurrencyAmount `json:"delivered_amount,omitempty"`
 }
 
 func (m *TxObjMeta) UnmarshalJSON(data []byte) error {
 	var h struct {
-		AffectedNodes          []AffectedNode  `json:"AffectedNodes"`
-		PartialDeliveredAmount json.RawMessage `json:"DeliveredAmount"`
-		TransactionIndex       uint64          `json:"TransactionIndex"`
-		TransactionResult      string          `json:"TransactionResult"`
-		DeliveredAmount        json.RawMessage `json:"delivered_amount"`
+		AffectedNodes          []AffectedNode  `json:"AffectedNodes,omitempty"`
+		PartialDeliveredAmount json.RawMessage `json:"DeliveredAmount,omitempty"`
+		TransactionIndex       uint64          `json:"TransactionIndex,omitempty"`
+		TransactionResult      string          `json:"TransactionResult,omitempty"`
+		DeliveredAmount        json.RawMessage `json:"delivered_amount,omitempty"`
 	}
 	if err := json.Unmarshal(data, &h); err != nil {
 		return err
@@ -58,15 +58,19 @@ func (m *TxObjMeta) UnmarshalJSON(data []byte) error {
 		TransactionIndex:  h.TransactionIndex,
 		TransactionResult: h.TransactionResult,
 	}
-	if part, err := types.UnmarshalCurrencyAmount(h.PartialDeliveredAmount); err != nil {
-		return err
-	} else {
-		m.PartialDeliveredAmount = part
+	if h.PartialDeliveredAmount != nil && len(h.PartialDeliveredAmount) > 0 {
+		if part, err := types.UnmarshalCurrencyAmount(h.PartialDeliveredAmount); err != nil {
+			return fmt.Errorf("unmarshal TxMeta object: %w", err)
+		} else {
+			m.PartialDeliveredAmount = part
+		}
 	}
-	if deliv, err := types.UnmarshalCurrencyAmount(h.DeliveredAmount); err != nil {
-		return err
-	} else {
-		m.DeliveredAmount = deliv
+	if h.DeliveredAmount != nil && len(h.DeliveredAmount) > 0 {
+		if deliv, err := types.UnmarshalCurrencyAmount(h.DeliveredAmount); err != nil {
+			return fmt.Errorf("unmarshal TxMeta object: %w", err)
+		} else {
+			m.DeliveredAmount = deliv
+		}
 	}
 	return nil
 }
@@ -93,17 +97,22 @@ func (n *CreatedNode) UnmarshalJSON(data []byte) error {
 	}
 	err := json.Unmarshal(data, &h)
 	if err != nil {
-		return err
+		return fmt.Errorf("unmarshal CreatedNode: %w", err)
 	}
 	var obj ledger.LedgerObject
 	if obj, err = ledger.EmptyLedgerObject(string(h.LedgerEntryType)); err != nil {
-		return err
+		return fmt.Errorf("unmarshal CreatedNode: %w", err)
 	}
-	if err = json.Unmarshal(h.NewFields, obj); err != nil {
-		return err
+	et := obj.EntryType()
+	if h.NewFields != nil && len(h.NewFields) > 0 {
+		if err = json.Unmarshal(h.NewFields, obj); err != nil {
+			return fmt.Errorf("unmarshal CreatedNode: %w", err)
+		}
+	} else {
+		obj = nil
 	}
 	*n = CreatedNode{
-		LedgerEntryType: h.LedgerEntryType,
+		LedgerEntryType: et,
 		LedgerIndex:     h.LedgerIndex,
 		NewFields:       obj,
 	}
@@ -111,10 +120,10 @@ func (n *CreatedNode) UnmarshalJSON(data []byte) error {
 }
 
 type ModifiedNode struct {
-	LedgerEntryType   ledger.LedgerEntryType `json:"LedgerEntryType"`
-	LedgerIndex       string                 `json:"LedgerIndex"`
-	FinalFields       ledger.LedgerObject    `json:"FinalFields"`
-	PreviousFields    ledger.LedgerObject    `json:"PreviousFields"`
+	LedgerEntryType   ledger.LedgerEntryType `json:"LedgerEntryType,omitempty"`
+	LedgerIndex       string                 `json:"LedgerIndex,omitempty"`
+	FinalFields       ledger.LedgerObject    `json:"FinalFields,omitempty"`
+	PreviousFields    ledger.LedgerObject    `json:"PreviousFields,omitempty"`
 	PreviousTxnID     string                 `json:"PreviousTxnID,omitempty"`
 	PreviousTxnLgrSeq uint64                 `json:"PreviousTxnLgrSeq,omitempty"`
 }
@@ -130,20 +139,36 @@ func (n *ModifiedNode) UnmarshalJSON(data []byte) error {
 	}
 	err := json.Unmarshal(data, &h)
 	if err != nil {
-		return err
+		return fmt.Errorf("unmarshal ModifiedNode: %w", err)
 	}
 	var prev, fin ledger.LedgerObject
+
 	if prev, err = ledger.EmptyLedgerObject(string(h.LedgerEntryType)); err != nil {
-		return err
+		return fmt.Errorf("unmarshal ModifiedNode: %w", err)
 	}
-	if err = json.Unmarshal(h.PreviousFields, prev); err != nil {
-		return err
+	// Get entry type before possible nullification
+	et := prev.EntryType()
+	if fin, err = ledger.EmptyLedgerObject(string(h.LedgerEntryType)); err != nil {
+		return fmt.Errorf("unmarshal ModifiedNode: %w", err)
 	}
-	if err = json.Unmarshal(h.FinalFields, fin); err != nil {
-		return err
+	if h.PreviousFields != nil && len(h.PreviousFields) > 0 {
+		if err = json.Unmarshal(h.PreviousFields, prev); err != nil {
+			return fmt.Errorf("unmarshal ModifiedNode: %w", err)
+		}
+	} else {
+		// Do not set if no previous fields
+		prev = nil
+	}
+	if h.FinalFields != nil && len(h.FinalFields) > 0 {
+		if err = json.Unmarshal(h.FinalFields, fin); err != nil {
+			return fmt.Errorf("unmarshal ModifiedNode: %w", err)
+		}
+	} else {
+		// Do not set if no final fields
+		fin = nil
 	}
 	*n = ModifiedNode{
-		LedgerEntryType:   h.LedgerEntryType,
+		LedgerEntryType:   et,
 		LedgerIndex:       h.LedgerIndex,
 		FinalFields:       fin,
 		PreviousFields:    prev,
@@ -154,9 +179,9 @@ func (n *ModifiedNode) UnmarshalJSON(data []byte) error {
 }
 
 type DeletedNode struct {
-	LedgerEntryType ledger.LedgerEntryType `json:"LedgerEntryType"`
-	LedgerIndex     string                 `json:"LedgerIndex"`
-	FinalFields     ledger.LedgerObject    `json:"FinalFields"`
+	LedgerEntryType ledger.LedgerEntryType `json:"LedgerEntryType,omitempty"`
+	LedgerIndex     string                 `json:"LedgerIndex,omitempty"`
+	FinalFields     ledger.LedgerObject    `json:"FinalFields,omitempty"`
 }
 
 func (n *DeletedNode) UnmarshalJSON(data []byte) error {
@@ -167,17 +192,22 @@ func (n *DeletedNode) UnmarshalJSON(data []byte) error {
 	}
 	err := json.Unmarshal(data, &h)
 	if err != nil {
-		return err
+		return fmt.Errorf("unmarshal DeletedNode: %w", err)
 	}
 	var obj ledger.LedgerObject
 	if obj, err = ledger.EmptyLedgerObject(string(h.LedgerEntryType)); err != nil {
-		return err
+		return fmt.Errorf("unmarshal DeletedNode: %w", err)
 	}
-	if err = json.Unmarshal(h.FinalFields, obj); err != nil {
-		return err
+	et := obj.EntryType()
+	if h.FinalFields != nil && len(h.FinalFields) > 0 {
+		if err = json.Unmarshal(h.FinalFields, obj); err != nil {
+			return fmt.Errorf("unmarshal DeletedNode: %w", err)
+		}
+	} else {
+		obj = nil
 	}
 	*n = DeletedNode{
-		LedgerEntryType: h.LedgerEntryType,
+		LedgerEntryType: et,
 		LedgerIndex:     h.LedgerIndex,
 		FinalFields:     obj,
 	}

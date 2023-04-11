@@ -9,7 +9,7 @@ type PaymentChannelCreate struct {
 	Amount         types.XRPCurrencyAmount
 	Destination    types.Address
 	SettleDelay    uint
-	PublicKey      []byte
+	PublicKey      string
 	CancelAfter    uint `json:",omitempty"`
 	DestinationTag uint `json:",omitempty"`
 }

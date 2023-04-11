@@ -7,8 +7,8 @@ import (
 type DirectoryNode struct {
 	Flags             uint
 	Indexes           []types.Hash256
-	IndexNext         uint64 `json:",omitempty"`
-	IndexPrevious     uint64 `json:",omitempty"`
+	IndexNext         string `json:",omitempty"`
+	IndexPrevious     string `json:",omitempty"`
 	LedgerEntryType   LedgerEntryType
 	Owner             types.Address `json:",omitempty"`
 	RootIndex         types.Hash256

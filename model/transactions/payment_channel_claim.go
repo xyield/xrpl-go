@@ -9,8 +9,8 @@ type PaymentChannelClaim struct {
 	Channel   types.Hash256
 	Balance   types.XRPCurrencyAmount `json:",omitempty"`
 	Amount    types.XRPCurrencyAmount `json:",omitempty"`
-	Signature []byte                  `json:",omitempty"`
-	PublicKey []byte                  `json:",omitempty"`
+	Signature string                  `json:",omitempty"`
+	PublicKey string                  `json:",omitempty"`
 }
 
 func (*PaymentChannelClaim) TxType() TxType {

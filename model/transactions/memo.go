@@ -1,7 +1,11 @@
 package transactions
 
+type MemoWrapper struct {
+	Memo Memo
+}
+
 type Memo struct {
-	MemoData   []byte
-	MemoFormat []byte
-	MemoType   []byte
+	MemoData   string `json:",omitempty"`
+	MemoFormat string `json:",omitempty"`
+	MemoType   string `json:",omitempty"`
 }

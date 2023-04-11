@@ -14,17 +14,17 @@ type Tx interface {
 type BaseTx struct {
 	Account            types.Address
 	TransactionType    TxType
-	Fee                types.XRPCurrencyAmount
-	Sequence           uint
-	AccountTxnID       types.Hash256 `json:",omitempty"`
-	Flags              uint          `json:",omitempty"`
-	LastLedgerSequence uint          `json:",omitempty"`
-	Memos              []Memo        `json:",omitempty"`
-	Signers            []Signer      `json:",omitempty"`
-	SourceTag          uint          `json:",omitempty"`
-	SigningPubKey      string
-	TicketSequence     uint `json:",omitempty"`
-	TxnSignature       string
+	Fee                types.XRPCurrencyAmount `json:",omitempty"`
+	Sequence           uint                    `json:",omitempty"`
+	AccountTxnID       types.Hash256           `json:",omitempty"`
+	Flags              uint                    `json:",omitempty"`
+	LastLedgerSequence uint                    `json:",omitempty"`
+	Memos              []MemoWrapper           `json:",omitempty"`
+	Signers            []Signer                `json:",omitempty"`
+	SourceTag          uint                    `json:",omitempty"`
+	SigningPubKey      string                  `json:",omitempty"`
+	TicketSequence     uint                    `json:",omitempty"`
+	TxnSignature       string                  `json:",omitempty"`
 }
 
 func (tx *BaseTx) TxType() TxType {
