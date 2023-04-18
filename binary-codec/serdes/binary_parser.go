@@ -1,7 +1,7 @@
 package serdes
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/xyield/xrpl-go/binary-codec/definitions"
 )
@@ -33,22 +33,47 @@ func (p *BinaryParser) ReadField() (*definitions.FieldInstance, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(f)
-	return nil, nil
+	return f, nil
 }
 
 func (p *BinaryParser) readFieldHeader() (*definitions.FieldHeader, error) {
-	typeCode := p.readByte()
+	typeCode, _ := p.readByte()
 	fieldCode := typeCode & 15
 	typeCode = typeCode >> 4
+
+	if typeCode == 0 {
+		typeCode, _ = p.readByte()
+		if typeCode == 0 || typeCode < 16 {
+			return nil, errors.New("invalid typecode")
+		}
+	}
+
+	if fieldCode == 0 {
+		fieldCode, _ := p.readByte()
+		if fieldCode == 0 || fieldCode < 16 {
+			return nil, errors.New("invalid fieldcode")
+		}
+	}
 	return &definitions.FieldHeader{
 		TypeCode:  int32(typeCode),
 		FieldCode: int32(fieldCode),
 	}, nil
 }
 
-func (p *BinaryParser) readByte() byte {
+func (p *BinaryParser) readByte() (byte, error) {
 	b := p.data[p.cursor]
 	p.cursor++
-	return b
+	return b, nil
+}
+
+func (p *BinaryParser) ReadBytes(n int) ([]byte, error) {
+	var bytes []byte
+	for i := 0; i < n; i++ {
+		b, err := p.readByte()
+		if err != nil {
+			return nil, err
+		}
+		bytes = append(bytes, b)
+	}
+	return bytes, nil
 }

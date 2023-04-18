@@ -45,6 +45,6 @@ func (h hash) FromJson(json any) ([]byte, error) {
 	return v, nil
 }
 
-func (h hash) FromParser(p *serdes.BinaryParser) ([]byte, error) {
+func (h hash) FromParser(p *serdes.BinaryParser) (any, error) {
 	return nil, nil
 }

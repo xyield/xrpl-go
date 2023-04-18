@@ -5,8 +5,6 @@ import (
 	"errors"
 	"strings"
 
-	"encoding/json"
-
 	"github.com/xyield/xrpl-go/binary-codec/definitions"
 
 	"github.com/xyield/xrpl-go/binary-codec/serdes"
@@ -113,14 +111,10 @@ func Decode(hexEncoded string) (map[string]any, error) {
 	}
 	p := serdes.NewBinaryParser(b)
 	st := &types.STObject{}
-	res, err := st.FromParser(p)
+	m, err := st.FromParser(p)
 	if err != nil {
 		return nil, err
 	}
-	var tx map[string]any
-	err = json.Unmarshal(res, &tx)
-	if err != nil {
-		return nil, err
-	}
-	return tx, nil
+
+	return m.(map[string]any), nil
 }

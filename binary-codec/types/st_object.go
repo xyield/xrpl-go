@@ -41,14 +41,24 @@ func (t *STObject) FromJson(json any) ([]byte, error) {
 	return s.GetSink(), nil
 }
 
-func (t *STObject) FromParser(p *serdes.BinaryParser) ([]byte, error) {
+func (t *STObject) FromParser(p *serdes.BinaryParser) (any, error) {
+	m := make(map[string]any)
 	f, err := p.ReadField()
-	// st := GetSerializedType(f.Type)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(f)
-	return nil, nil
+	st := GetSerializedType(f.Type)
+	res, err := st.FromParser(p)
+	if err != nil {
+		return nil, err
+	}
+	res, err = enumToStr(f.FieldName, res)
+	if err != nil {
+		return nil, err
+	}
+	m[f.FieldName] = res
+	// fmt.Println(f)
+	return m, nil
 }
 
 // nolint
@@ -87,4 +97,17 @@ func getSortedKeys(m map[definitions.FieldInstance]any) []definitions.FieldInsta
 	})
 
 	return keys
+}
+
+func enumToStr(fieldType string, value any) (any, error) {
+	switch fieldType {
+	case "TransactionType":
+		return definitions.Get().GetTransactionTypeNameByTransactionTypeCode(int32(value.(int)))
+	case "TransactionResult":
+		return definitions.Get().GetTransactionResultNameByTransactionResultTypeCode(int32(value.(int)))
+	case "LedgerEntryType":
+		return definitions.Get().GetLedgerEntryTypeNameByLedgerEntryTypeCode(int32(value.(int)))
+	default:
+		return value, nil
+	}
 }

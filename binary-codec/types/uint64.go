@@ -32,6 +32,10 @@ func (u *UInt64) FromJson(value any) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func (u *UInt64) FromParser(p *serdes.BinaryParser) ([]byte, error) {
-	return nil, nil
+func (u *UInt64) FromParser(p *serdes.BinaryParser) (any, error) {
+	b, err := p.ReadBytes(8)
+	if err != nil {
+		return nil, err
+	}
+	return strconv.Itoa(int(binary.BigEndian.Uint64(b))), nil
 }

@@ -79,7 +79,7 @@ func (a *Amount) FromJson(value any) ([]byte, error) {
 	}
 }
 
-func (a *Amount) FromParser(p *serdes.BinaryParser) ([]byte, error) {
+func (a *Amount) FromParser(p *serdes.BinaryParser) (any, error) {
 	return nil, nil
 }
 
