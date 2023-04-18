@@ -443,49 +443,79 @@ func TestEncodeForSigning(t *testing.T) {
 	}
 }
 
-// func TestDecode(t *testing.T) {
-// 	tt := []struct {
-// 		description string
-// 		input       string
-// 		expected    map[string]any
-// 		expectedErr error
-// 	}{
-// 		{
-// 			description: "decode tx1",
-// 			input:       "120007220008000024001ABED82A2380BF2C2019001ABED764D55920AC9391400000000000000000000000000055534400000000000A20B3C85F482532A9578DBB3950B85CA06594D165400000037E11D60068400000000000000A732103EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3744630440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C8114DD76483FACDEE26E60D8A586BB58D09F27045C46",
-// 			expected: map[string]any{
-// 				"Account":       "rMBzp8CgpE441cp5PVyA9rpVV7oT8hP3ys",
-// 				"Expiration":    595640108,
-// 				"Fee":           "10",
-// 				"Flags":         524288,
-// 				"OfferSequence": 1752791,
-// 				"Sequence":      1752792,
-// 				"SigningPubKey": "03EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3",
-// 				"TakerGets":     "15000000000",
-// 				"TakerPays": map[string]any{
-// 					"currency": "USD",
-// 					"issuer":   "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
-// 					"value":    "7072.8",
-// 				},
-// 				"TransactionType": "OfferCreate",
-// 				"TxnSignature":    "30440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C",
-// 				"hash":            "73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C",
-// 			},
-// 			expectedErr: nil,
-// 		},
-// 	}
+func TestDecode(t *testing.T) {
+	tt := []struct {
+		description string
+		input       string
+		expected    map[string]any
+		expectedErr error
+	}{
+		{
+			description: "decode tx1",
+			input:       "120007",
+			expected: map[string]any{
+				// "Account":       "rMBzp8CgpE441cp5PVyA9rpVV7oT8hP3ys",
+				// "Expiration":    595640108,
+				// "Fee":           "10",
+				// "Flags":         524288,
+				// "OfferSequence": 1752791,
+				// "Sequence":      1752792,
+				// "SigningPubKey": "03EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3",
+				// "TakerGets":     "15000000000",
+				// "TakerPays": map[string]any{
+				// 	"currency": "USD",
+				// 	"issuer":   "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+				// 	"value":    "7072.8",
+				// },
+				"TransactionType": "OfferCreate",
+				// "TxnSignature":    "30440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C",
+				// "hash":            "73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C",
+			},
+			expectedErr: nil,
+		},
+		{
+			description: "deserialize Uint16 LedgerEntryType",
+			input:       "110072",
+			expected:    map[string]any{"LedgerEntryType": "RippleState"},
+			expectedErr: nil,
+		},
+		{
+			description: "deserialize Uint16 TransferFee",
+			input:       "14789A",
+			expected:    map[string]any{"TransferFee": 30874},
+			expectedErr: nil,
+		},
+		{
+			description: "deserialize Uint8 int correctly",
+			input:       "011019",
+			expected:    map[string]any{"CloseResolution": 25},
+			expectedErr: nil,
+		},
+		{
+			description: "deserialize Uint32 correctly",
+			input:       "2A2380BF2C",
+			expected:    map[string]any{"Expiration": 595640108},
+			expectedErr: nil,
+		},
+		{
+			description: "deserialize Uint64 correctly",
+			input:       "34000000044B82FA09",
+			expected:    map[string]any{"OwnerNode": "18446744073"},
+			expectedErr: nil,
+		},
+	}
 
-// 	for _, tc := range tt {
-// 		t.Run(tc.description, func(t *testing.T) {
-// 			act, err := Decode(tc.input)
-// 			if tc.expectedErr != nil {
-// 				require.Error(t, err, tc.expectedErr.Error())
-// 				require.Nil(t, act)
-// 			} else {
-// 				require.NoError(t, err)
-// 				require.Equal(t, tc.expected, act)
-// 			}
-// 		})
-// 	}
+	for _, tc := range tt {
+		t.Run(tc.description, func(t *testing.T) {
+			act, err := Decode(tc.input)
+			if tc.expectedErr != nil {
+				require.Error(t, err, tc.expectedErr.Error())
+				require.Nil(t, act)
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, tc.expected, act)
+			}
+		})
+	}
 
-// }
+}

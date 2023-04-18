@@ -16,6 +16,6 @@ func (b *Blob) FromJson(json any) ([]byte, error) {
 	return v, nil
 }
 
-func (b *Blob) FromParser(p *serdes.BinaryParser) ([]byte, error) {
+func (b *Blob) FromParser(p *serdes.BinaryParser) (any, error) {
 	return nil, nil
 }

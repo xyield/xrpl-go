@@ -30,6 +30,10 @@ func (u *UInt8) FromJson(value any) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func (u *UInt8) FromParser(p *serdes.BinaryParser) ([]byte, error) {
-	return nil, nil
+func (u *UInt8) FromParser(p *serdes.BinaryParser) (any, error) {
+	b, err := p.ReadBytes(1)
+	if err != nil {
+		return nil, err
+	}
+	return int(b[0]), nil
 }

@@ -33,6 +33,11 @@ func (u *UInt16) FromJson(value any) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func (u *UInt16) FromParser(p *serdes.BinaryParser) ([]byte, error) {
-	return nil, nil
+func (u *UInt16) FromParser(p *serdes.BinaryParser) (any, error) {
+	// Uint16 is 2 bytes
+	b, err := p.ReadBytes(2)
+	if err != nil {
+		return nil, err
+	}
+	return int(binary.BigEndian.Uint16(b)), nil
 }

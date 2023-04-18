@@ -27,6 +27,6 @@ func (t *STArray) FromJson(json any) ([]byte, error) {
 	return sink, nil
 }
 
-func (t *STArray) FromParser(p *serdes.BinaryParser) ([]byte, error) {
+func (t *STArray) FromParser(p *serdes.BinaryParser) (any, error) {
 	return nil, nil
 }

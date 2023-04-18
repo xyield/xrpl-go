@@ -26,6 +26,6 @@ func (a *AccountID) FromJson(value any) ([]byte, error) {
 	return accountID, nil
 }
 
-func (a *AccountID) FromParser(p *serdes.BinaryParser) ([]byte, error) {
+func (a *AccountID) FromParser(p *serdes.BinaryParser) (any, error) {
 	return nil, nil
 }

@@ -34,7 +34,7 @@ func (v *Vector256) FromJson(json any) ([]byte, error) {
 
 }
 
-func (v *Vector256) FromParser(p *serdes.BinaryParser) ([]byte, error) {
+func (v *Vector256) FromParser(p *serdes.BinaryParser) (any, error) {
 	return nil, nil
 }
 
