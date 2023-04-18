@@ -7,8 +7,7 @@ import (
 )
 
 type BinaryParser struct {
-	data   []byte
-	cursor int
+	data []byte
 }
 
 func NewBinaryParser(d []byte) *BinaryParser {
@@ -49,7 +48,7 @@ func (p *BinaryParser) readFieldHeader() (*definitions.FieldHeader, error) {
 	}
 
 	if fieldCode == 0 {
-		fieldCode, _ := p.readByte()
+		fieldCode, _ = p.readByte()
 		if fieldCode == 0 || fieldCode < 16 {
 			return nil, errors.New("invalid fieldcode")
 		}
@@ -61,8 +60,8 @@ func (p *BinaryParser) readFieldHeader() (*definitions.FieldHeader, error) {
 }
 
 func (p *BinaryParser) readByte() (byte, error) {
-	b := p.data[p.cursor]
-	p.cursor++
+	b := p.data[0]
+	p.data = p.data[1:]
 	return b, nil
 }
 
@@ -76,4 +75,8 @@ func (p *BinaryParser) ReadBytes(n int) ([]byte, error) {
 		bytes = append(bytes, b)
 	}
 	return bytes, nil
+}
+
+func (p *BinaryParser) HasMore() bool {
+	return len(p.data) != 0
 }

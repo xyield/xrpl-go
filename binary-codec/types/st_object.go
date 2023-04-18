@@ -43,20 +43,22 @@ func (t *STObject) FromJson(json any) ([]byte, error) {
 
 func (t *STObject) FromParser(p *serdes.BinaryParser) (any, error) {
 	m := make(map[string]any)
-	f, err := p.ReadField()
-	if err != nil {
-		return nil, err
+	for p.HasMore() {
+		f, err := p.ReadField()
+		if err != nil {
+			return nil, err
+		}
+		st := GetSerializedType(f.Type)
+		res, err := st.FromParser(p)
+		if err != nil {
+			return nil, err
+		}
+		res, err = enumToStr(f.FieldName, res)
+		if err != nil {
+			return nil, err
+		}
+		m[f.FieldName] = res
 	}
-	st := GetSerializedType(f.Type)
-	res, err := st.FromParser(p)
-	if err != nil {
-		return nil, err
-	}
-	res, err = enumToStr(f.FieldName, res)
-	if err != nil {
-		return nil, err
-	}
-	m[f.FieldName] = res
 	// fmt.Println(f)
 	return m, nil
 }
