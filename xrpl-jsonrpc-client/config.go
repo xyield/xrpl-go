@@ -67,3 +67,8 @@ func NewConfig(url string) (*Config, error) {
 
 	return cfg, nil
 }
+
+// Method to set http client used for testing
+func (cfg *Config) AddHttpClient(c HTTPClient) {
+	cfg.HTTPClient = c
+}

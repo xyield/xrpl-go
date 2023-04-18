@@ -2,7 +2,6 @@ package jsonrpc
 
 import (
 	"bytes"
-	"encoding/json"
 	"io/ioutil"
 	"net/http"
 
@@ -17,7 +16,7 @@ type JsonRpcClientError struct {
 }
 
 func (e *JsonRpcClientError) Error() string {
-	return "No root path provided"
+	return e.ErrorString
 }
 
 type jsonRpcRequest struct {
@@ -28,30 +27,39 @@ type jsonRpcRequest struct {
 type jsonRpcResponse struct {
 	Result    AnyJson       `json:"result"`
 	Warning   string        `json:"warning,omitempty"`
-	Warnings  []interface{} `json:"warnings,omitempty"`
+	Warnings  []interface{} `json:"warnings,omitempty"` // TODO: check full response body maps to this correctly
 	Forwarded bool          `json:"forwarded,omitempty"`
 }
 
-// each method will have a successful response struct that will impl this - better way to do this than empty interface?
-type RequestResult interface {
-}
-
-// each method has their own param struct to be passed into CreateRequest
-// each param struct (for each request) will impl this interface - add method to impl?
+// each method has their own request param struct to be passed into CreateRequest
 type RequestParams interface {
 }
 
+// each method will have a successful response struct that will impl this
+type ResponseType interface {
+	UnmarshallJSON([]byte) error
+}
+
+// Params will have been serialised and added to request struct before passing to this method
+// Have to serilase the parameters for signed transactions etc
 func CreateRequest(method string, params RequestParams) ([]byte, error) {
 
-	// TODO: Have to serilase the parameters for signed transactions - do this before this func?
+	var body jsonRpcRequest
 
-	r := &jsonRpcRequest{
-		Method: method,
-		Params: [1]interface{}{params}, // array with 1 json array
+	if params == nil {
+		body = jsonRpcRequest{
+			Method: method,
+		}
+	} else {
+		body = jsonRpcRequest{
+			Method: method,
+			Params: [1]interface{}{params}, // array with 1 json array - will be its own struct with json serialising tags
+		}
 	}
 
-	// jsonBytes, err := json.Marshal(c) // TODO: add correct formatting for the marshal here? with correct spaces etc
-	jsonBytes, err := json.MarshalIndent(r, "", "\t")
+	jsonBytes, err := jsoniter.Marshal(body)
+	// TODO: add correct formatting for the marshal here - do we need the indent formatter below?
+	// jsonBytes, err := json.MarshalIndent(r, "", "\t")
 
 	if err != nil {
 		return nil, err
@@ -60,36 +68,37 @@ func CreateRequest(method string, params RequestParams) ([]byte, error) {
 	return jsonBytes, nil
 }
 
-func CheckForError(res *http.Response) ([]byte, error) {
-
-	b, err := ioutil.ReadAll(res.Body)
-	if err != nil || b == nil {
-		return nil, err
-	}
-
-	if res.StatusCode != 200 {
-		return nil, &JsonRpcClientError{ErrorString: string(b)}
-	}
+// currently returning the whole response as well as the error - ok?
+func CheckForError(res *http.Response) (jsonRpcResponse, error) {
 
 	var jr jsonRpcResponse
 
+	b, err := ioutil.ReadAll(res.Body)
+	if err != nil || b == nil {
+		return jr, err
+	}
+
+	if res.StatusCode != 200 {
+		return jr, &JsonRpcClientError{ErrorString: string(b)}
+	}
+
 	err = jsoniter.Unmarshal(b, &jr)
 	if err != nil {
-		return nil, err
+		return jr, err
 	}
 
-	// result will have 'error' if error
+	// result will have 'error' if error response
 	if _, ok := jr.Result["error"]; ok {
-		return nil, &JsonRpcClientError{ErrorString: jr.Result["error"].(string)}
+		return jr, &JsonRpcClientError{ErrorString: jr.Result["error"].(string)}
 	}
 
-	return b, nil
+	return jr, nil
 }
 
-// pass config in or give this method a new interface reciever for each method
-func SendRequest(body []byte, cfg *jsonrpcclient.Config, r RequestResult) error {
+// TODO: pass config in or give this method a new interface reciever for each method interface?
+func SendRequest(body []byte, cfg *jsonrpcclient.Config, responseStruct ResponseType) error {
 
-	// TODO: add CreateRequest in here too?
+	// add CreateRequest in here so only call 1 method?
 
 	req, err := http.NewRequest(http.MethodPost, cfg.Url, bytes.NewReader(body))
 	if err != nil {
@@ -110,16 +119,53 @@ func SendRequest(body []byte, cfg *jsonrpcclient.Config, r RequestResult) error 
 
 	// TODO: check if get 503 service unavailable (from rate limiting) and re-try if so
 
-	responseBody, err := CheckForError(response)
+	jsonRpcResponse, err := CheckForError(response)
 	if err != nil {
 		return err
 	}
 
-	// unmarshall successful response into expected struct
-	err = jsoniter.Unmarshal(responseBody, &r)
+	// If no error unmarshall jsonRpcResponse.Result into the result struct
+	b, err := jsoniter.Marshal(jsonRpcResponse.Result)
 	if err != nil {
 		return err
 	}
+
+	err = responseStruct.UnmarshallJSON(b)
+	if err != nil {
+		return err
+	}
+
+	// TODO: we are going to have to run the decode method here on the response body?
 
 	return nil
 }
+
+/////////////////////// Doesn't work marshalling result into a string
+// b, _ := jsoniter.Marshal(jsonRpcResponse.Result)
+// fmt.Println(string(b))
+
+// r, _ := GetResultString(response)
+
+// resultBytes, err := jsoniter.Marshal(r.Result) // marshall the string version of result
+// if err != nil {
+// 	return &responseStruct, err
+// }
+
+// var jr jsonRpcResult
+
+// b, err := ioutil.ReadAll(response.Body)
+// if err != nil || b == nil {
+// 	return &responseStruct, err
+// }
+// err = jsoniter.Unmarshal(b, &jr) // grab just stringified value of "result" so do not convert to AnyJson
+// if err != nil {
+// 	return &responseStruct, err
+// }
+///////////////
+
+// err = jsoniter.Unmarshal(byteJson, &responseStruct) // error as can only unmarshall into a pointer
+// fmt.Println("Operation: ", responseStruct)
+// if err != nil {
+// 	// return &responseStruct, err
+// 	return err
+// }
