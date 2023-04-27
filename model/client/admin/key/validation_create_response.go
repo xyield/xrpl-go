@@ -1,4 +1,4 @@
-package admin
+package key
 
 type ValidationCreateResponse struct {
 	ValidationKey       string `json:"validation_key"`

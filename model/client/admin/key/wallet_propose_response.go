@@ -1,4 +1,4 @@
-package admin
+package key
 
 import "github.com/xyield/xrpl-go/model/transactions/types"
 

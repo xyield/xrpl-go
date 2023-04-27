@@ -1,4 +1,4 @@
-package admin
+package key
 
 type ValidationCreateRequest struct {
 	Secret string `json:"secret,omitempty"`

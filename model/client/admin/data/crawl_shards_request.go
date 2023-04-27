@@ -1,4 +1,4 @@
-package admin
+package data
 
 type CrawlShardsRequest struct {
 	PublicKey bool `json:"public_key,omitempty"`

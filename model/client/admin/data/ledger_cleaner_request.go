@@ -1,4 +1,4 @@
-package admin
+package data
 
 import "github.com/xyield/xrpl-go/model/client/common"
 

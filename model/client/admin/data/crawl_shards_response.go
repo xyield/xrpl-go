@@ -1,4 +1,4 @@
-package admin
+package data
 
 type CrawlShardsResponse struct {
 	CompleteShards string       `json:"complete_shards,omitempty"`

@@ -1,4 +1,4 @@
-package admin
+package key
 
 type WalletProposeRequest struct {
 	KeyType    string `json:"key_type"`
