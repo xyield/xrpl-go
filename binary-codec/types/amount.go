@@ -38,6 +38,7 @@ const (
 var (
 	ErrInvalidXRPValue     = errors.New("invalid XRP value")
 	ErrInvalidCurrencyCode = errors.New("invalid currency code")
+	zeroByteArray          = make([]byte, 20)
 )
 
 type InvalidAmountError struct {
@@ -79,8 +80,105 @@ func (a *Amount) FromJson(value any) ([]byte, error) {
 	}
 }
 
-func (a *Amount) FromParser(p *serdes.BinaryParser) (any, error) {
-	return nil, nil
+func (a *Amount) FromParser(p *serdes.BinaryParser, opts ...int) (any, error) {
+	b, err := p.Peek()
+	if err != nil {
+		return nil, err
+	}
+	var sign string
+	if !isPositive(b) {
+		sign = "-"
+	}
+	if isNative(b) {
+		xrp, err := p.ReadBytes(8)
+		if err != nil {
+			return nil, err
+		}
+		xrpVal := binary.BigEndian.Uint64(xrp)
+		xrpVal = xrpVal & 0x3FFFFFFFFFFFFFFF
+		return sign + strconv.FormatUint(xrpVal, 10), nil
+	} else {
+		token, err := p.ReadBytes(48)
+		if err != nil {
+			return nil, err
+		}
+		return deserialiseToken(token)
+	}
+}
+
+func deserialiseToken(data []byte) (map[string]any, error) {
+	value, err := deserialiseValue(data[:8])
+	if err != nil {
+		return nil, err
+	}
+	issuer, err := deserialiseIssuer(data[28:])
+	if err != nil {
+		return nil, err
+	}
+	curr, err := deserialiseCurrencyCode(data[8:28])
+	if err != nil {
+		return nil, err
+	}
+	return map[string]any{
+		"value":    value,
+		"currency": curr,
+		"issuer":   issuer,
+	}, nil
+}
+
+func deserialiseValue(data []byte) (string, error) {
+	sign := ""
+	if !isPositive(data[0]) {
+		sign = "-"
+	}
+	value_bytes := data[:8]
+	b1 := value_bytes[0]
+	b2 := value_bytes[1]
+	e1 := int((b1 & 0x3F) << 2)
+	e2 := int(b2 >> 6)
+	exponent := e1 + e2 - 97
+	sig_figs := append([]byte{0, (b2 & 0x3F)}, value_bytes[2:]...)
+	sig_figs_int := binary.BigEndian.Uint64(sig_figs)
+	d, err := bigdecimal.NewBigDecimal(sign + strconv.Itoa(int(sig_figs_int)) + "e" + strconv.Itoa(exponent))
+	if err != nil {
+		return "", err
+	}
+	val := d.GetScaledValue()
+	err = verifyIOUValue(val)
+	if err != nil {
+		return "", err
+	}
+	return val, nil
+}
+
+func deserialiseCurrencyCode(data []byte) (string, error) {
+	// Check for special xrp case
+	if bytes.Equal(data, zeroByteArray) {
+		return "XRP", nil
+	}
+	if data[0] != 0 {
+		return "", ErrInvalidCurrencyCode
+	}
+	// the next 88 bits (11 bytes) are reserved and should all be zero
+	for _, i := range data[1:12] {
+		if i != 0 {
+			return "", ErrInvalidCurrencyCode
+		}
+	}
+	iso := strings.ToUpper(string(data[12:15]))
+	if iso == "XRP" {
+		return "", ErrInvalidCurrencyCode
+	}
+	ok, _ := regexp.MatchString(IOUCodeRegex, iso)
+
+	if !ok {
+		return "", ErrInvalidCurrencyCode
+	}
+	return iso, nil
+}
+
+func deserialiseIssuer(data []byte) (string, error) {
+	return addresscodec.Encode(data, []byte{addresscodec.AccountAddressPrefix}, addresscodec.AccountAddressLength), nil
 }
 
 // validates the format of an XRP amount value
@@ -316,16 +414,14 @@ func SerializeIssuedCurrencyAmount(value, currency, issuer string) ([]byte, erro
 }
 
 // Returns true if this amount is a "native" XRP amount - first bit in first byte set to 0 for native XRP
-func isNative(value []byte) bool {
-	fmt.Printf("%08b", value)
-	x := []byte(value)[0]&NotXRPBitMask == 0 // & bitwise operator returns 1 if both first bits are 1, otherwise 0
+func isNative(value byte) bool {
+	x := value&NotXRPBitMask == 0 // & bitwise operator returns 1 if both first bits are 1, otherwise 0
 	return x
 }
 
 // Determines if this AmountType is positive - 2nd bit in 1st byte is set to 1 for positive amounts
-func isPositive(value []byte) bool {
-	fmt.Printf("%08b", value)
-	x := []byte(value)[0]&0x40 > 0
+func isPositive(value byte) bool {
+	x := value&0x40 > 0
 	return x
 }
 
