@@ -26,6 +26,13 @@ func (a *AccountID) FromJson(value any) ([]byte, error) {
 	return accountID, nil
 }
 
-func (a *AccountID) FromParser(p *serdes.BinaryParser) (any, error) {
-	return nil, nil
+func (a *AccountID) FromParser(p *serdes.BinaryParser, opts ...int) (any, error) {
+	if opts == nil {
+		return nil, ErrNoLengthPrefix
+	}
+	b, err := p.ReadBytes(opts[0])
+	if err != nil {
+		return nil, err
+	}
+	return addresscodec.Encode(b, []byte{addresscodec.AccountAddressPrefix}, addresscodec.AccountAddressLength), nil
 }

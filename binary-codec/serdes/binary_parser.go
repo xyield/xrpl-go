@@ -6,6 +6,10 @@ import (
 	"github.com/xyield/xrpl-go/binary-codec/definitions"
 )
 
+var (
+	ErrParserOutOfBound error = errors.New("parser out of bounds")
+)
+
 type BinaryParser struct {
 	data []byte
 }
@@ -36,10 +40,14 @@ func (p *BinaryParser) ReadField() (*definitions.FieldInstance, error) {
 }
 
 func (p *BinaryParser) readFieldHeader() (*definitions.FieldHeader, error) {
+	// Read the first byte of the field header
 	typeCode, _ := p.readByte()
+
+	// The field code is the last 4 bits of the first byte
 	fieldCode := typeCode & 15
 	typeCode = typeCode >> 4
 
+	// Read the type code if it's not in the first byte
 	if typeCode == 0 {
 		typeCode, _ = p.readByte()
 		if typeCode == 0 || typeCode < 16 {
@@ -47,12 +55,15 @@ func (p *BinaryParser) readFieldHeader() (*definitions.FieldHeader, error) {
 		}
 	}
 
+	// Read the field code if it's not in the first byte
 	if fieldCode == 0 {
 		fieldCode, _ = p.readByte()
 		if fieldCode == 0 || fieldCode < 16 {
 			return nil, errors.New("invalid fieldcode")
 		}
 	}
+
+	// Return the field header
 	return &definitions.FieldHeader{
 		TypeCode:  int32(typeCode),
 		FieldCode: int32(fieldCode),
@@ -60,9 +71,19 @@ func (p *BinaryParser) readFieldHeader() (*definitions.FieldHeader, error) {
 }
 
 func (p *BinaryParser) readByte() (byte, error) {
+	if len(p.data) < 1 {
+		return 0, ErrParserOutOfBound
+	}
 	b := p.data[0]
 	p.data = p.data[1:]
 	return b, nil
+}
+
+func (p *BinaryParser) Peek() (byte, error) {
+	if len(p.data) < 1 {
+		return 0, ErrParserOutOfBound
+	}
+	return p.data[0], nil
 }
 
 func (p *BinaryParser) ReadBytes(n int) ([]byte, error) {
@@ -79,4 +100,33 @@ func (p *BinaryParser) ReadBytes(n int) ([]byte, error) {
 
 func (p *BinaryParser) HasMore() bool {
 	return len(p.data) != 0
+}
+
+func (p *BinaryParser) ReadVariableLength() (int, error) {
+	b1, err := p.readByte()
+	if err != nil {
+		return 0, err
+	}
+	if b1 < 193 {
+		return int(b1), nil
+	}
+	if b1 > 192 && b1 < 241 {
+		b2, err := p.readByte()
+		if err != nil {
+			return 0, err
+		}
+		return 193 + ((int(b1) - 193) * 256) + int(b2), nil
+	}
+	if b1 > 240 && b1 < 255 {
+		b2, err := p.readByte()
+		if err != nil {
+			return 0, err
+		}
+		b3, err := p.readByte()
+		if err != nil {
+			return 0, err
+		}
+		return 12481 + ((int(b1) - 241) * 65536) + (int(b2) * 256) + int(b3), nil
+	}
+	return 0, nil
 }

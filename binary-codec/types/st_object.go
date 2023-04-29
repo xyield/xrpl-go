@@ -41,7 +41,7 @@ func (t *STObject) FromJson(json any) ([]byte, error) {
 	return s.GetSink(), nil
 }
 
-func (t *STObject) FromParser(p *serdes.BinaryParser) (any, error) {
+func (t *STObject) FromParser(p *serdes.BinaryParser, opts ...int) (any, error) {
 	m := make(map[string]any)
 	for p.HasMore() {
 		f, err := p.ReadField()
@@ -49,7 +49,19 @@ func (t *STObject) FromParser(p *serdes.BinaryParser) (any, error) {
 			return nil, err
 		}
 		st := GetSerializedType(f.Type)
-		res, err := st.FromParser(p)
+		var res any
+		if f.IsVLEncoded {
+			size, err := p.ReadVariableLength()
+			if err != nil {
+				return nil, err
+			}
+			res, err = st.FromParser(p, size)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			res, err = st.FromParser(p)
+		}
 		if err != nil {
 			return nil, err
 		}

@@ -393,17 +393,17 @@ func TestSerializeIssuedCurrencyAmount(t *testing.T) {
 func TestIsNative(t *testing.T) {
 	tests := []struct {
 		name     string
-		input    []byte
+		input    byte
 		expected bool
 	}{
 		{
 			name:     "native XRP",
-			input:    []byte{0, 64, 128, 32}, // 0 in binary is 00000000. If the first bit of the first byte is 0, it is deemed to be native XRP
+			input:    64, // 64 in binary is 01000000. If the first bit of the first byte is 0, it is deemed to be native XRP
 			expected: true,
 		},
 		{
 			name:     "not native XRP",
-			input:    []byte{128, 0, 0, 1, 0, 1, 0, 0}, // 128 in binary is 10000000. If the first bit of the first byte is not 0, it is deemed to be not native XRP
+			input:    128, // 128 in binary is 10000000. If the first bit of the first byte is not 0, it is deemed to be not native XRP
 			expected: false,
 		},
 	}
@@ -417,17 +417,17 @@ func TestIsNative(t *testing.T) {
 func TestIsPositive(t *testing.T) {
 	tests := []struct {
 		name     string
-		input    []byte
+		input    byte
 		expected bool
 	}{
 		{
 			name:     "positive",
-			input:    []byte{64, 0, 0, 0}, // 64 in binary is 01000000. If the second bit of the first byte is 1, it is deemed positive
+			input:    64, // 64 in binary is 01000000. If the second bit of the first byte is 1, it is deemed positive
 			expected: true,
 		},
 		{
 			name:     "negative",
-			input:    []byte{128, 0, 0, 0, 0, 0, 0, 0}, // 128 in binary is 10000000. If the second bit of the first byte is 0, it is deemed negative
+			input:    128, // 128 in binary is 10000000. If the second bit of the first byte is 0, it is deemed negative
 			expected: false,
 		},
 	}

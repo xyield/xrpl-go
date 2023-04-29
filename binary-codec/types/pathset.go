@@ -34,7 +34,7 @@ func (p PathSet) FromJson(json any) ([]byte, error) {
 	return newPathSet(json.([]any)), nil
 }
 
-func (p PathSet) FromParser(parser *serdes.BinaryParser) (any, error) {
+func (p PathSet) FromParser(parser *serdes.BinaryParser, opts ...int) (any, error) {
 	return nil, nil
 }
 
