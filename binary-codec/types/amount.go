@@ -80,7 +80,7 @@ func (a *Amount) FromJson(value any) ([]byte, error) {
 	}
 }
 
-func (a *Amount) FromParser(p *serdes.BinaryParser, opts ...int) (any, error) {
+func (a *Amount) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
 	b, err := p.Peek()
 	if err != nil {
 		return nil, err

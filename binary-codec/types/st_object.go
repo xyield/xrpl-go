@@ -41,7 +41,7 @@ func (t *STObject) FromJson(json any) ([]byte, error) {
 	return s.GetSink(), nil
 }
 
-func (t *STObject) FromParser(p *serdes.BinaryParser, opts ...int) (any, error) {
+func (t *STObject) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
 	m := make(map[string]any)
 	for p.HasMore() {
 		f, err := p.ReadField()
@@ -55,15 +55,15 @@ func (t *STObject) FromParser(p *serdes.BinaryParser, opts ...int) (any, error) 
 			if err != nil {
 				return nil, err
 			}
-			res, err = st.FromParser(p, size)
+			res, err = st.ToJson(p, size)
 			if err != nil {
 				return nil, err
 			}
 		} else {
-			res, err = st.FromParser(p)
-		}
-		if err != nil {
-			return nil, err
+			res, err = st.ToJson(p)
+			if err != nil {
+				return nil, err
+			}
 		}
 		res, err = enumToStr(f.FieldName, res)
 		if err != nil {

@@ -111,7 +111,7 @@ func Decode(hexEncoded string) (map[string]any, error) {
 	}
 	p := serdes.NewBinaryParser(b)
 	st := &types.STObject{}
-	m, err := st.FromParser(p)
+	m, err := st.ToJson(p)
 	if err != nil {
 		return nil, err
 	}
