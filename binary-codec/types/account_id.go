@@ -26,7 +26,7 @@ func (a *AccountID) FromJson(value any) ([]byte, error) {
 	return accountID, nil
 }
 
-func (a *AccountID) FromParser(p *serdes.BinaryParser, opts ...int) (any, error) {
+func (a *AccountID) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
 	if opts == nil {
 		return nil, ErrNoLengthPrefix
 	}

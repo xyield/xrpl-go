@@ -22,7 +22,7 @@ func (b *Blob) FromJson(json any) ([]byte, error) {
 	return v, nil
 }
 
-func (b *Blob) FromParser(p *serdes.BinaryParser, opts ...int) (any, error) {
+func (b *Blob) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
 	if opts == nil {
 		return nil, ErrNoLengthPrefix
 	}

@@ -20,7 +20,7 @@ func (u *UInt32) FromJson(value any) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func (u *UInt32) FromParser(p *serdes.BinaryParser, opts ...int) (any, error) {
+func (u *UInt32) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
 	b, err := p.ReadBytes(4)
 	if err != nil {
 		return nil, err
