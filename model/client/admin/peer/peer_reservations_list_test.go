@@ -8,7 +8,7 @@ import (
 
 func TestPeerReservationsListResponse(t *testing.T) {
 	s := PeerReservationsListResponse{
-		Reservations: []PeerReservation{
+		Reservations: []*PeerReservation{
 			{
 				Node:        "n9Jt8awsPzWLjBCNKVEEDQnw4bQEPjezfcQ4gttD1UzbLT1FoG99",
 				Description: "Ripple s1 server 'WOOL'",
