@@ -20,12 +20,13 @@ type Peer struct {
 	Latency         int     `json:"latency"`
 	Ledger          string  `json:"ledger"`
 	Load            int     `json:"load"`
+	Protocol        string  `json:"protocol,omitempty"`
 	Metrics         Metrics `json:"metrics"`
 	PublicKey       string  `json:"public_key,omitempty"`
 	Sanity          string  `json:"sanity,omitempty"`
 	Status          string  `json:"status,omitempty"`
 	Uptime          uint    `json:"uptime"`
-	Version         string  `json:"version"`
+	Version         string  `json:"version,omitempty"`
 }
 
 type Metrics struct {

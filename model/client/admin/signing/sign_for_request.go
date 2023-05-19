@@ -18,7 +18,7 @@ type SignForRequest struct {
 }
 
 func (*SignForRequest) Method() string {
-	return "sign"
+	return "sign_for"
 }
 
 func (r *SignForRequest) UnmarshalJSON(data []byte) error {
