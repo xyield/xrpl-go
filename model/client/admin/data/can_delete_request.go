@@ -7,7 +7,7 @@ import (
 )
 
 type CanDeleteRequest struct {
-	CanDelete common.LedgerSpecifier `json:"can_delete"`
+	CanDelete common.LedgerSpecifier `json:"can_delete,omitempty"`
 }
 
 func (*CanDeleteRequest) Method() string {

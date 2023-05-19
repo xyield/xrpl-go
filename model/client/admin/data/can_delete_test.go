@@ -20,7 +20,15 @@ func TestCanDeleteRequest(t *testing.T) {
 		t.Error(err)
 	}
 }
+func TestCanDeleteRequestEmpty(t *testing.T) {
+	s := CanDeleteRequest{}
 
+	j := `{}`
+
+	if err := test.SerializeAndDeserialize(t, s, j); err != nil {
+		t.Error(err)
+	}
+}
 func TestCanDeleteResponse(t *testing.T) {
 	s := CanDeleteResponse{
 		CanDelete: 54321,
