@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/stretchr/testify v1.7.5
-	github.com/ugorji/go/codec v1.2.7
+	github.com/ugorji/go/codec v1.2.11
 )
 
 require (

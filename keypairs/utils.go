@@ -13,7 +13,7 @@ type randomizer struct {
 
 func (r *randomizer) generateBytes(n int) ([]byte, error) {
 	b := make([]byte, n)
-	_, err := r.Read(b)
+	_, err := r.Read(b) //nolint
 	if err != nil {
 		return nil, err
 	}
