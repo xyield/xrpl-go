@@ -41,7 +41,7 @@ func (p *BinaryParser) ReadField() (*definitions.FieldInstance, error) {
 
 func (p *BinaryParser) readFieldHeader() (*definitions.FieldHeader, error) {
 	// Read the first byte of the field header
-	typeCode, _ := p.readByte()
+	typeCode, _ := p.ReadByte()
 
 	// The field code is the last 4 bits of the first byte
 	fieldCode := typeCode & 15
@@ -49,7 +49,7 @@ func (p *BinaryParser) readFieldHeader() (*definitions.FieldHeader, error) {
 
 	// Read the type code if it's not in the first byte
 	if typeCode == 0 {
-		typeCode, _ = p.readByte()
+		typeCode, _ = p.ReadByte()
 		if typeCode == 0 || typeCode < 16 {
 			return nil, errors.New("invalid typecode")
 		}
@@ -57,7 +57,7 @@ func (p *BinaryParser) readFieldHeader() (*definitions.FieldHeader, error) {
 
 	// Read the field code if it's not in the first byte
 	if fieldCode == 0 {
-		fieldCode, _ = p.readByte()
+		fieldCode, _ = p.ReadByte()
 		if fieldCode == 0 || fieldCode < 16 {
 			return nil, errors.New("invalid fieldcode")
 		}
@@ -70,7 +70,7 @@ func (p *BinaryParser) readFieldHeader() (*definitions.FieldHeader, error) {
 	}, nil
 }
 
-func (p *BinaryParser) readByte() (byte, error) {
+func (p *BinaryParser) ReadByte() (byte, error) {
 	if len(p.data) < 1 {
 		return 0, ErrParserOutOfBound
 	}
@@ -89,7 +89,7 @@ func (p *BinaryParser) Peek() (byte, error) {
 func (p *BinaryParser) ReadBytes(n int) ([]byte, error) {
 	var bytes []byte
 	for i := 0; i < n; i++ {
-		b, err := p.readByte()
+		b, err := p.ReadByte()
 		if err != nil {
 			return nil, err
 		}
@@ -103,7 +103,7 @@ func (p *BinaryParser) HasMore() bool {
 }
 
 func (p *BinaryParser) ReadVariableLength() (int, error) {
-	b1, err := p.readByte()
+	b1, err := p.ReadByte()
 	if err != nil {
 		return 0, err
 	}
@@ -111,18 +111,18 @@ func (p *BinaryParser) ReadVariableLength() (int, error) {
 		return int(b1), nil
 	}
 	if b1 > 192 && b1 < 241 {
-		b2, err := p.readByte()
+		b2, err := p.ReadByte()
 		if err != nil {
 			return 0, err
 		}
 		return 193 + ((int(b1) - 193) * 256) + int(b2), nil
 	}
 	if b1 > 240 && b1 < 255 {
-		b2, err := p.readByte()
+		b2, err := p.ReadByte()
 		if err != nil {
 			return 0, err
 		}
-		b3, err := p.readByte()
+		b3, err := p.ReadByte()
 		if err != nil {
 			return 0, err
 		}

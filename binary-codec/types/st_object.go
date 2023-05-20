@@ -48,6 +48,11 @@ func (t *STObject) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		if f.FieldName == "ObjectEndMarker" || f.FieldName == "ArrayEndMarker" {
+			continue
+		}
+
 		st := GetSerializedType(f.Type)
 		var res any
 		if f.IsVLEncoded {
@@ -71,7 +76,6 @@ func (t *STObject) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
 		}
 		m[f.FieldName] = res
 	}
-	// fmt.Println(f)
 	return m, nil
 }
 

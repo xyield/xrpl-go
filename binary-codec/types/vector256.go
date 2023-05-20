@@ -1,7 +1,9 @@
 package types
 
 import (
+	"encoding/hex"
 	"fmt"
+	"strings"
 
 	"github.com/xyield/xrpl-go/binary-codec/serdes"
 )
@@ -34,10 +36,6 @@ func (v *Vector256) FromJson(json any) ([]byte, error) {
 
 }
 
-func (v *Vector256) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
-	return nil, nil
-}
-
 func vector256FromValue(value []string) ([]byte, error) {
 	b := make([]byte, 0)
 	for _, s := range value {
@@ -51,4 +49,16 @@ func vector256FromValue(value []string) ([]byte, error) {
 
 	}
 	return b, nil
+}
+
+func (v *Vector256) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
+
+	b, _ := p.ReadBytes(opts[0])
+	var value []string
+
+	for i := 0; i < len(b); i += HashLengthBytes {
+		value = append(value, strings.ToUpper(hex.EncodeToString(b[i:i+HashLengthBytes])))
+	}
+
+	return value, nil
 }

@@ -28,5 +28,16 @@ func (t *STArray) FromJson(json any) ([]byte, error) {
 }
 
 func (t *STArray) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
-	return nil, nil
+	var value []any
+
+	for p.HasMore() {
+		st := &STObject{}
+		v, err := st.ToJson(p, opts...)
+		if err != nil {
+			return nil, err
+		}
+		value = append(value, v)
+	}
+
+	return value, nil
 }
