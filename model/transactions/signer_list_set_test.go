@@ -18,21 +18,21 @@ func TestSignerListSetTx(t *testing.T) {
 			Fee:             types.XRPCurrencyAmount(12),
 		},
 		SignerQuorum: 3,
-		SignerEntries: []ledger.SignerEntry{
+		SignerEntries: []ledger.SignerEntryWrapper{
 			{
-				SignerEntry: ledger.Signer{
+				SignerEntry: ledger.SignerEntry{
 					Account:      "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",
 					SignerWeight: 2,
 				},
 			},
 			{
-				SignerEntry: ledger.Signer{
+				SignerEntry: ledger.SignerEntry{
 					Account:      "rUpy3eEg8rqjqfUoLeBnZkscbKbFsKXC3v",
 					SignerWeight: 1,
 				},
 			},
 			{
-				SignerEntry: ledger.Signer{
+				SignerEntry: ledger.SignerEntry{
 					Account:      "raKEEVSGnKSD9Zyvxu4z6Pqpm4ABH8FS6n",
 					SignerWeight: 1,
 				},

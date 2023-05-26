@@ -36,7 +36,7 @@ func TestAccountObjectsResponse(t *testing.T) {
 				PreviousTxnID:     "abc",
 				PreviousTxnLgrSeq: 123,
 				OwnerNode:         "bob",
-				SignerEntries:     []ledger.SignerEntry{},
+				SignerEntries:     []ledger.SignerEntryWrapper{},
 				SignerListID:      213,
 				SignerQuorum:      0,
 			},
