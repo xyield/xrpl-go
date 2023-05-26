@@ -1,0 +1,53 @@
+package ledger
+
+import (
+	"testing"
+
+	"github.com/xyield/xrpl-go/model/transactions/types"
+	"github.com/xyield/xrpl-go/test"
+)
+
+func TestAmmendments(t *testing.T) {
+	var s LedgerObject
+	s = &Amendments{
+		Amendments: []types.Hash256{
+			"42426C4D4F1009EE67080A9B7965B44656D7714D104A72F9B4369F97ABF044EE",
+			"4C97EBA926031A7CF7D7B36FDE3ED66DDA5421192D63DE53FFB46E43B9DC8373",
+			"6781F8368C4771B83E8B821D88F580202BCB4228075297B19E4FDC5233F1EFDC",
+			"740352F2412A9909880C23A559FCECEDA3BE2126FED62FC7660D628A06927F11",
+		},
+		Flags:           0,
+		LedgerEntryType: AmendmentsEntry,
+		Majorities: []MajorityEntry{
+			{
+				Majority: Majority{
+					Amendment: "1562511F573A19AE9BD103B5D6B9E01B3B46805AEC5D3C4805C902B514399146",
+					CloseTime: 535589001,
+				},
+			},
+		},
+	}
+
+	j := `{
+	"Amendments": [
+		"42426C4D4F1009EE67080A9B7965B44656D7714D104A72F9B4369F97ABF044EE",
+		"4C97EBA926031A7CF7D7B36FDE3ED66DDA5421192D63DE53FFB46E43B9DC8373",
+		"6781F8368C4771B83E8B821D88F580202BCB4228075297B19E4FDC5233F1EFDC",
+		"740352F2412A9909880C23A559FCECEDA3BE2126FED62FC7660D628A06927F11"
+	],
+	"Flags": 0,
+	"LedgerEntryType": "Amendments",
+	"Majorities": [
+		{
+			"Majority": {
+				"Amendment": "1562511F573A19AE9BD103B5D6B9E01B3B46805AEC5D3C4805C902B514399146",
+				"CloseTime": 535589001
+			}
+		}
+	]
+}`
+
+	if err := test.SerializeAndDeserialize(t, s, j); err != nil {
+		t.Error(err)
+	}
+}

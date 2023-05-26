@@ -8,11 +8,15 @@ type Amendments struct {
 	Amendments      []types.Hash256 `json:",omitempty"`
 	Flags           uint
 	LedgerEntryType LedgerEntryType
-	Majorities      []Majority `json:",omitempty"`
+	Majorities      []MajorityEntry `json:",omitempty"`
 }
 
 func (*Amendments) EntryType() LedgerEntryType {
 	return AmendmentsEntry
+}
+
+type MajorityEntry struct {
+	Majority Majority
 }
 
 type Majority struct {

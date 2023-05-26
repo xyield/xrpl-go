@@ -7,7 +7,7 @@ type LedgerHashes struct {
 	Flags               uint
 	Hashes              []types.Hash256
 	LastLedgerSequence  uint
-	LedgerEntryType     string
+	LedgerEntryType     LedgerEntryType
 }
 
 func (*LedgerHashes) EntryType() LedgerEntryType {

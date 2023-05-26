@@ -6,7 +6,7 @@ import (
 
 type Escrow struct {
 	Account           types.Address
-	Amount            string
+	Amount            types.XRPCurrencyAmount
 	CancelAfter       uint   `json:",omitempty"`
 	Condition         string `json:",omitempty"`
 	Destination       types.Address

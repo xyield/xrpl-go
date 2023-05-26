@@ -13,7 +13,7 @@ type SignerList struct {
 	PreviousTxnLgrSeq uint64
 	OwnerNode         string
 	SignerEntries     []SignerEntry
-	SignerListId      uint64
+	SignerListID      uint64
 	SignerQuorum      uint64
 }
 

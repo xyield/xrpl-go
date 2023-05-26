@@ -4,11 +4,11 @@ import (
 	"github.com/xyield/xrpl-go/model/transactions/types"
 )
 
-type SignerWrapper struct {
-	SignerEntry SignerEntry
+type SignerEntry struct {
+	SignerEntry Signer
 }
 
-type SignerEntry struct {
+type Signer struct {
 	Account       types.Address
 	SignerWeight  uint64
 	WalletLocator types.Hash256 `json:",omitempty"`
