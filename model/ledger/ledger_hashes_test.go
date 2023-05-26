@@ -8,8 +8,7 @@ import (
 )
 
 func TestLedgerHashes(t *testing.T) {
-	var s LedgerObject
-	s = &LedgerHashes{
+	var s LedgerObject = &LedgerHashes{
 		FirstLedgerSequence: 2,
 		Flags:               0,
 		Hashes: []types.Hash256{

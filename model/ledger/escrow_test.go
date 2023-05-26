@@ -8,8 +8,7 @@ import (
 )
 
 func TestEscrow(t *testing.T) {
-	var s LedgerObject
-	s = &Escrow{
+	var s LedgerObject = &Escrow{
 		Account:           "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
 		Amount:            types.XRPCurrencyAmount(10000),
 		CancelAfter:       545440232,

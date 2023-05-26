@@ -8,8 +8,7 @@ import (
 )
 
 func TestNFTokenPage(t *testing.T) {
-	var s LedgerObject
-	s = &NFTokenPage{
+	var s LedgerObject = &NFTokenPage{
 		LedgerEntryType:   NFTokenPageEntry,
 		PreviousTxnID:     "95C8761B22894E328646F7A70035E9DFBECC90EDD83E43B7B973F626D21A0822",
 		PreviousTxnLgrSeq: 42891441,

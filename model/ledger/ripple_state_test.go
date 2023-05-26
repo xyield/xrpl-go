@@ -8,8 +8,7 @@ import (
 )
 
 func TestRippleState(t *testing.T) {
-	var s LedgerObject
-	s = &RippleState{
+	var s LedgerObject = &RippleState{
 		Balance: types.IssuedCurrencyAmount{
 			Currency: "USD",
 			Issuer:   "rrrrrrrrrrrrrrrrrrrrBZbvji",

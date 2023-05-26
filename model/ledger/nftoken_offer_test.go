@@ -8,8 +8,7 @@ import (
 )
 
 func TestNFTokenOffer(t *testing.T) {
-	var s LedgerObject
-	s = &NFTokenOffer{
+	var s LedgerObject = &NFTokenOffer{
 		Amount:            types.XRPCurrencyAmount(1000000),
 		Flags:             1,
 		LedgerEntryType:   NFTokenOfferEntry,

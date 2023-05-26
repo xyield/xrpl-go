@@ -8,8 +8,7 @@ import (
 )
 
 func TestAmmendments(t *testing.T) {
-	var s LedgerObject
-	s = &Amendments{
+	var s LedgerObject = &Amendments{
 		Amendments: []types.Hash256{
 			"42426C4D4F1009EE67080A9B7965B44656D7714D104A72F9B4369F97ABF044EE",
 			"4C97EBA926031A7CF7D7B36FDE3ED66DDA5421192D63DE53FFB46E43B9DC8373",

@@ -8,8 +8,7 @@ import (
 )
 
 func TestPayChannel(t *testing.T) {
-	var s LedgerObject
-	s = &PayChannel{
+	var s LedgerObject = &PayChannel{
 		Account:           "rBqb89MRQJnMPq8wTwEbtz4kvxrEDfcYvt",
 		Destination:       "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
 		Amount:            types.XRPCurrencyAmount(4325800),
