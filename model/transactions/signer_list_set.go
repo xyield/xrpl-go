@@ -7,7 +7,7 @@ import (
 type SignerListSet struct {
 	BaseTx
 	SignerQuorum  uint
-	SignerEntries []ledger.SignerWrapper
+	SignerEntries []ledger.SignerEntry
 }
 
 func (*SignerListSet) TxType() TxType {
