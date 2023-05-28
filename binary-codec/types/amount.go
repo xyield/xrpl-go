@@ -110,20 +110,20 @@ func (a *Amount) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
 		if err != nil {
 			return nil, err
 		}
-		return deserialiseToken(token)
+		return deserializeToken(token)
 	}
 }
 
-func deserialiseToken(data []byte) (map[string]any, error) {
-	value, err := deserialiseValue(data[:8])
+func deserializeToken(data []byte) (map[string]any, error) {
+	value, err := deserializeValue(data[:8])
 	if err != nil {
 		return nil, err
 	}
-	issuer, err := deserialiseIssuer(data[28:])
+	issuer, err := deserializeIssuer(data[28:])
 	if err != nil {
 		return nil, err
 	}
-	curr, err := deserialiseCurrencyCode(data[8:28])
+	curr, err := deserializeCurrencyCode(data[8:28])
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +134,7 @@ func deserialiseToken(data []byte) (map[string]any, error) {
 	}, nil
 }
 
-func deserialiseValue(data []byte) (string, error) {
+func deserializeValue(data []byte) (string, error) {
 	sign := ""
 	if !isPositive(data[0]) {
 		sign = "-"
@@ -159,7 +159,7 @@ func deserialiseValue(data []byte) (string, error) {
 	return val, nil
 }
 
-func deserialiseCurrencyCode(data []byte) (string, error) {
+func deserializeCurrencyCode(data []byte) (string, error) {
 	// Check for special xrp case
 	if bytes.Equal(data, zeroByteArray) {
 		return "XRP", nil
@@ -185,7 +185,7 @@ func deserialiseCurrencyCode(data []byte) (string, error) {
 	return iso, nil
 }
 
-func deserialiseIssuer(data []byte) (string, error) {
+func deserializeIssuer(data []byte) (string, error) {
 	return addresscodec.Encode(data, []byte{addresscodec.AccountAddressPrefix}, addresscodec.AccountAddressLength), nil
 }
 
