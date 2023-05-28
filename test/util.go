@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Deserialize(s interface{}, d string) error {
@@ -27,12 +27,12 @@ func SerializeAndDeserialize(t *testing.T, s interface{}, d string) error {
 	if err != nil {
 		return err
 	}
-	assert.Equal(t, d, string(j), "json encoding does not match expected string")
+	require.Equal(t, d, string(j), "json encoding does not match expected string")
 	decode := reflect.New(reflect.TypeOf(s))
 	err = json.Unmarshal(j, decode.Interface())
 	if err != nil {
 		return err
 	}
-	assert.Equal(t, s, decode.Elem().Interface(), "json decoding does not match expected struct")
+	require.Equal(t, s, decode.Elem().Interface(), "json decoding does not match expected struct")
 	return nil
 }

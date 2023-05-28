@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestEncode(t *testing.T) {
@@ -29,7 +29,7 @@ func TestEncode(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.description, func(t *testing.T) {
 
-			assert.Equal(t, tc.expectedOutput, Encode(tc.input, tc.inputPrefix, tc.inputLength))
+			require.Equal(t, tc.expectedOutput, Encode(tc.input, tc.inputPrefix, tc.inputLength))
 
 		})
 	}
@@ -56,7 +56,7 @@ func TestDecode(t *testing.T) {
 		t.Run(tc.description, func(t *testing.T) {
 
 			res, _ := Decode(tc.input, tc.inputPrefix)
-			assert.Equal(t, tc.expectedOutput, res)
+			require.Equal(t, tc.expectedOutput, res)
 		})
 	}
 }
@@ -106,11 +106,11 @@ func TestEncodeClassicAddressFromPublicKeyHex(t *testing.T) {
 			got, err := EncodeClassicAddressFromPublicKeyHex(tc.input)
 
 			if tc.expectedErr != nil {
-				assert.EqualError(t, err, tc.expectedErr.Error())
+				require.EqualError(t, err, tc.expectedErr.Error())
 			} else {
-				assert.NoError(t, err)
-				assert.NoError(t, err)
-				assert.Equal(t, tc.expectedOutput, got)
+				require.NoError(t, err)
+				require.NoError(t, err)
+				require.Equal(t, tc.expectedOutput, got)
 			}
 		})
 	}
@@ -180,9 +180,9 @@ func TestEncodeSeed(t *testing.T) {
 			got, err := EncodeSeed(tc.input, tc.inputEncodingType)
 
 			if tc.expectedErr != nil {
-				assert.EqualError(t, err, tc.expectedErr.Error())
+				require.EqualError(t, err, tc.expectedErr.Error())
 			} else {
-				assert.Equal(t, tc.expectedOutput, got)
+				require.Equal(t, tc.expectedOutput, got)
 			}
 		})
 	}
@@ -239,12 +239,12 @@ func TestDecodeSeed(t *testing.T) {
 			got, algorithm, err := DecodeSeed(tc.input)
 
 			if tc.expectedErr != nil {
-				assert.EqualError(t, err, tc.expectedErr.Error())
-				assert.Nil(t, tc.expectedOutput)
+				require.EqualError(t, err, tc.expectedErr.Error())
+				require.Nil(t, tc.expectedOutput)
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tc.expectedOutput, got)
-				assert.Equal(t, tc.expectedAlgorithm, algorithm)
+				require.NoError(t, err)
+				require.Equal(t, tc.expectedOutput, got)
+				require.Equal(t, tc.expectedAlgorithm, algorithm)
 			}
 		})
 	}
@@ -294,13 +294,13 @@ func TestDecodeAddressToAccountID(t *testing.T) {
 			typePrefix, accountID, err := DecodeClassicAddressToAccountID(tc.input)
 
 			if tc.expectedErr != nil {
-				assert.EqualError(t, err, tc.expectedErr.Error())
-				assert.Nil(t, tc.expectedPrefix, typePrefix)
-				assert.Nil(t, tc.expectedAccountID, accountID)
+				require.EqualError(t, err, tc.expectedErr.Error())
+				require.Nil(t, tc.expectedPrefix, typePrefix)
+				require.Nil(t, tc.expectedAccountID, accountID)
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tc.expectedPrefix, typePrefix)
-				assert.Equal(t, tc.expectedAccountID, accountID)
+				require.NoError(t, err)
+				require.Equal(t, tc.expectedPrefix, typePrefix)
+				require.Equal(t, tc.expectedAccountID, accountID)
 			}
 		})
 	}
@@ -327,9 +327,9 @@ func TestIsValidClassicAddress(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.description, func(t *testing.T) {
 			if tc.expected != true {
-				assert.False(t, IsValidClassicAddress(tc.input))
+				require.False(t, IsValidClassicAddress(tc.input))
 			} else {
-				assert.True(t, IsValidClassicAddress(tc.input))
+				require.True(t, IsValidClassicAddress(tc.input))
 			}
 		})
 	}
@@ -361,10 +361,10 @@ func TestEncodeNodePublicKey(t *testing.T) {
 			res, err := EncodeNodePublicKey(tc.input)
 
 			if tc.expectedErr != nil {
-				assert.EqualError(t, err, tc.expectedErr.Error())
+				require.EqualError(t, err, tc.expectedErr.Error())
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tc.expectedOutput, res)
+				require.NoError(t, err)
+				require.Equal(t, tc.expectedOutput, res)
 			}
 		})
 	}
@@ -396,10 +396,10 @@ func TestDecodeNodePublicKey(t *testing.T) {
 			res, err := DecodeNodePublicKey(tc.input)
 
 			if tc.expectedErr != nil {
-				assert.EqualError(t, err, tc.expectedErr.Error())
+				require.EqualError(t, err, tc.expectedErr.Error())
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tc.expectedOutput, res)
+				require.NoError(t, err)
+				require.Equal(t, tc.expectedOutput, res)
 			}
 		})
 	}
@@ -431,10 +431,10 @@ func TestEncodeAccountPublicKey(t *testing.T) {
 			res, err := EncodeAccountPublicKey(tc.input)
 
 			if tc.expectedErr != nil {
-				assert.EqualError(t, err, tc.expectedErr.Error())
+				require.EqualError(t, err, tc.expectedErr.Error())
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tc.expectedOutput, res)
+				require.NoError(t, err)
+				require.Equal(t, tc.expectedOutput, res)
 			}
 		})
 	}
@@ -466,10 +466,10 @@ func TestDecodeAccountPublicKey(t *testing.T) {
 			res, err := DecodeAccountPublicKey(tc.input)
 
 			if tc.expectedErr != nil {
-				assert.EqualError(t, err, tc.expectedErr.Error())
+				require.EqualError(t, err, tc.expectedErr.Error())
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tc.output, res)
+				require.NoError(t, err)
+				require.Equal(t, tc.output, res)
 			}
 		})
 	}

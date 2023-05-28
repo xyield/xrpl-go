@@ -6,7 +6,7 @@ package addresscodec
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestEncodeBase58(t *testing.T) {
@@ -34,7 +34,7 @@ func TestEncodeBase58(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.description, func(t *testing.T) {
-			assert.Equal(t, tc.expectedOutput, EncodeBase58(tc.input))
+			require.Equal(t, tc.expectedOutput, EncodeBase58(tc.input))
 		})
 	}
 }
@@ -64,7 +64,7 @@ func TestDecodeBase58(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.description, func(t *testing.T) {
-			assert.Equal(t, tc.expectedOutput, DecodeBase58(tc.input))
+			require.Equal(t, tc.expectedOutput, DecodeBase58(tc.input))
 		})
 	}
 }

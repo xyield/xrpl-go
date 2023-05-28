@@ -19,7 +19,8 @@ const (
 	txSigPrefix               = "53545800"
 )
 
-// Encode: encodes a transaction or other object from json to the canonical binary format as a hex string.
+// Encode converts a JSON transaction object to a hex string in the canonical binary format.
+// The binary format is defined in XRPL's core codebase.
 func Encode(json map[string]any) (string, error) {
 
 	st := &types.STObject{}
@@ -91,6 +92,7 @@ func EncodeForSigningClaim(json map[string]any) (string, error) {
 	return strings.ToUpper(paymentChannelClaimPrefix + hex.EncodeToString(channel) + hex.EncodeToString(amount)), nil
 }
 
+// removeNonSigningFields removes the fields from a JSON transaction object that should not be signed.
 func removeNonSigningFields(json map[string]any) map[string]any {
 
 	for k := range json {
@@ -104,6 +106,7 @@ func removeNonSigningFields(json map[string]any) map[string]any {
 	return json
 }
 
+// Decode decodes a hex string in the canonical binary format into a JSON transaction object.
 func Decode(hexEncoded string) (map[string]any, error) {
 	b, err := hex.DecodeString(hexEncoded)
 	if err != nil {

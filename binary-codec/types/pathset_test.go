@@ -3,7 +3,7 @@ package types
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/xyield/xrpl-go/binary-codec/serdes"
 )
 
@@ -40,7 +40,7 @@ func TestIsPathStep(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.description, func(t *testing.T) {
-			assert.Equal(t, tc.expected, isPathStep(tc.input))
+			require.Equal(t, tc.expected, isPathStep(tc.input))
 		})
 	}
 }
@@ -65,7 +65,7 @@ func TestNewPathStep(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.description, func(t *testing.T) {
-			assert.Equal(t, tc.expected, newPathStep(tc.input))
+			require.Equal(t, tc.expected, newPathStep(tc.input))
 		})
 	}
 }
@@ -97,7 +97,7 @@ func TestNewPath(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.description, func(t *testing.T) {
-			assert.Equal(t, tc.expected, newPath(tc.input))
+			require.Equal(t, tc.expected, newPath(tc.input))
 		})
 	}
 
@@ -155,7 +155,7 @@ func TestNewPathSet(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.description, func(t *testing.T) {
-			assert.Equal(t, tc.expected, newPathSet(tc.input))
+			require.Equal(t, tc.expected, newPathSet(tc.input))
 		})
 	}
 }
@@ -182,7 +182,7 @@ func TestParsePathStep(t *testing.T) {
 
 			p := serdes.NewBinaryParser(tc.input)
 			got, _ := parsePathStep(p)
-			assert.Equal(t, tc.expected, got)
+			require.Equal(t, tc.expected, got)
 		})
 	}
 }
@@ -216,7 +216,7 @@ func TestParsePath(t *testing.T) {
 		t.Run(tc.description, func(t *testing.T) {
 			p := serdes.NewBinaryParser(tc.input)
 			got, _ := parsePath(p)
-			assert.Equal(t, tc.expected, got)
+			require.Equal(t, tc.expected, got)
 		})
 	}
 }
@@ -275,7 +275,7 @@ func TestParsePathSet(t *testing.T) {
 		t.Run(tc.description, func(t *testing.T) {
 			p := serdes.NewBinaryParser(tc.input)
 			got, _ := parsePathSet(p)
-			assert.Equal(t, tc.expected, got)
+			require.Equal(t, tc.expected, got)
 		})
 	}
 }
