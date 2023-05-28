@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/xyield/xrpl-go/binary-codec/definitions"
 )
 
@@ -50,10 +50,10 @@ func TestCreateFieldInstanceMapFromJson(t *testing.T) {
 
 			got, err := createFieldInstanceMapFromJson(tc.input)
 			if tc.expectedErr != nil {
-				assert.EqualError(t, err, tc.expectedErr.Error())
+				require.EqualError(t, err, tc.expectedErr.Error())
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tc.output, got)
+				require.NoError(t, err)
+				require.Equal(t, tc.output, got)
 			}
 		})
 	}
@@ -102,7 +102,7 @@ func TestGetSortedKeys(t *testing.T) {
 
 	for i, tc := range tt {
 		t.Run(fmt.Sprintf("Test %v", i), func(t *testing.T) {
-			assert.Equal(t, tc.output, getSortedKeys(tc.input))
+			require.Equal(t, tc.output, getSortedKeys(tc.input))
 		})
 	}
 }

@@ -3,7 +3,7 @@ package keypairs
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	addresscodec "github.com/xyield/xrpl-go/address-codec"
 )
 
@@ -40,12 +40,12 @@ func TestED25519DeriveKeypair(t *testing.T) {
 			ds, _, _ := addresscodec.DecodeSeed(tc.seed)
 			priv, pub, err := e.deriveKeypair(ds, tc.validator)
 			if tc.expErr != nil {
-				assert.Zero(t, pub)
-				assert.Zero(t, priv)
-				assert.Error(t, err, tc.expErr.Error())
+				require.Zero(t, pub)
+				require.Zero(t, priv)
+				require.Error(t, err, tc.expErr.Error())
 			} else {
-				assert.Equal(t, tc.expPrivKey, priv)
-				assert.Equal(t, tc.expPubKey, pub)
+				require.Equal(t, tc.expPrivKey, priv)
+				require.Equal(t, tc.expPubKey, pub)
 			}
 		})
 	}
@@ -88,11 +88,11 @@ func TestED25519Sign(t *testing.T) {
 			actual, err := e.sign(tc.inputMsg, tc.inputPrivKey)
 
 			if tc.expectedErr != nil {
-				assert.Zero(t, actual)
-				assert.Error(t, err, tc.expectedErr.Error())
+				require.Zero(t, actual)
+				require.Error(t, err, tc.expectedErr.Error())
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tc.expected, actual)
+				require.NoError(t, err)
+				require.Equal(t, tc.expected, actual)
 			}
 		})
 	}
@@ -126,7 +126,7 @@ func TestED25519Validate(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.description, func(t *testing.T) {
 			actual := e.validate(tc.inputMsg, tc.inputPubKey, tc.inputSig)
-			assert.Equal(t, tc.expected, actual)
+			require.Equal(t, tc.expected, actual)
 		})
 	}
 }

@@ -7,7 +7,7 @@ import (
 	"encoding/hex"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/xyield/xrpl-go/binary-codec/definitions"
 )
 
@@ -85,11 +85,11 @@ func TestEncodeFieldID(t *testing.T) {
 			got, err := encodeFieldID(tc.input)
 
 			if tc.expectedErr != nil {
-				assert.EqualError(t, err, tc.expectedErr.Error())
-				assert.Nil(t, got)
+				require.EqualError(t, err, tc.expectedErr.Error())
+				require.Nil(t, got)
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tc.expected, got)
+				require.NoError(t, err)
+				require.Equal(t, tc.expected, got)
 			}
 		})
 	}
@@ -166,11 +166,11 @@ func TestDecodeFieldID(t *testing.T) {
 			// fmt.Println(actual)
 
 			if tc.expectedErr != nil {
-				assert.Error(t, err, tc.expectedErr.Error())
-				assert.Zero(t, actual)
+				require.Error(t, err, tc.expectedErr.Error())
+				require.Zero(t, actual)
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tc.expected, actual)
+				require.NoError(t, err)
+				require.Equal(t, tc.expected, actual)
 			}
 		})
 	}

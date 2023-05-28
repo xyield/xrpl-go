@@ -3,7 +3,7 @@ package types
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	bigdecimal "github.com/xyield/xrpl-go/pkg/big-decimal"
 )
 
@@ -38,9 +38,9 @@ func TestVerifyXrpValue(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.expErr != nil {
-				assert.Equal(t, tt.expErr, verifyXrpValue(tt.input))
+				require.Equal(t, tt.expErr, verifyXrpValue(tt.input))
 			} else {
-				assert.NoError(t, verifyXrpValue(tt.input))
+				require.NoError(t, verifyXrpValue(tt.input))
 			}
 		})
 	}
@@ -89,9 +89,9 @@ func TestVerifyIOUValue(t *testing.T) {
 
 			err := verifyIOUValue(tt.input)
 			if tt.expErr != nil {
-				assert.EqualError(t, tt.expErr, err.Error())
+				require.EqualError(t, tt.expErr, err.Error())
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 			}
 		})
 	}
@@ -158,10 +158,10 @@ func TestSerializeXrpAmount(t *testing.T) {
 
 			got, err := SerializeXrpAmount(tt.input)
 			if tt.expErr != nil {
-				assert.EqualError(t, tt.expErr, err.Error())
+				require.EqualError(t, tt.expErr, err.Error())
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tt.expectedOutput, got)
+				require.NoError(t, err)
+				require.Equal(t, tt.expectedOutput, got)
 			}
 		})
 	}
@@ -235,10 +235,10 @@ func TestSerializeIssuedCurrencyValue(t *testing.T) {
 			got, err := SerializeIssuedCurrencyValue(tt.input)
 
 			if tt.expectedErr != nil {
-				assert.EqualError(t, tt.expectedErr, err.Error())
+				require.EqualError(t, tt.expectedErr, err.Error())
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tt.expected, got)
+				require.NoError(t, err)
+				require.Equal(t, tt.expected, got)
 			}
 
 		})
@@ -337,10 +337,10 @@ func TestSerializeIssuedCurrencyCode(t *testing.T) {
 			got, err := serializeIssuedCurrencyCode(tt.input)
 
 			if tt.expectedErr != nil {
-				assert.EqualError(t, tt.expectedErr, err.Error())
+				require.EqualError(t, tt.expectedErr, err.Error())
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tt.expected, got)
+				require.NoError(t, err)
+				require.Equal(t, tt.expected, got)
 			}
 
 		})
@@ -380,10 +380,10 @@ func TestSerializeIssuedCurrencyAmount(t *testing.T) {
 			got, err := SerializeIssuedCurrencyAmount(tt.inputValue, tt.inputCurrency, tt.inputIssuer)
 
 			if tt.expectedErr != nil {
-				assert.EqualError(t, tt.expectedErr, err.Error())
+				require.EqualError(t, tt.expectedErr, err.Error())
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tt.expected, got)
+				require.NoError(t, err)
+				require.Equal(t, tt.expected, got)
 			}
 
 		})
@@ -409,7 +409,7 @@ func TestIsNative(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.expected, isNative(tt.input))
+			require.Equal(t, tt.expected, isNative(tt.input))
 		})
 	}
 }
@@ -433,7 +433,7 @@ func TestIsPositive(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.expected, isPositive(tt.input))
+			require.Equal(t, tt.expected, isPositive(tt.input))
 		})
 	}
 }

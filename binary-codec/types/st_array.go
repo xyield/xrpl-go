@@ -6,8 +6,14 @@ import (
 	"github.com/xyield/xrpl-go/binary-codec/serdes"
 )
 
+// STArray represents an array of STObject instances.
 type STArray struct{}
 
+// FromJson is a method that takes a JSON value (which should be a slice of JSON objects),
+// and converts it to a byte slice, representing the serialized form of the STArray.
+// It loops through the JSON slice, and for each element, calls the FromJson method
+// of an STObject, appending the resulting byte slice to a "sink" slice.
+// The method returns an error if the JSON value is not a slice.
 func (t *STArray) FromJson(json any) ([]byte, error) {
 	if _, ok := json.([]any); !ok {
 		return nil, fmt.Errorf("not a slice of objects")
@@ -27,6 +33,10 @@ func (t *STArray) FromJson(json any) ([]byte, error) {
 	return sink, nil
 }
 
+// ToJson is a method that takes a BinaryParser and optional parameters, and converts
+// the serialized byte data back to a JSON value.
+// The method loops until the BinaryParser has no more data, and for each loop,
+// it calls the ToJson method of an STObject, appending the resulting JSON value to a "value" slice.
 func (t *STArray) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
 	var value []any
 
