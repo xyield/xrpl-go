@@ -167,7 +167,7 @@ func parsePathStep(parser *serdes.BinaryParser) (map[string]any, error) {
 			}
 
 			if op.typeKey == typeCurrency {
-				value, err := deserialiseCurrencyCode(bytes)
+				value, err := deserializeCurrencyCode(bytes)
 				if err != nil {
 					return nil, err
 				}
