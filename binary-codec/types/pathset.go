@@ -194,7 +194,10 @@ func parsePath(parser *serdes.BinaryParser) ([]any, error) {
 		}
 
 		if peek == pathsetEndByte || peek == pathSeparatorByte {
-			parser.ReadByte()
+			_, err := parser.ReadByte()
+			if err != nil {
+				return nil, err
+			}
 			break
 		}
 
