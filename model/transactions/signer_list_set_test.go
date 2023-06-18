@@ -18,7 +18,7 @@ func TestSignerListSetTx(t *testing.T) {
 			Fee:             types.XRPCurrencyAmount(12),
 		},
 		SignerQuorum: 3,
-		SignerEntries: []ledger.SignerWrapper{
+		SignerEntries: []ledger.SignerEntryWrapper{
 			{
 				SignerEntry: ledger.SignerEntry{
 					Account:      "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",

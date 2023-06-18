@@ -1,6 +1,6 @@
 package types
 
 type NFToken struct {
-	NFTokenID
-	NFTokenURI `json:"URI"`
+	NFTokenID  NFTokenID
+	NFTokenURI NFTokenURI `json:"URI"`
 }

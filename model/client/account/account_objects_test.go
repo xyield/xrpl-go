@@ -36,8 +36,8 @@ func TestAccountObjectsResponse(t *testing.T) {
 				PreviousTxnID:     "abc",
 				PreviousTxnLgrSeq: 123,
 				OwnerNode:         "bob",
-				SignerEntries:     []ledger.SignerEntry{},
-				SignerListId:      213,
+				SignerEntries:     []ledger.SignerEntryWrapper{},
+				SignerListID:      213,
 				SignerQuorum:      0,
 			},
 			&ledger.NFTokenOffer{
@@ -70,7 +70,7 @@ func TestAccountObjectsResponse(t *testing.T) {
 			"PreviousTxnLgrSeq": 123,
 			"OwnerNode": "bob",
 			"SignerEntries": [],
-			"SignerListId": 213,
+			"SignerListID": 213,
 			"SignerQuorum": 0
 		},
 		{

@@ -68,7 +68,8 @@ func TestTransactionEntryResponse(t *testing.T) {
 					"LedgerEntryType": "NegativeUNL",
 					"LedgerIndex": "123",
 					"NewFields": {
-						"Flags": 16
+						"Flags": 16,
+						"LedgerEntryType": ""
 					}
 				}
 			}
