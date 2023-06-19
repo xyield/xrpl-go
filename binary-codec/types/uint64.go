@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"encoding/binary"
 	"strconv"
+
+	"github.com/xyield/xrpl-go/binary-codec/serdes"
 )
 
 type UInt64 struct{}
 
 // Serializes the given json value to a 64-bit UInt byte slice.
-func (u *UInt64) SerializeJson(value any) ([]byte, error) {
+func (u *UInt64) FromJson(value any) ([]byte, error) {
 
 	// convert string to uint64
 
@@ -28,4 +30,12 @@ func (u *UInt64) SerializeJson(value any) ([]byte, error) {
 		return nil, err
 	}
 	return buf.Bytes(), nil
+}
+
+func (u *UInt64) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
+	b, err := p.ReadBytes(8)
+	if err != nil {
+		return nil, err
+	}
+	return strconv.Itoa(int(binary.BigEndian.Uint64(b))), nil
 }

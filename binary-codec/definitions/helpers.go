@@ -55,7 +55,7 @@ func (d *Definitions) GetFieldCodeByFieldName(n string) (int32, error) {
 }
 
 // Returns the field header struct associated with the given field name.
-func (d *Definitions) GetFieldHeaderByFieldName(n string) (*fieldHeader, error) {
+func (d *Definitions) GetFieldHeaderByFieldName(n string) (*FieldHeader, error) {
 
 	fi, ok := d.Fields[n]
 
@@ -70,7 +70,7 @@ func (d *Definitions) GetFieldHeaderByFieldName(n string) (*fieldHeader, error) 
 }
 
 // Returns the field name associated with the given field header struct.
-func (d *Definitions) GetFieldNameByFieldHeader(fh fieldHeader) (string, error) {
+func (d *Definitions) GetFieldNameByFieldHeader(fh FieldHeader) (string, error) {
 
 	fim, ok := definitions.FieldIdNameMap[fh]
 

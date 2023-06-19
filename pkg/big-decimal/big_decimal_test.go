@@ -6,6 +6,71 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestGetScaledValue(t *testing.T) {
+	tt := []struct {
+		description string
+		bd          *BigDecimal
+		expected    string
+	}{
+		{
+			description: "result should be decimal less than zero",
+			bd: &BigDecimal{
+				Scale:         -3,
+				UnscaledValue: "423",
+				Precision:     3,
+				Sign:          0,
+			},
+			expected: "0.423",
+		},
+		{
+			description: "result should be decimal greater than 0",
+			bd: &BigDecimal{
+				Scale:         -1,
+				UnscaledValue: "70728",
+				Precision:     5,
+				Sign:          0,
+			},
+			expected: "7072.8",
+		},
+		{
+			description: "no decimal place",
+			bd: &BigDecimal{
+				Scale:         12,
+				UnscaledValue: "654",
+				Precision:     3,
+				Sign:          0,
+			},
+			expected: "654000000000000",
+		},
+		{
+			description: "negative value",
+			bd: &BigDecimal{
+				Scale:         5,
+				UnscaledValue: "23",
+				Precision:     2,
+				Sign:          1,
+			},
+			expected: "-2300000",
+		},
+		{
+			description: "large value with decimal",
+			bd: &BigDecimal{
+				Scale:         -3,
+				UnscaledValue: "23005",
+				Precision:     5,
+				Sign:          1,
+			},
+			expected: "-23.005",
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.description, func(t *testing.T) {
+			require.Equal(t, tc.expected, tc.bd.GetScaledValue())
+		})
+	}
+}
+
 func TestNewBigDecimal(t *testing.T) {
 	tt := []struct {
 		name      string

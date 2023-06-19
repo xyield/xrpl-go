@@ -1,6 +1,10 @@
 package types
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/xyield/xrpl-go/binary-codec/serdes"
+)
 
 const HashLengthBytes = 32
 
@@ -14,7 +18,7 @@ func (e *ErrInvalidVector256Type) Error() string {
 
 type Vector256 struct{}
 
-func (v *Vector256) SerializeJson(json any) ([]byte, error) {
+func (v *Vector256) FromJson(json any) ([]byte, error) {
 
 	if _, ok := json.([]string); !ok {
 		return nil, &ErrInvalidVector256Type{fmt.Sprintf("%T", json)}
@@ -30,10 +34,14 @@ func (v *Vector256) SerializeJson(json any) ([]byte, error) {
 
 }
 
+func (v *Vector256) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
+	return nil, nil
+}
+
 func vector256FromValue(value []string) ([]byte, error) {
 	b := make([]byte, 0)
 	for _, s := range value {
-		hash256, err := NewHash256().SerializeJson(s)
+		hash256, err := NewHash256().FromJson(s)
 
 		if err != nil {
 			return nil, err

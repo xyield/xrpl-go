@@ -3,6 +3,7 @@ package bigdecimal
 import (
 	"errors"
 	"fmt"
+	"math/big"
 	"regexp"
 	"strconv"
 	"strings"
@@ -24,6 +25,34 @@ type BigDecimal struct {
 	Precision     int
 	UnscaledValue string
 	Sign          int // 1 for negative, 0 for positive
+}
+
+func (bd *BigDecimal) GetScaledValue() string {
+	unscaled, _ := new(big.Float).SetString(bd.UnscaledValue)
+
+	scalingFactor := new(big.Float).SetFloat64(1)
+	for i := 0; i < abs(bd.Scale); i++ {
+		scalingFactor.Mul(scalingFactor, big.NewFloat(10))
+	}
+
+	var scaledValue *big.Float
+	if bd.Scale >= 0 {
+		scaledValue = new(big.Float).Mul(unscaled, scalingFactor)
+	} else {
+		scaledValue = new(big.Float).Quo(unscaled, scalingFactor)
+	}
+
+	if bd.Sign == 1 {
+		scaledValue.Neg(scaledValue)
+	}
+	return strings.TrimSuffix(strings.TrimRight(scaledValue.Text('f', bd.Scale), "0"), ".")
+}
+
+func abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
 }
 
 // Creates a new custom BigDecimal object from a value string

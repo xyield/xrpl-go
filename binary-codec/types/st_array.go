@@ -2,11 +2,13 @@ package types
 
 import (
 	"fmt"
+
+	"github.com/xyield/xrpl-go/binary-codec/serdes"
 )
 
 type STArray struct{}
 
-func (t *STArray) SerializeJson(json any) ([]byte, error) {
+func (t *STArray) FromJson(json any) ([]byte, error) {
 	if _, ok := json.([]any); !ok {
 		return nil, fmt.Errorf("not a slice of objects")
 	}
@@ -14,7 +16,7 @@ func (t *STArray) SerializeJson(json any) ([]byte, error) {
 	var sink []byte
 	for _, v := range json.([]any) {
 		st := &STObject{}
-		b, err := st.SerializeJson(v)
+		b, err := st.FromJson(v)
 		if err != nil {
 			return nil, err
 		}
@@ -23,4 +25,8 @@ func (t *STArray) SerializeJson(json any) ([]byte, error) {
 	sink = append(sink, 0xF1)
 
 	return sink, nil
+}
+
+func (t *STArray) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
+	return nil, nil
 }

@@ -10,7 +10,7 @@ import (
 
 type STObject struct{}
 
-func (t *STObject) SerializeJson(json any) ([]byte, error) {
+func (t *STObject) FromJson(json any) ([]byte, error) {
 	s := serdes.NewSerializer()
 	if _, ok := json.(map[string]any); !ok {
 		return nil, fmt.Errorf("not a valid json node")
@@ -24,13 +24,12 @@ func (t *STObject) SerializeJson(json any) ([]byte, error) {
 	sk := getSortedKeys(fimap)
 
 	for _, v := range sk {
-
 		if !v.IsSerialized {
 			continue
 		}
 
 		st := GetSerializedType(v.Type)
-		b, err := st.SerializeJson(fimap[v])
+		b, err := st.FromJson(fimap[v])
 		if err != nil {
 			return nil, err
 		}
@@ -40,6 +39,40 @@ func (t *STObject) SerializeJson(json any) ([]byte, error) {
 		}
 	}
 	return s.GetSink(), nil
+}
+
+func (t *STObject) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
+	m := make(map[string]any)
+	for p.HasMore() {
+		f, err := p.ReadField()
+		if err != nil {
+			return nil, err
+		}
+		st := GetSerializedType(f.Type)
+		var res any
+		if f.IsVLEncoded {
+			size, err := p.ReadVariableLength()
+			if err != nil {
+				return nil, err
+			}
+			res, err = st.ToJson(p, size)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			res, err = st.ToJson(p)
+			if err != nil {
+				return nil, err
+			}
+		}
+		res, err = enumToStr(f.FieldName, res)
+		if err != nil {
+			return nil, err
+		}
+		m[f.FieldName] = res
+	}
+	// fmt.Println(f)
+	return m, nil
 }
 
 // nolint
@@ -78,4 +111,17 @@ func getSortedKeys(m map[definitions.FieldInstance]any) []definitions.FieldInsta
 	})
 
 	return keys
+}
+
+func enumToStr(fieldType string, value any) (any, error) {
+	switch fieldType {
+	case "TransactionType":
+		return definitions.Get().GetTransactionTypeNameByTransactionTypeCode(int32(value.(int)))
+	case "TransactionResult":
+		return definitions.Get().GetTransactionResultNameByTransactionResultTypeCode(int32(value.(int)))
+	case "LedgerEntryType":
+		return definitions.Get().GetLedgerEntryTypeNameByLedgerEntryTypeCode(int32(value.(int)))
+	default:
+		return value, nil
+	}
 }

@@ -1,7 +1,10 @@
 package types
 
+import "github.com/xyield/xrpl-go/binary-codec/serdes"
+
 type SerializedType interface {
-	SerializeJson(json any) ([]byte, error)
+	FromJson(json any) ([]byte, error)
+	ToJson(parser *serdes.BinaryParser, opts ...int) (any, error)
 }
 
 // Returns the serialized type for the given type description.
