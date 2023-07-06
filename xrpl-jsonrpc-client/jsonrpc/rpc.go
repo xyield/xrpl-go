@@ -2,8 +2,11 @@ package jsonrpc
 
 import (
 	"bytes"
+	"context"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	jsoniter "github.com/json-iterator/go"
 	jsonrpcclient "github.com/xyield/xrpl-go/xrpl-jsonrpc-client"
@@ -24,11 +27,17 @@ type jsonRpcRequest struct {
 	Params [1]interface{} `json:"params"`
 }
 
+type ApiWarning struct {
+	Id      int         `json:"id"`
+	Message string      `json:"message"`
+	Details interface{} `json:"details,omitempty"`
+}
+
 type jsonRpcResponse struct {
-	Result    AnyJson       `json:"result"`
-	Warning   string        `json:"warning,omitempty"`
-	Warnings  []interface{} `json:"warnings,omitempty"` // TODO: check full response body maps to this correctly
-	Forwarded bool          `json:"forwarded,omitempty"`
+	Result    AnyJson      `json:"result"`
+	Warning   string       `json:"warning,omitempty"`
+	Warnings  []ApiWarning `json:"warnings,omitempty"`
+	Forwarded bool         `json:"forwarded,omitempty"`
 }
 
 // each method has their own request param struct to be passed into CreateRequest
@@ -40,8 +49,8 @@ type ResponseType interface {
 	UnmarshallJSON([]byte) error
 }
 
-// Params will have been serialised and added to request struct before passing to this method
-// Have to serilase the parameters for signed transactions etc
+// CreateRequest formats the parameters and method name ready for sending request
+// Params will have been serialised if required and added to request struct before being passed to this method
 func CreateRequest(method string, params RequestParams) ([]byte, error) {
 
 	var body jsonRpcRequest
@@ -53,22 +62,20 @@ func CreateRequest(method string, params RequestParams) ([]byte, error) {
 	} else {
 		body = jsonRpcRequest{
 			Method: method,
-			Params: [1]interface{}{params}, // array with 1 json array - will be its own struct with json serialising tags
+			// each param object will have a struct with json serialising tags
+			Params: [1]interface{}{params},
 		}
 	}
 
 	jsonBytes, err := jsoniter.Marshal(body)
-	// TODO: add correct formatting for the marshal here - do we need the indent formatter below?
-	// jsonBytes, err := json.MarshalIndent(r, "", "\t")
-
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to marshal JSON-RPC request for method %s with parameters %+v: %w", method, params, err)
 	}
 
 	return jsonBytes, nil
 }
 
-// currently returning the whole response as well as the error - ok?
+// CheckForError reads the http response and formats the error if it exists
 func CheckForError(res *http.Response) (jsonRpcResponse, error) {
 
 	var jr jsonRpcResponse
@@ -78,6 +85,7 @@ func CheckForError(res *http.Response) (jsonRpcResponse, error) {
 		return jr, err
 	}
 
+	// In case a different error code is returned
 	if res.StatusCode != 200 {
 		return jr, &JsonRpcClientError{ErrorString: string(b)}
 	}
@@ -95,77 +103,78 @@ func CheckForError(res *http.Response) (jsonRpcResponse, error) {
 	return jr, nil
 }
 
-// TODO: pass config in or give this method a new interface reciever for each method interface?
-func SendRequest(body []byte, cfg *jsonrpcclient.Config, responseStruct ResponseType) error {
+// SendRequest makes request to xrpl and returns error if exists or populates the response struct for each request if sucessful
+func SendRequest(body []byte, cfg *jsonrpcclient.Config, responseStruct ResponseType) (jsonRpcResponse, error) {
 
-	// add CreateRequest in here so only call 1 method?
+	var jr jsonRpcResponse
 
 	req, err := http.NewRequest(http.MethodPost, cfg.Url, bytes.NewReader(body))
 	if err != nil {
-		return err
+		return jr, err
 	}
-	headers := map[string][]string{
-		"Content-Type": {"application/json"},
-	}
-	req.Header = headers
 
-	response, err := cfg.HTTPClient.Do(req)
-	if err != nil {
-		return err
+	// add timeout context to prevent hanging
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+	req = req.WithContext(ctx)
+
+	req.Header = cfg.Headers
+
+	var response *http.Response
+
+	response, err = cfg.HTTPClient.Do(req)
+	if err != nil || response == nil {
+		return jr, err
 	}
 
 	// allow client to reuse persistant connection
 	defer response.Body.Close()
 
-	// TODO: check if get 503 service unavailable (from rate limiting) and re-try if so
+	// Check for service unavailable response and retry if so
+	if response.StatusCode == 503 {
 
-	jsonRpcResponse, err := CheckForError(response)
+		maxRetries := 3
+		backoffDuration := 1 * time.Second
+
+		for i := 0; i < maxRetries; i++ {
+			time.Sleep(backoffDuration)
+
+			// Make request again after waiting
+			response, err = cfg.HTTPClient.Do(req)
+			if err != nil {
+				return jr, err
+			}
+
+			if response.StatusCode != 503 {
+				break
+			}
+
+			// Increase backoff duration for the next retry
+			backoffDuration *= 2
+		}
+
+		if response.StatusCode == 503 {
+			// Return service unavailable error here after retry 3 times
+			return jr, &JsonRpcClientError{ErrorString: "Server is overloaded, rate limit exceeded"}
+		}
+
+	}
+
+	jr, err = CheckForError(response)
 	if err != nil {
-		return err
+		return jr, err
 	}
 
 	// If no error unmarshall jsonRpcResponse.Result into the result struct
-	b, err := jsoniter.Marshal(jsonRpcResponse.Result)
+	b, err := jsoniter.Marshal(jr.Result)
 	if err != nil {
-		return err
+		return jr, err
 	}
 
 	err = responseStruct.UnmarshallJSON(b)
 	if err != nil {
-		return err
+		return jr, err
 	}
 
-	// TODO: we are going to have to run the decode method here on the response body?
-
-	return nil
+	return jr, err
 }
-
-/////////////////////// Doesn't work marshalling result into a string
-// b, _ := jsoniter.Marshal(jsonRpcResponse.Result)
-// fmt.Println(string(b))
-
-// r, _ := GetResultString(response)
-
-// resultBytes, err := jsoniter.Marshal(r.Result) // marshall the string version of result
-// if err != nil {
-// 	return &responseStruct, err
-// }
-
-// var jr jsonRpcResult
-
-// b, err := ioutil.ReadAll(response.Body)
-// if err != nil || b == nil {
-// 	return &responseStruct, err
-// }
-// err = jsoniter.Unmarshal(b, &jr) // grab just stringified value of "result" so do not convert to AnyJson
-// if err != nil {
-// 	return &responseStruct, err
-// }
-///////////////
-
-// err = jsoniter.Unmarshal(byteJson, &responseStruct) // error as can only unmarshall into a pointer
-// fmt.Println("Operation: ", responseStruct)
-// if err != nil {
-// 	// return &responseStruct, err
-// 	return err
-// }

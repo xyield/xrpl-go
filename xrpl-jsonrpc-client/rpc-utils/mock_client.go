@@ -7,8 +7,9 @@ import (
 )
 
 type MockClient struct {
-	DoFunc func(req *http.Request) (*http.Response, error)
-	Spy    *http.Request
+	DoFunc       func(req *http.Request) (*http.Response, error)
+	Spy          *http.Request
+	RequestCount int
 }
 
 func (m *MockClient) Do(req *http.Request) (*http.Response, error) {

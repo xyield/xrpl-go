@@ -3,9 +3,11 @@ package jsonrpc
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"testing"
+	"time"
 
 	jsoniter "github.com/json-iterator/go"
 	"github.com/stretchr/testify/assert"
@@ -19,16 +21,22 @@ type testParamStruct struct {
 }
 
 type testResponseStruct struct {
-	Account     string `json:"account"`
-	LedgerHash  string `json:"ledger_hash,omitempty"`
-	LedgerIndex int    `json:"ledger_index,omitempty"`
+	Account      string `json:"account"`
+	LedgerHash   string `json:"ledger_hash,omitempty"`
+	LedgerIndex  int    `json:"ledger_index,omitempty"`
+	LedgerNumber int    `json:"ledger_number,omitempty"`
+	Reference    string `json:"reference,omitempty"`
 }
 
-// This method will be added to every response struct passed into SendRequest
+// Every response struct passed to SendRequest will have this method available to them
 func (r *testResponseStruct) UnmarshallJSON(data []byte) error {
 	type Alias testResponseStruct
 	var aux Alias
 	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+	err := json.Unmarshal(data, &aux)
+	if err != nil {
 		return err
 	}
 	*r = testResponseStruct(aux)
@@ -118,7 +126,6 @@ func TestCheckForError(t *testing.T) {
 }
 
 func TestCreateRequest(t *testing.T) {
-
 	t.Run("Create request", func(t *testing.T) {
 
 		params := testParamStruct{
@@ -158,20 +165,53 @@ func TestCreateRequest(t *testing.T) {
 }
 
 func TestSendRequest(t *testing.T) {
-	t.Run("Send request - sucessful response", func(t *testing.T) {
+
+	t.Run("SendRequest - Check headers and URL", func(t *testing.T) {
+		response := `{}`
+		var capturedRequest *http.Request
+
+		mc := &rpcutils.MockClient{}
+		mc.DoFunc = func(req *http.Request) (*http.Response, error) {
+			capturedRequest = req
+			return rpcutils.MockResponse(response, 200, mc)(req)
+		}
+
+		requestBodyBytes := createTestRequest()
+		resStruct := &testResponseStruct{}
+
+		cfg, err := jsonrpcclient.NewConfig("http://testnode/")
+		assert.NoError(t, err)
+		cfg.AddHttpClient(mc)
+
+		_, err = SendRequest(requestBodyBytes, cfg, resStruct)
+
+		assert.NotNil(t, capturedRequest)
+		assert.NoError(t, err)
+		assert.Equal(t, "POST", capturedRequest.Method)
+		assert.Equal(t, "http://testnode/", capturedRequest.URL.String())
+		assert.Equal(t, "application/json", capturedRequest.Header.Get("Content-Type"))
+	})
+
+	t.Run("SendRequest - sucessful response", func(t *testing.T) {
 
 		response := `{
 			"result": {
-			  "account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-			  "ledger_hash": "27F530E5C93ED5C13994812787C1ED073C822BAEC7597964608F2C049C2ACD2D",
-			  "ledger_index": 71766343
-				}
-			}`
+				"account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+				"ledger_hash": "27F530E5C93ED5C13994812787C1ED073C822BAEC7597964608F2C049C2ACD2D",
+				"ledger_index": 71766343
+			},
+			"warning": "none",
+			"warnings":
+			[{
+				"id": 1,
+				"message": "message"
+			}]
+		}`
 
 		mc := &rpcutils.MockClient{}
 		mc.DoFunc = rpcutils.MockResponse(response, 200, mc)
 
-		requestBodyBytes := createRequest()
+		requestBodyBytes := createTestRequest()
 
 		resStruct := &testResponseStruct{}
 
@@ -179,16 +219,20 @@ func TestSendRequest(t *testing.T) {
 		assert.NoError(t, err)
 		cfg.AddHttpClient(mc)
 
-		err = SendRequest(requestBodyBytes, cfg, resStruct)
+		jr, err := SendRequest(requestBodyBytes, cfg, resStruct)
 
 		assert.NoError(t, err)
+		assert.Equal(t, "none", jr.Warning)
+		assert.Equal(t, ApiWarning{Message: "message", Id: 1}, jr.Warnings[0])
 		assert.Equal(t, "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn", resStruct.Account)
 		assert.Equal(t, "27F530E5C93ED5C13994812787C1ED073C822BAEC7597964608F2C049C2ACD2D", resStruct.LedgerHash)
 		assert.Equal(t, 71766343, resStruct.LedgerIndex)
+		assert.Equal(t, 0, resStruct.LedgerNumber)
+		assert.Equal(t, "", resStruct.Reference)
 
 	})
 
-	t.Run("Send request - error response", func(t *testing.T) {
+	t.Run("SendRequest - error response", func(t *testing.T) {
 
 		response := `{
 			"result": {
@@ -206,7 +250,7 @@ func TestSendRequest(t *testing.T) {
 		mc := &rpcutils.MockClient{}
 		mc.DoFunc = rpcutils.MockResponse(response, 200, mc)
 
-		requestBodyBytes := createRequest()
+		requestBodyBytes := createTestRequest()
 
 		resStruct := &testResponseStruct{}
 
@@ -214,19 +258,105 @@ func TestSendRequest(t *testing.T) {
 		assert.NoError(t, err)
 		cfg.AddHttpClient(mc)
 
-		err = SendRequest(requestBodyBytes, cfg, resStruct)
+		_, err = SendRequest(requestBodyBytes, cfg, resStruct)
 
 		assert.Equal(t, "", resStruct.Account)
 		assert.Equal(t, "", resStruct.LedgerHash)
 		assert.EqualError(t, err, "ledgerIndexMalformed")
 	})
 
-	// test different struct also works?
-	// test it sends correct headers and url
-	// test the defer
+	t.Run("SendRequest - 503 response", func(t *testing.T) {
+
+		response := `Service Unavailable`
+
+		mc := &rpcutils.MockClient{}
+		mc.DoFunc = func(req *http.Request) (*http.Response, error) {
+			mc.RequestCount++
+			return rpcutils.MockResponse(response, 503, mc)(req)
+		}
+
+		requestBodyBytes := createTestRequest()
+
+		resStruct := &testResponseStruct{}
+
+		cfg, err := jsonrpcclient.NewConfig("http://testnode/")
+		assert.NoError(t, err)
+		cfg.AddHttpClient(mc)
+
+		_, err = SendRequest(requestBodyBytes, cfg, resStruct)
+
+		// Check that 3 extra requests were made
+		assert.Equal(t, 4, mc.RequestCount)
+
+		assert.Equal(t, "", resStruct.Account)
+		assert.Equal(t, "", resStruct.LedgerHash)
+		assert.EqualError(t, err, "Server is overloaded, rate limit exceeded")
+	})
+
+	t.Run("SendRequest - 503 response sucessfully resolves", func(t *testing.T) {
+
+		sucessResponse := `{
+			"result": {
+			  "account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+			  "ledger_hash": "27F530E5C93ED5C13994812787C1ED073C822BAEC7597964608F2C049C2ACD2D",
+			  "ledger_index": 71766343
+				}
+			}`
+
+		mc := &rpcutils.MockClient{}
+		mc.DoFunc = func(req *http.Request) (*http.Response, error) {
+			if mc.RequestCount < 3 {
+				// Return 503 response for the first three requests
+				mc.RequestCount++
+				return rpcutils.MockResponse(`Service Unavailable`, 503, mc)(req)
+			}
+			// Return 200 response for the fourth request
+			return rpcutils.MockResponse(sucessResponse, 200, mc)(req)
+		}
+
+		requestBodyBytes := createTestRequest()
+
+		resStruct := &testResponseStruct{}
+
+		cfg, err := jsonrpcclient.NewConfig("http://testnode/")
+		assert.NoError(t, err)
+		cfg.AddHttpClient(mc)
+
+		_, err = SendRequest(requestBodyBytes, cfg, resStruct)
+
+		// Check that only 2 extra requests were made
+		assert.Equal(t, 3, mc.RequestCount)
+
+		assert.NoError(t, err)
+		assert.Equal(t, "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn", resStruct.Account)
+		assert.Equal(t, "27F530E5C93ED5C13994812787C1ED073C822BAEC7597964608F2C049C2ACD2D", resStruct.LedgerHash)
+		assert.Equal(t, 71766343, resStruct.LedgerIndex)
+	})
+
+	t.Run("SendRequest - timeout", func(t *testing.T) {
+		mc := &rpcutils.MockClient{}
+		mc.DoFunc = func(req *http.Request) (*http.Response, error) {
+			// hit the timeout by not responding
+			time.Sleep(time.Second * 5)
+			return nil, errors.New("timeout")
+		}
+
+		requestBodyBytes := createTestRequest()
+		resStruct := &testResponseStruct{}
+
+		cfg, err := jsonrpcclient.NewConfig("http://testnode/")
+		assert.NoError(t, err)
+		cfg.AddHttpClient(mc)
+
+		_, err = SendRequest(requestBodyBytes, cfg, resStruct)
+
+		// Check that the expected timeout error occurred
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "timeout")
+	})
 }
 
-func createRequest() []byte {
+func createTestRequest() []byte {
 	params := testParamStruct{
 		Account: "account1",
 		Info:    "some account information",

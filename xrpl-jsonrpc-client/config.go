@@ -20,7 +20,7 @@ type HTTPClient interface {
 type Config struct {
 	HTTPClient HTTPClient
 	Url        string
-	// Request    *http.Request
+	Headers    map[string][]string
 }
 
 func NewConfigWithHttpClient(url string, c HTTPClient) (*Config, error) {
@@ -48,21 +48,12 @@ func NewConfig(url string) (*Config, error) {
 		url += "/"
 	}
 
-	// TODO: validate correct http and TLS version?
-
-	// req, err := http.NewRequest(http.MethodPost, url, nil)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// headers := map[string][]string{
-	// 	"Content-Type": {"application/json"},
-	// }
-	// req.Header = headers
-
 	cfg := &Config{
 		HTTPClient: &http.Client{Timeout: time.Duration(1) * time.Second}, // default timeout value - allow custom timme out?
 		Url:        url,
-		// Request:    req,
+		Headers: map[string][]string{
+			"Content-Type": {"application/json"},
+		},
 	}
 
 	return cfg, nil

@@ -52,7 +52,7 @@ func (a *AccountMethods) Channels(params AccountChannelsParams) (interface{}, er
 
 	response := &AccountChannelsResponse{}
 
-	err = jsonrpc.SendRequest(body, a.Cfg, response)
+	_, err = jsonrpc.SendRequest(body, a.Cfg, response)
 	if err != nil {
 		return nil, err
 	}

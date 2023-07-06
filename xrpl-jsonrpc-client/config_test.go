@@ -19,10 +19,8 @@ func TestConfigCreation(t *testing.T) {
 		cfg, _ := NewConfig("http://s1.ripple.com:51234/")
 
 		req, err := http.NewRequest(http.MethodPost, "http://s1.ripple.com:51234/", nil)
-		headers := map[string][]string{
-			"Content-Type": {"application/json"},
-		}
-		req.Header = headers
+
+		req.Header = cfg.Headers
 		assert.Equal(t, "http://s1.ripple.com:51234/", cfg.Url)
 		assert.NoError(t, err)
 	})
@@ -36,10 +34,8 @@ func TestConfigCreation(t *testing.T) {
 		cfg, _ := NewConfig("http://s1.ripple.com:51234")
 
 		req, err := http.NewRequest(http.MethodPost, "http://s1.ripple.com:51234/", nil)
-		headers := map[string][]string{
-			"Content-Type": {"application/json"},
-		}
-		req.Header = headers
+
+		req.Header = cfg.Headers
 		assert.Equal(t, "http://s1.ripple.com:51234/", cfg.Url)
 		assert.NoError(t, err)
 	})
@@ -52,8 +48,8 @@ func TestConfigCreation(t *testing.T) {
 		headers := map[string][]string{
 			"Content-Type": {"application/json"},
 		}
-		req.Header = headers
-		assert.Equal(t, &Config{HTTPClient: customHttpClient{}, Url: "http://s1.ripple.com:51234/"}, cfg)
+		req.Header = cfg.Headers
+		assert.Equal(t, &Config{HTTPClient: customHttpClient{}, Url: "http://s1.ripple.com:51234/", Headers: headers}, cfg)
 		assert.NoError(t, err)
 	})
 }
