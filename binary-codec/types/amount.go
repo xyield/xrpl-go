@@ -1,15 +1,20 @@
 package types
 
 import (
+	"bytes"
 	"encoding/binary"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"math/big"
+	"regexp"
 	"strconv"
 	"strings"
-)
 
-type Amount struct{}
+	addresscodec "github.com/xyield/xrpl-go/address-codec"
+	"github.com/xyield/xrpl-go/binary-codec/serdes"
+	bigdecimal "github.com/xyield/xrpl-go/pkg/big-decimal"
+)
 
 const (
 	MinIOUExponent  = -96
@@ -27,125 +32,164 @@ const (
 	MinXRP   = 1e-6
 	MaxDrops = 1e17 // 100 billion XRP in drops aka 10^17
 
-	AllowedIOUCharacters = "0123456789.-eE" // going to do this with Regex
+	IOUCodeRegex = `[0-9A-Za-z?!@#$%^&*<>(){}\[\]|]{3}`
 )
 
-type BigDecimal struct {
-	Scale         int
-	Precision     int
-	UnscaledValue string
-	Sign          string
+var (
+	ErrInvalidXRPValue     = errors.New("invalid XRP value")
+	ErrInvalidCurrencyCode = errors.New("invalid currency code")
+	zeroByteArray          = make([]byte, 20)
+)
+
+type InvalidAmountError struct {
+	Amount string
 }
 
-func (a *Amount) SerializeJson(value any) ([]byte, error) {
-
-	return nil, nil
+func (e *InvalidAmountError) Error() string {
+	return fmt.Sprintf("value '%s' is an invalid amount", e.Amount)
 }
 
-// Creates a new custom BigDecimal object from a value string
-func NewBigDecimal(value string) (*BigDecimal, error) {
+type OutOfRangeError struct {
+	Type string
+}
 
-	bigDecimal := new(BigDecimal)
-	var err error
+func (e *OutOfRangeError) Error() string {
+	return fmt.Sprintf("%s is out of range", e.Type)
+}
 
-	if ContainsInvalidCharacters(value) {
-		return nil, errors.New("value contains invalid characters: only '0-9' '.' '-' 'e' and 'E' are allowed")
+type InvalidCodeError struct {
+	Disallowed string
+}
+
+func (e *InvalidCodeError) Error() string {
+	return fmt.Sprintf("'%s' is/are disallowed or invalid", e.Disallowed)
+}
+
+type Amount struct{}
+
+// Serializes an issued currency amount to its bytes representation from json
+func (a *Amount) FromJson(value any) ([]byte, error) {
+
+	switch value := value.(type) {
+	case string:
+		return SerializeXrpAmount(value)
+	case map[string]any:
+		return SerializeIssuedCurrencyAmount(value["value"].(string), value["currency"].(string), value["issuer"].(string))
+	default:
+		return nil, errors.New("invalid amount type")
 	}
-	if strings.HasPrefix(value, "-") { // if the value is negative, set the sign to negative
-		bigDecimal.Sign = "-"
+}
+
+func (a *Amount) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
+	b, err := p.Peek()
+	if err != nil {
+		return nil, err
 	}
-
-	value = strings.ToLower(strings.TrimPrefix(value, "-")) // remove the sign from the value
-
-	prefix, suffix, ePresent := strings.Cut(value, "e") // split the value into prefix and suffix at the 'e' character, if present
-
-	if strings.Contains(prefix, "-") { // if the value still has a minus sign in the prefix, return an error
-		return nil, errors.New("value contains multiple '-' characters, excluding the exponent sign")
+	var sign string
+	if !isPositive(b) {
+		sign = "-"
 	}
-	if strings.Contains(prefix, "e") || strings.Contains(suffix, "e") { // if the prefix or suffix still contains an 'e' character, return an error
-		return nil, errors.New("value contains multiple 'e' or 'E' characters")
-	}
-
-	emptyCheck := strings.Trim(prefix, "0") // remove all zeros from the prefix
-
-	if emptyCheck == "" || emptyCheck == "." { // if the prefix is empty or just a decimal point, set everything to 0 or "" and return
-		bigDecimal.Scale = 0
-		bigDecimal.Precision = 0
-		bigDecimal.UnscaledValue = ""
-		bigDecimal.Sign = ""
-		return bigDecimal, nil
-	}
-
-	containsDecimal, decimalErr := containsDecimal(value) // check if the value contains a SINGLE decimal point
-
-	if decimalErr != nil {
-		return nil, decimalErr
-	}
-
-	decimalPrefix, decimalSuffix, _ := strings.Cut(prefix, ".") // split the prefix into decimal prefix and decimal suffix at the '.' character, if present
-
-	if ePresent { // if the value contains an 'e' character
-		bigDecimal.Scale, err = strconv.Atoi(suffix) // convert the suffix to an int, which is the scale
+	if isNative(b) {
+		xrp, err := p.ReadBytes(8)
 		if err != nil {
 			return nil, err
 		}
-
-		if containsDecimal { // if the value contains a SINGLE decimal point
-			decimalSuffixNoTrailingZeros := strings.TrimRight(decimalSuffix, "0")         // remove trailing zeros from the decimal suffix
-			decimalPrefixNoLeadingZeros := strings.TrimLeft(decimalPrefix, "0")           // remove leading zeros from the decimal prefix
-			bigDecimal.Scale = bigDecimal.Scale - len(decimalSuffixNoTrailingZeros)       // subtract the length of the decimal suffix from the scale
-			bigDecimal.UnscaledValue = strings.Trim((decimalPrefix + decimalSuffix), "0") // remove leading and trailing zeros from the concatenated decimal prefix and decimal suffix to get the unscaled value
-
-			if decimalSuffixNoTrailingZeros == "" { // if the decimal suffix is empty because it only contained trailing zeros
-				bigDecimal.Scale = bigDecimal.Scale + (len(decimalPrefixNoLeadingZeros) - len(bigDecimal.UnscaledValue)) // add the difference between the length of the decimal prefix and the length of the unscaled value, to the scale
-			}
-
-		} else if !containsDecimal { // if the value does not contain a SINGLE decimal point
-			prefixNoTrailingZeros := strings.Trim(prefix, "0")                                             // remove trailing zeros from the prefix
-			prefixNoLeadingZeros := strings.TrimLeft(prefix, "0")                                          // remove leading zeros from the prefix
-			bigDecimal.Scale = bigDecimal.Scale + (len(prefixNoLeadingZeros) - len(prefixNoTrailingZeros)) // add the difference between the length of the prefix and the length of the prefix with trailing zeros removed, to the scale
-			bigDecimal.UnscaledValue = prefixNoTrailingZeros                                               // set the unscaled value to the prefix with trailing zeros removed
-		} else {
+		xrpVal := binary.BigEndian.Uint64(xrp)
+		xrpVal = xrpVal & 0x3FFFFFFFFFFFFFFF
+		return sign + strconv.FormatUint(xrpVal, 10), nil
+	} else {
+		token, err := p.ReadBytes(48)
+		if err != nil {
 			return nil, err
 		}
+		return deserialiseToken(token)
 	}
+}
 
-	if !ePresent { // if the value does not contain an 'e' character
+func deserialiseToken(data []byte) (map[string]any, error) {
+	value, err := deserialiseValue(data[:8])
+	if err != nil {
+		return nil, err
+	}
+	issuer, err := deserialiseIssuer(data[28:])
+	if err != nil {
+		return nil, err
+	}
+	curr, err := deserialiseCurrencyCode(data[8:28])
+	if err != nil {
+		return nil, err
+	}
+	return map[string]any{
+		"value":    value,
+		"currency": curr,
+		"issuer":   issuer,
+	}, nil
+}
 
-		if containsDecimal && decimalErr == nil { // if the value contains a SINGLE decimal point
-			decimalSuffixNoTrailingZeros := strings.TrimRight(decimalSuffix, "0")                        // remove trailing zeros from the decimal suffix
-			decimalPrefixNoLeadingZeros := strings.TrimLeft(decimalPrefix, "0")                          // remove leading zeros from the decimal prefix
-			bigDecimal.Scale = -len(decimalSuffixNoTrailingZeros)                                        // set the scale to the negative of the length of the decimal suffix with trailing zeros removed
-			bigDecimal.UnscaledValue = strings.Trim((decimalPrefix + decimalSuffixNoTrailingZeros), "0") // remove leading and trailing zeros from the concatenated decimal prefix and decimal suffix with trailing zeros removed to get the unscaled value
+func deserialiseValue(data []byte) (string, error) {
+	sign := ""
+	if !isPositive(data[0]) {
+		sign = "-"
+	}
+	value_bytes := data[:8]
+	b1 := value_bytes[0]
+	b2 := value_bytes[1]
+	e1 := int((b1 & 0x3F) << 2)
+	e2 := int(b2 >> 6)
+	exponent := e1 + e2 - 97
+	sig_figs := append([]byte{0, (b2 & 0x3F)}, value_bytes[2:]...)
+	sig_figs_int := binary.BigEndian.Uint64(sig_figs)
+	d, err := bigdecimal.NewBigDecimal(sign + strconv.Itoa(int(sig_figs_int)) + "e" + strconv.Itoa(exponent))
+	if err != nil {
+		return "", err
+	}
+	val := d.GetScaledValue()
+	err = verifyIOUValue(val)
+	if err != nil {
+		return "", err
+	}
+	return val, nil
+}
 
-			if decimalSuffixNoTrailingZeros == "" { // if the decimal suffix is empty because it only contained trailing zeros
-				bigDecimal.Scale = len(decimalPrefixNoLeadingZeros) - len(bigDecimal.UnscaledValue) // set the scale to the difference between the length of the decimal prefix and the length of the unscaled value
-			}
-
-		} else if !containsDecimal && decimalErr == nil { // if the value does not contain a SINGLE decimal point
-			decimalPrefixNoTrailingZeros := strings.TrimRight(prefix, "0")             // remove trailing zeros from the prefix
-			bigDecimal.Scale = len(prefix) - len(decimalPrefixNoTrailingZeros)         // set the scale to the difference between the length of the prefix and the length of the prefix with trailing zeros removed
-			bigDecimal.UnscaledValue = strings.Trim(decimalPrefixNoTrailingZeros, "0") // remove leading and trailing zeros from the prefix with trailing zeros removed to get the unscaled value
-		} else {
-			return nil, err
+func deserialiseCurrencyCode(data []byte) (string, error) {
+	// Check for special xrp case
+	if bytes.Equal(data, zeroByteArray) {
+		return "XRP", nil
+	}
+	if data[0] != 0 {
+		return "", ErrInvalidCurrencyCode
+	}
+	// the next 88 bits (11 bytes) are reserved and should all be zero
+	for _, i := range data[1:12] {
+		if i != 0 {
+			return "", ErrInvalidCurrencyCode
 		}
 	}
+	iso := strings.ToUpper(string(data[12:15]))
+	if iso == "XRP" {
+		return "", ErrInvalidCurrencyCode
+	}
+	ok, _ := regexp.MatchString(IOUCodeRegex, iso)
 
-	bigDecimal.Precision = len(bigDecimal.UnscaledValue) // set the precision to the length of the unscaled value
+	if !ok {
+		return "", ErrInvalidCurrencyCode
+	}
+	return iso, nil
+}
 
-	return bigDecimal, nil
+func deserialiseIssuer(data []byte) (string, error) {
+	return addresscodec.Encode(data, []byte{addresscodec.AccountAddressPrefix}, addresscodec.AccountAddressLength), nil
 }
 
 // validates the format of an XRP amount value
 // XRP values shouldn't contain a decimal point BECAUSE they are represented as integers as drops
-func VerifyXrpValue(value string) error {
+func verifyXrpValue(value string) error {
 
-	containsDecimal, err := containsDecimal(value)
+	r := regexp.MustCompile(`\d+`) // regex to match only digits
+	m := r.FindAllString(value, -1)
 
-	if err != nil {
-		return err
-	} else if containsDecimal {
-		return errors.New("XRP value must not contain a decimal")
+	if len(m) != 1 {
+		return ErrInvalidXRPValue
 	}
 
 	decimal := new(big.Float)
@@ -160,40 +204,35 @@ func VerifyXrpValue(value string) error {
 	}
 
 	if decimal.Cmp(big.NewFloat(MinXRP)) == -1 || decimal.Cmp(big.NewFloat(MaxDrops)) == 1 {
-		return errors.New("XRP value is an invalid XRP amount")
+		return &InvalidAmountError{value}
 	}
 
 	return nil
 }
 
 // validates the format of an issued currency amount value
-func VerifyIOUValue(value string) error {
+func verifyIOUValue(value string) error {
 
-	bigDecimal, err := NewBigDecimal(value)
-	exp := bigDecimal.Scale
+	bigDecimal, err := bigdecimal.NewBigDecimal(value)
 
 	if err != nil {
 		return err
 	}
 
-	decimalValue, ok := new(big.Float).SetString(value) // bigFloat for precision
-
-	if !ok {
-		return errors.New("failed to convert string to big.Float")
-	}
-
-	if decimalValue.Sign() == 0 {
+	if bigDecimal.UnscaledValue == "" {
 		return nil
 	}
 
+	exp := bigDecimal.Scale
+
 	if bigDecimal.Precision > MaxIOUPrecision {
-		return errors.New("IOU value is an invalid IOU amount - precision is too large > 16") // if the precision is greater than 16, return an error
+		return &OutOfRangeError{Type: "Precision"} // if the precision is greater than 16, return an error
 	}
 	if exp < MinIOUExponent {
-		return errors.New("IOU value is an invalid IOU amount - exponent is out of range") // if the scale is less than -96 or greater than 80, return an error
+		return &OutOfRangeError{Type: "Exponent"} // if the scale is less than -96 or greater than 80, return an error
 	}
 	if exp > MaxIOUExponent {
-		return errors.New("IOU value is an invalid IOU amount - exponent is out of range") // if the scale is less than -96 or greater than 80, return an error
+		return &OutOfRangeError{Type: "Exponent"} // if the scale is less than -96 or greater than 80, return an error
 	}
 
 	return err
@@ -202,8 +241,8 @@ func VerifyIOUValue(value string) error {
 // Serializes an XRP amount value
 func SerializeXrpAmount(value string) ([]byte, error) {
 
-	if VerifyXrpValue(value) != nil {
-		return nil, VerifyXrpValue(value)
+	if verifyXrpValue(value) != nil {
+		return nil, verifyXrpValue(value)
 	}
 
 	val, err := strconv.ParseUint(value, 10, 64)
@@ -229,13 +268,13 @@ func SerializeXrpAmount(value string) ([]byte, error) {
 // over-rounding in the least significant digits.
 
 // Serializes the value field of an issued currency amount to its bytes representation
-func serializeIssuedCurrencyValue(value string) ([]byte, error) {
+func SerializeIssuedCurrencyValue(value string) ([]byte, error) {
 
-	if VerifyIOUValue(value) != nil {
-		return nil, VerifyIOUValue(value)
+	if verifyIOUValue(value) != nil {
+		return nil, verifyIOUValue(value)
 	}
 
-	bigDecimal, err := NewBigDecimal(value)
+	bigDecimal, err := bigdecimal.NewBigDecimal(value)
 
 	if err != nil {
 		return nil, err
@@ -262,7 +301,7 @@ func serializeIssuedCurrencyValue(value string) ([]byte, error) {
 
 	for mantissa > MaxIOUMantissa {
 		if exp >= MaxIOUExponent {
-			return nil, errors.New("IOU value is an invalid IOU amount - exponent is out of range") // if the scale is less than -96 or greater than 80, return an error
+			return nil, &OutOfRangeError{Type: "Exponent"} // if the scale is less than -96 or greater than 80, return an error
 		}
 		mantissa /= 10
 		exp++
@@ -275,14 +314,14 @@ func serializeIssuedCurrencyValue(value string) ([]byte, error) {
 		}
 
 		if exp > MaxIOUExponent || mantissa > MaxIOUMantissa {
-			return nil, errors.New("IOU value is an invalid IOU amount - exponent is out of range") // if the scale is less than -96 or greater than 80, return an error
+			return nil, &OutOfRangeError{Type: "Exponent"} // if the scale is less than -96 or greater than 80, return an error
 		}
 	}
 
 	// convert components to bytes
 
 	serial := uint64(ZeroCurrencyAmountHex) // set first bit to 1 because it is not XRP
-	if bigDecimal.Sign == "" {
+	if bigDecimal.Sign == 0 {
 		serial |= PosSignBitMask // if the sign is positive, set the sign (second) bit to 1
 	}
 	serial |= (uint64(exp+97) << 54) // if the exponent is positive, set the exponent bits to the exponent + 97
@@ -294,36 +333,102 @@ func serializeIssuedCurrencyValue(value string) ([]byte, error) {
 	return serialReturn, nil
 }
 
+// Serializes an issued currency code to its bytes representation. The currency code can be 3 allowed string characters, or 20 bytes of hex
+func serializeIssuedCurrencyCode(currency string) ([]byte, error) {
+
+	currency = strings.TrimPrefix(currency, "0x")                                    // remove the 0x prefix if it exists
+	if currency == "XRP" || currency == "0000000000000000000000005852500000000000" { // if the currency code is uppercase XRP, return an error
+		return nil, &InvalidCodeError{Disallowed: "XRP uppercase"}
+	}
+
+	switch len(currency) {
+	case 3: // if the currency code is 3 characters, it is standard
+		return serializeIssuedCurrencyCodeChars(currency)
+	case 40: // if the currency code is 40 characters, it is hex encoded
+		return serializeIssuedCurrencyCodeHex(currency)
+	}
+
+	return nil, &InvalidCodeError{Disallowed: currency}
+
+}
+
+func serializeIssuedCurrencyCodeHex(currency string) ([]byte, error) {
+	decodedHex, err := hex.DecodeString(currency)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if bytes.HasPrefix(decodedHex, []byte{0x00}) {
+
+		if bytes.Equal(decodedHex[12:15], []byte{0x00, 0x00, 0x00}) {
+			return make([]byte, 20), nil
+		}
+
+		if containsInvalidIOUCodeCharactersHex(decodedHex[12:15]) {
+			return nil, ErrInvalidCurrencyCode
+		}
+		return decodedHex, nil
+
+	}
+	return decodedHex, nil
+}
+
+func serializeIssuedCurrencyCodeChars(currency string) ([]byte, error) {
+
+	r := regexp.MustCompile(IOUCodeRegex) // regex to check if the currency code is valid
+	m := r.FindAllString(currency, -1)
+
+	if len(m) != 1 {
+		return nil, ErrInvalidCurrencyCode
+	}
+
+	currencyBytes := make([]byte, 20)
+	copy(currencyBytes[12:], []byte(currency))
+	return currencyBytes[:], nil
+}
+
+// Serializes the currency field of an issued currency amount to its bytes representation from value, currency code, and issuer address in string form (e.g. "USD", "r123456789")
+// The currency code can be 3 allowed string characters, or 20 bytes of hex in standard currency format (e.g. with "00" prefix) or non-standard currency format (e.g. without "00" prefix)
+func SerializeIssuedCurrencyAmount(value, currency, issuer string) ([]byte, error) {
+
+	valBytes, err := SerializeIssuedCurrencyValue(value) // serialize the value
+
+	if err != nil {
+		return nil, err
+	}
+	currencyBytes, err := serializeIssuedCurrencyCode(currency) // serialize the currency code
+
+	if err != nil {
+		return nil, err
+	}
+	_, issuerBytes, err := addresscodec.DecodeClassicAddressToAccountID(issuer) // decode the issuer address
+	if err != nil {
+		return nil, err
+	}
+
+	// AccountIDs that appear as children of special fields (Amount issuer and PathSet account) are not length-prefixed.
+	// So in Amount and PathSet fields, don't use the length indicator 0x14. This is in contrast to the AccountID fields where the length indicator prefix 0x14 is added.
+
+	return append(append(valBytes, currencyBytes...), issuerBytes...), nil
+}
+
 // Returns true if this amount is a "native" XRP amount - first bit in first byte set to 0 for native XRP
-func isNative(value []byte) bool {
-	fmt.Printf("%08b", value)
-	x := []byte(value)[0]&NotXRPBitMask == 0 // & bitwise operator returns 1 if both first bits are 1, otherwise 0
+func isNative(value byte) bool {
+	x := value&NotXRPBitMask == 0 // & bitwise operator returns 1 if both first bits are 1, otherwise 0
 	return x
 }
 
 // Determines if this AmountType is positive - 2nd bit in 1st byte is set to 1 for positive amounts
-func isPositive(value []byte) bool {
-	fmt.Printf("%08b", value)
-	x := []byte(value)[0]&0x40 > 0
+func isPositive(value byte) bool {
+	x := value&0x40 > 0
 	return x
 }
 
-// XRP values shouldn't contain a decimal point BECAUSE they are represented as integers as drops
-// returns true if the string contains a SINGLE decimal point character
-func containsDecimal(s string) (bool, error) {
-	decCount := strings.Count(s, ".") // count the number of decimal points
-	if decCount > 1 {
-		return true, errors.New("invalid - string contains more than one decimal point")
-	}
-	return strings.Contains(s, "."), nil
-}
+func containsInvalidIOUCodeCharactersHex(currency []byte) bool {
 
-// Checks if a value string contains invalid characters - returns true if it does
-func ContainsInvalidCharacters(value string) bool {
-	for _, char := range value {
-		if !strings.Contains(AllowedIOUCharacters, strings.ToLower(string(char))) { // if the character is not in the allowed characters list return true
-			return true
-		}
-	}
-	return false
+	r := regexp.MustCompile(IOUCodeRegex) // regex to check if the currency code is valid
+	m := r.FindAll(currency, -1)
+
+	return len(m) != 1
 }

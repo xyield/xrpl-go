@@ -1,8 +1,50 @@
 package types
 
-import "hash"
+import (
+	"encoding/hex"
+	"fmt"
 
-func CalcHash(buf []byte, hasher hash.Hash) []byte {
-	_, _ = hasher.Write(buf)
-	return hasher.Sum(nil)
+	"github.com/xyield/xrpl-go/binary-codec/serdes"
+)
+
+type ErrInvalidHashLength struct {
+	Expected int
+}
+
+func (e *ErrInvalidHashLength) Error() string {
+	return fmt.Sprintf("invalid hash length expected length %v", e.Expected)
+}
+
+type hashI interface {
+	SerializedType
+	getLength() int
+}
+
+type hash struct {
+	Length int
+}
+
+func newHash(l int) hash {
+	return hash{
+		Length: l,
+	}
+}
+
+func (h hash) getLength() int {
+	return h.Length
+}
+
+func (h hash) FromJson(json any) ([]byte, error) {
+	v, err := hex.DecodeString(json.(string))
+	if err != nil {
+		return nil, err
+	}
+	if h.getLength() != len(v) {
+		return nil, &ErrInvalidHashLength{Expected: h.getLength()}
+	}
+	return v, nil
+}
+
+func (h hash) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
+	return nil, nil
 }

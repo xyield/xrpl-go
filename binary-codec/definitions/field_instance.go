@@ -3,7 +3,7 @@ package definitions
 type FieldInstance struct {
 	FieldName string
 	*fieldInfo
-	FieldHeader *fieldHeader
+	FieldHeader *FieldHeader
 	Ordinal     int32
 }
 
@@ -15,13 +15,13 @@ type fieldInfo struct {
 	Type           string
 }
 
-type fieldHeader struct {
+type FieldHeader struct {
 	TypeCode  int32
 	FieldCode int32
 }
 
-func CreateFieldHeader(tc, fc int32) fieldHeader {
-	return fieldHeader{
+func CreateFieldHeader(tc, fc int32) FieldHeader {
+	return FieldHeader{
 		TypeCode:  tc,
 		FieldCode: fc,
 	}

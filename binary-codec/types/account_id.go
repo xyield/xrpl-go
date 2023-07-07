@@ -2,12 +2,13 @@ package types
 
 import (
 	addresscodec "github.com/xyield/xrpl-go/address-codec"
+	"github.com/xyield/xrpl-go/binary-codec/serdes"
 )
 
 type AccountID struct{}
 
 // Serializes the given json value to an AccountID byte slice.
-func (a *AccountID) SerializeJson(value any) ([]byte, error) {
+func (a *AccountID) FromJson(value any) ([]byte, error) {
 
 	_, accountID, err := addresscodec.DecodeClassicAddressToAccountID(value.(string))
 
@@ -22,5 +23,16 @@ func (a *AccountID) SerializeJson(value any) ([]byte, error) {
 	// AccountIDs that appear as children of special fields (Amount issuer and PathSet account) are not length-prefixed.
 	// So in Amount and PathSet fields, don't use the length indicator 0x14.
 
-	return append([]byte{0x14}, accountID...), nil
+	return accountID, nil
+}
+
+func (a *AccountID) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
+	if opts == nil {
+		return nil, ErrNoLengthPrefix
+	}
+	b, err := p.ReadBytes(opts[0])
+	if err != nil {
+		return nil, err
+	}
+	return addresscodec.Encode(b, []byte{addresscodec.AccountAddressPrefix}, addresscodec.AccountAddressLength), nil
 }
