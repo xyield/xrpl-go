@@ -1,0 +1,191 @@
+package jsonrpcclient
+
+import (
+	"bytes"
+	"context"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"reflect"
+	"time"
+
+	jsoniter "github.com/json-iterator/go"
+	"github.com/xyield/xrpl-go/client"
+	"github.com/xyield/xrpl-go/model/client/common"
+)
+
+type JsonRpcClient struct {
+	Config *client.JsonRpcConfig
+}
+
+func NewJsonRpcClient(cfg *client.JsonRpcConfig) *JsonRpcClient {
+
+	c := &JsonRpcClient{
+		Config: cfg,
+	}
+
+	return c
+}
+
+// satisfy the Client interface
+func (c *JsonRpcClient) SendRequest(reqParams common.XRPLRequest, responseStruct common.XRPLResponse) error {
+
+	var jr jsonRpcResponse
+
+	body, err := CreateRequest(reqParams)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, c.Config.Url, bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+
+	// add timeout context to prevent hanging
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+	req = req.WithContext(ctx)
+
+	req.Header = c.Config.Headers
+
+	var response *http.Response
+
+	response, err = c.Config.HTTPClient.Do(req)
+	if err != nil || response == nil {
+		return err
+	}
+
+	// allow client to reuse persistant connection
+	defer response.Body.Close()
+
+	// Check for service unavailable response and retry if so
+	if response.StatusCode == 503 {
+
+		maxRetries := 3
+		backoffDuration := 1 * time.Second
+
+		for i := 0; i < maxRetries; i++ {
+			time.Sleep(backoffDuration)
+
+			// Make request again after waiting
+			response, err = c.Config.HTTPClient.Do(req)
+			if err != nil {
+				return err
+			}
+
+			if response.StatusCode != 503 {
+				break
+			}
+
+			// Increase backoff duration for the next retry
+			backoffDuration *= 2
+		}
+
+		if response.StatusCode == 503 {
+			// Return service unavailable error here after retry 3 times
+			return &JsonRpcClientError{ErrorString: "Server is overloaded, rate limit exceeded"}
+		}
+
+	}
+
+	jr, err = CheckForError(response)
+	if err != nil {
+		return err
+	}
+
+	// If no error unmarshall jsonRpcResponse.Result into the result struct
+	b, err := jsoniter.Marshal(jr.Result)
+	if err != nil {
+		return err
+	}
+
+	// Every response struct must impl this interface method
+	err = responseStruct.UnmarshallJSON(b)
+	if err != nil {
+		return err
+	}
+
+	return err
+}
+
+// CreateRequest formats the parameters and method name ready for sending request
+// Params will have been serialised if required and added to request struct before being passed to this method
+func CreateRequest(reqParams common.XRPLRequest) ([]byte, error) {
+
+	var body jsonRpcRequest
+
+	// catches if var req *utility.PingRequest passed in
+	if reflect.ValueOf(reqParams).IsZero() {
+		body = jsonRpcRequest{
+			Method: reqParams.Method(),
+		}
+	} else {
+		body = jsonRpcRequest{
+			Method: reqParams.Method(),
+			// each param object will have a struct with json serialising tags
+			Params: [1]interface{}{reqParams},
+		}
+	}
+
+	jsonBytes, err := jsoniter.Marshal(body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal JSON-RPC request for method %s with parameters %+v: %w", reqParams.Method(), reqParams, err)
+	}
+
+	// TODO: omit the Params field if method doesn't require any (not required or not passed in)
+	///// If no params in struct OR all are 'omitEmpty' then the params look like this [{}] - check if the params object is equal to {}
+	// var req jsonRpcRequest
+	// if err := json.Unmarshal(jsonBytes, &req); err != nil {
+	// 	return nil, err
+	// }
+	// // Now, check whether params has an empty object
+	// if len(req.Params) == 1 {
+	// 	m, ok := req.Params[0].(map[string]interface{})
+	// 	if ok && len(m) == 0 {
+	// 		fmt.Println("`params` contains an empty object.")
+	// 		// TODO: re do the body and mershall it
+	// 		jsonBytes, err := jsoniter.Marshal(jsonRpcRequest{
+	// 			Method: reqParams.Method(),
+	// 		})
+	// 		if err != nil {
+	// 			return nil, fmt.Errorf("failed to marshal JSON-RPC request for method %s with parameters %+v: %w", reqParams.Method(), reqParams, err)
+	// 		}
+	// 		return jsonBytes, nil
+	// 	}
+	// } else {
+	// 	fmt.Println("`params` is not a single object array.")
+	// 	// TODO: add stuff here??
+	// }
+	///////
+
+	return jsonBytes, nil
+}
+
+// CheckForError reads the http response and formats the error if it exists
+func CheckForError(res *http.Response) (jsonRpcResponse, error) {
+
+	var jr jsonRpcResponse
+
+	b, err := ioutil.ReadAll(res.Body)
+	if err != nil || b == nil {
+		return jr, err
+	}
+
+	// In case a different error code is returned
+	if res.StatusCode != 200 {
+		return jr, &JsonRpcClientError{ErrorString: string(b)}
+	}
+
+	err = jsoniter.Unmarshal(b, &jr)
+	if err != nil {
+		return jr, err
+	}
+
+	// result will have 'error' if error response
+	if _, ok := jr.Result["error"]; ok {
+		return jr, &JsonRpcClientError{ErrorString: jr.Result["error"].(string)}
+	}
+
+	return jr, nil
+}

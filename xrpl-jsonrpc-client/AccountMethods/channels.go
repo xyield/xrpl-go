@@ -2,8 +2,6 @@ package accountmethods
 
 import (
 	"encoding/json"
-
-	"github.com/xyield/xrpl-go/xrpl-jsonrpc-client/jsonrpc"
 )
 
 // impl RequestParams. User will pass this struct into the channels method
@@ -38,25 +36,21 @@ func (e *AccountChannelsMissingAccountError) Error() string {
 
 func (a *AccountMethods) Channels(params AccountChannelsParams) (interface{}, error) {
 
-	// check required params are there + validate others + serialise (if required)
-	if params.Account == "" {
-		return nil, &AccountChannelsMissingAccountError{}
-	}
+	// // check required params are there + validate others + serialise (if required)
+	// if params.Account == "" {
+	// 	return nil, &AccountChannelsMissingAccountError{}
+	// }
 
-	// serialise params will happen here
+	// // serialise params will happen here
 
-	body, err := jsonrpc.CreateRequest("account_currencies", params)
-	if err != nil {
-		return nil, err
-	}
+	// response := &AccountChannelsResponse{}
 
-	response := &AccountChannelsResponse{}
+	// _, err := jsonrpc.SendRequest("account_currencies", params, a.Cfg, response)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	_, err = jsonrpc.SendRequest(body, a.Cfg, response)
-	if err != nil {
-		return nil, err
-	}
-
-	// Return response struct if all gone successfully - unmarshalled into response in SendRequest()
-	return response, nil
+	// // Return response struct if all gone successfully - unmarshalled into response in SendRequest()
+	// return response, nil
+	return nil, nil
 }
