@@ -134,13 +134,27 @@ func TestCreateRequest(t *testing.T) {
 		// assert json equal
 		assert.Equal(t, string(expectedRequestBytes), string(byteRequest))
 	})
-	t.Run("Create request - no parameters", func(t *testing.T) {
+	t.Run("Create request - no parameters with using pointer declaration", func(t *testing.T) {
 
-		// TODO: not working currently ------> remove the 1 for the params field?
-		// req := &utility.PingRequest{} // means params get set an empty object
+		var req *utility.PingRequest // params sent in as zero value struct
 
-		// both below work currently to not set params field (even if some with no omitEmpty)
-		var req *utility.PingRequest
+		expetedBody := jsonRpcRequest{
+			Method: "ping",
+		}
+		expectedRequestBytes, _ := jsoniter.Marshal(expetedBody)
+
+		byteRequest, err := CreateRequest(req)
+
+		assert.NoError(t, err)
+		// assert bytes equal
+		assert.Equal(t, expectedRequestBytes, byteRequest)
+		// assert json equal
+		assert.Equal(t, string(expectedRequestBytes), string(byteRequest))
+	})
+
+	t.Run("Create request - no parameters with struct initialisation", func(t *testing.T) {
+
+		req := &utility.PingRequest{} // means params get set an empty object
 
 		expetedBody := jsonRpcRequest{
 			Method: "ping",

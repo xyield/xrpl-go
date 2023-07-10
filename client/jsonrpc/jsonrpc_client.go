@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"reflect"
+	"strings"
 	"time"
 
 	jsoniter "github.com/json-iterator/go"
@@ -128,36 +129,23 @@ func CreateRequest(reqParams common.XRPLRequest) ([]byte, error) {
 		}
 	}
 
+	// Omit the Params field if method doesn't require any - check whether params is [{}] and remove if so
+	paramBytes, err := jsoniter.Marshal(body.Params)
+	if err != nil {
+		return nil, err
+	}
+	paramString := string(paramBytes)
+	if strings.Compare(paramString, "[{}]") == 0 {
+		// need to remove params field from the body if it is empty
+		body = jsonRpcRequest{
+			Method: reqParams.Method(),
+		}
+	}
+
 	jsonBytes, err := jsoniter.Marshal(body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal JSON-RPC request for method %s with parameters %+v: %w", reqParams.Method(), reqParams, err)
 	}
-
-	// TODO: omit the Params field if method doesn't require any (not required or not passed in)
-	///// If no params in struct OR all are 'omitEmpty' then the params look like this [{}] - check if the params object is equal to {}
-	// var req jsonRpcRequest
-	// if err := json.Unmarshal(jsonBytes, &req); err != nil {
-	// 	return nil, err
-	// }
-	// // Now, check whether params has an empty object
-	// if len(req.Params) == 1 {
-	// 	m, ok := req.Params[0].(map[string]interface{})
-	// 	if ok && len(m) == 0 {
-	// 		fmt.Println("`params` contains an empty object.")
-	// 		// TODO: re do the body and mershall it
-	// 		jsonBytes, err := jsoniter.Marshal(jsonRpcRequest{
-	// 			Method: reqParams.Method(),
-	// 		})
-	// 		if err != nil {
-	// 			return nil, fmt.Errorf("failed to marshal JSON-RPC request for method %s with parameters %+v: %w", reqParams.Method(), reqParams, err)
-	// 		}
-	// 		return jsonBytes, nil
-	// 	}
-	// } else {
-	// 	fmt.Println("`params` is not a single object array.")
-	// 	// TODO: add stuff here??
-	// }
-	///////
 
 	return jsonBytes, nil
 }
