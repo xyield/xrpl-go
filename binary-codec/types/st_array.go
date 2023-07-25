@@ -6,6 +6,11 @@ import (
 	"github.com/xyield/xrpl-go/binary-codec/serdes"
 )
 
+const (
+	ArrayEndMarker  = 0xF1
+	ObjectEndMarker = 0xE1
+)
+
 // STArray represents an array of STObject instances.
 type STArray struct{}
 
@@ -28,7 +33,7 @@ func (t *STArray) FromJson(json any) ([]byte, error) {
 		}
 		sink = append(sink, b...)
 	}
-	sink = append(sink, 0xF1)
+	sink = append(sink, ArrayEndMarker)
 
 	return sink, nil
 }
@@ -38,6 +43,7 @@ func (t *STArray) FromJson(json any) ([]byte, error) {
 // The method loops until the BinaryParser has no more data, and for each loop,
 // it calls the ToJson method of an STObject, appending the resulting JSON value to a "value" slice.
 func (t *STArray) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
+
 	var value []any
 
 	for p.HasMore() {
@@ -45,6 +51,19 @@ func (t *STArray) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
 		v, err := st.ToJson(p, opts...)
 		if err != nil {
 			return nil, err
+		}
+		peek, err := p.Peek()
+		if err != nil {
+			return nil, err
+		}
+
+		if peek == ArrayEndMarker {
+			_, err := p.ReadByte()
+			if err != nil {
+				return nil, err
+			}
+			value = append(value, v)
+			break
 		}
 		value = append(value, v)
 	}

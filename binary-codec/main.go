@@ -1,6 +1,7 @@
 package binarycodec
 
 import (
+	"bytes"
 	"encoding/hex"
 	"errors"
 	"strings"
@@ -82,11 +83,16 @@ func EncodeForSigningClaim(json map[string]any) (string, error) {
 		return "", err
 	}
 
-	t := &types.UInt64{}
+	t := &types.Amount{}
 	amount, err := t.FromJson(json["Amount"])
 
 	if err != nil {
 		return "", err
+
+	}
+
+	if bytes.HasPrefix(amount, []byte{0x40}) {
+		amount = bytes.Replace(amount, []byte{0x40}, []byte{0x00}, 1)
 	}
 
 	return strings.ToUpper(paymentChannelClaimPrefix + hex.EncodeToString(channel) + hex.EncodeToString(amount)), nil

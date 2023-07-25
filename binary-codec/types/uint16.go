@@ -24,11 +24,11 @@ func (u *UInt16) FromJson(value any) ([]byte, error) {
 				return nil, err
 			}
 		}
-		value = tc
+		value = int(tc)
 	}
 
 	buf := new(bytes.Buffer)
-	err := binary.Write(buf, binary.BigEndian, uint16(value.(int32)))
+	err := binary.Write(buf, binary.BigEndian, uint16(value.(int)))
 
 	if err != nil {
 		return nil, err

@@ -15,6 +15,94 @@ func TestEncode(t *testing.T) {
 		expectedErr error
 	}{
 		{
+			description: "large test tx",
+			input: map[string]any{
+				"Account":       "rMBzp8CgpE441cp5PVyA9rpVV7oT8hP3ys",
+				"Expiration":    595640108,
+				"Fee":           "10",
+				"Flags":         524288,
+				"OfferSequence": 1752791,
+				"Sequence":      1752792,
+				"SigningPubKey": "03EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3",
+				"TakerGets":     "15000000000",
+				"TakerPays": map[string]any{
+					"currency": "USD",
+					"issuer":   "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+					"value":    "7072.8",
+				},
+				"TransactionType": "OfferCreate",
+				"TxnSignature":    "30440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C",
+				"Paths": []any{
+					[]any{
+						map[string]any{
+							"account":  "rPDXxSZcuVL3ZWoyU82bcde3zwvmShkRyF",
+							"type":     1,
+							"type_hex": "0000000000000001",
+						},
+						map[string]any{
+							"currency": "XRP",
+							"type":     16,
+							"type_hex": "0000000000000010",
+						},
+					},
+					[]any{
+						map[string]any{
+							"account":  "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+							"type":     1,
+							"type_hex": "0000000000000001",
+						},
+						map[string]any{
+							"account":  "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
+							"type":     1,
+							"type_hex": "0000000000000001",
+						},
+						map[string]any{
+							"currency": "XRP",
+							"type":     16,
+							"type_hex": "0000000000000010",
+						},
+					},
+					[]any{
+						map[string]any{
+							"account":  "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+							"type":     1,
+							"type_hex": "0000000000000001",
+						},
+						map[string]any{
+							"account":  "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
+							"type":     1,
+							"type_hex": "0000000000000001",
+						},
+						map[string]any{
+							"currency": "XRP",
+							"type":     16,
+							"type_hex": "0000000000000010",
+						},
+					},
+				},
+				"Memos": []any{
+					map[string]any{
+						"Memo": map[string]any{
+							"MemoData": "04C4D46544659A2D58525043686174",
+						},
+					},
+				},
+				"LedgerEntryType": "RippleState",
+				"TransferFee":     30874,
+				"CloseResolution": 25,
+				"OwnerNode":       "0000018446744073",
+				"Amendments": []string{
+					"73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C",
+					"73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C",
+				},
+				"EmailHash":         "73734B611DDA23D3F5F62E20A173B78A",
+				"TakerPaysCurrency": "73734B611DDA23D3F5F62E20A173B78AB8406AC5",
+				"Digest":            "73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C",
+			},
+			output:      "11007212000714789A220008000024001ABED82A2380BF2C2019001ABED73400000184467440734173734B611DDA23D3F5F62E20A173B78A501573734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C64D55920AC9391400000000000000000000000000055534400000000000A20B3C85F482532A9578DBB3950B85CA06594D165400000037E11D60068400000000000000A732103EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3744630440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C8114DD76483FACDEE26E60D8A586BB58D09F27045C46F9EA7D0F04C4D46544659A2D58525043686174E1F1011019011173734B611DDA23D3F5F62E20A173B78AB8406AC5011201F3B1997562FD742B54D4EBDEA1D6AEA3D4906B8F100000000000000000000000000000000000000000FF014B4E9C06F24296074F7BC48F92A97916C6DC5EA901DD39C650A96EDA48334E70CC4A85B8B2E8502CD3100000000000000000000000000000000000000000FF014B4E9C06F24296074F7BC48F92A97916C6DC5EA901DD39C650A96EDA48334E70CC4A85B8B2E8502CD31000000000000000000000000000000000000000000003134073734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C",
+			expectedErr: nil,
+		},
+		{
 			description: "successfully serialized signed transaction 1",
 			input: map[string]any{
 				"Account":       "rMBzp8CgpE441cp5PVyA9rpVV7oT8hP3ys",
@@ -125,7 +213,7 @@ func TestEncode(t *testing.T) {
 		{
 			description: "serialize OwnerNode example - UInt64",
 			input:       map[string]any{"OwnerNode": "18446744073"},
-			output:      "34000000044B82FA09",
+			output:      "340000018446744073",
 			expectedErr: nil,
 		},
 		{
@@ -341,7 +429,7 @@ func TestEncodeForSigningClaim(t *testing.T) {
 	tt := []struct {
 		description string
 		input       map[string]any
-		expected    string
+		output      string
 		expectedErr error
 	}{
 		{
@@ -350,7 +438,7 @@ func TestEncodeForSigningClaim(t *testing.T) {
 				"Channel": "43904CBFCDCEC530B4037871F86EE90BF799DF8D2E0EA564BC8A3F332E4F5FB1",
 				"Amount":  "1000",
 			},
-			expected:    "434C4D0043904CBFCDCEC530B4037871F86EE90BF799DF8D2E0EA564BC8A3F332E4F5FB100000000000003E8",
+			output:      "434C4D0043904CBFCDCEC530B4037871F86EE90BF799DF8D2E0EA564BC8A3F332E4F5FB100000000000003E8",
 			expectedErr: nil,
 		},
 		{
@@ -358,7 +446,7 @@ func TestEncodeForSigningClaim(t *testing.T) {
 			input: map[string]any{
 				"Amount": "1000",
 			},
-			expected:    "",
+			output:      "",
 			expectedErr: ErrSigningClaimFieldNotFound,
 		},
 		{
@@ -366,7 +454,7 @@ func TestEncodeForSigningClaim(t *testing.T) {
 			input: map[string]any{
 				"Channel": "43904CBFCDCEC530B4037871F86EE90BF799DF8D2E0EA564BC8A3F332E4F5FB1",
 			},
-			expected:    "",
+			output:      "",
 			expectedErr: ErrSigningClaimFieldNotFound,
 		},
 	}
@@ -380,7 +468,7 @@ func TestEncodeForSigningClaim(t *testing.T) {
 				require.Empty(t, got)
 			} else {
 				require.NoError(t, err)
-				require.Equal(t, tc.expected, got)
+				require.Equal(t, tc.output, got)
 			}
 		})
 	}
@@ -447,13 +535,13 @@ func TestDecode(t *testing.T) {
 	tt := []struct {
 		description string
 		input       string
-		expected    map[string]any
+		output      map[string]any
 		expectedErr error
 	}{
 		{
-			description: "decode tx1",
-			input:       "120007220008000024001ABED82A2380BF2C2019001ABED764D55920AC9391400000000000000000000000000055534400000000000A20B3C85F482532A9578DBB3950B85CA06594D165400000037E11D60068400000000000000A732103EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3744630440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C8114DD76483FACDEE26E60D8A586BB58D09F27045C46",
-			expected: map[string]any{
+			description: "large test tx",
+			input:       "11007212000714789A220008000024001ABED82A2380BF2C2019001ABED73400000184467440734173734B611DDA23D3F5F62E20A173B78A501573734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C64D55920AC9391400000000000000000000000000055534400000000000A20B3C85F482532A9578DBB3950B85CA06594D165400000037E11D60068400000000000000A732103EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3744630440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C8114DD76483FACDEE26E60D8A586BB58D09F27045C46F9EA7D0F04C4D46544659A2D58525043686174E1F1011019011173734B611DDA23D3F5F62E20A173B78AB8406AC5011201F3B1997562FD742B54D4EBDEA1D6AEA3D4906B8F100000000000000000000000000000000000000000FF014B4E9C06F24296074F7BC48F92A97916C6DC5EA901DD39C650A96EDA48334E70CC4A85B8B2E8502CD3100000000000000000000000000000000000000000FF014B4E9C06F24296074F7BC48F92A97916C6DC5EA901DD39C650A96EDA48334E70CC4A85B8B2E8502CD31000000000000000000000000000000000000000000003134073734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C",
+			output: map[string]any{
 				"Account":       "rMBzp8CgpE441cp5PVyA9rpVV7oT8hP3ys",
 				"Expiration":    595640108,
 				"Fee":           "10",
@@ -469,68 +557,6 @@ func TestDecode(t *testing.T) {
 				},
 				"TransactionType": "OfferCreate",
 				"TxnSignature":    "30440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C",
-			},
-			expectedErr: nil,
-		},
-		{
-			description: "deserialize Uint16 LedgerEntryType",
-			input:       "110072",
-			expected:    map[string]any{"LedgerEntryType": "RippleState"},
-			expectedErr: nil,
-		},
-		{
-			description: "deserialize Uint16 TransferFee",
-			input:       "14789A",
-			expected:    map[string]any{"TransferFee": 30874},
-			expectedErr: nil,
-		},
-		{
-			description: "deserialize Uint8 int correctly",
-			input:       "011019",
-			expected:    map[string]any{"CloseResolution": 25},
-			expectedErr: nil,
-		},
-		{
-			description: "deserialize Uint32 correctly",
-			input:       "2A2380BF2C",
-			expected:    map[string]any{"Expiration": 595640108},
-			expectedErr: nil,
-		},
-		{
-			description: "deserialize Uint64 correctly",
-			input:       "34000000044B82FA09",
-			expected:    map[string]any{"OwnerNode": "18446744073"},
-			expectedErr: nil,
-		},
-
-		{
-			description: "deserialize Vector256 successfully,",
-			input:       "03134073734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C",
-			expected:    map[string]any{"Amendments": []string{"73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C", "73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C"}},
-			expectedErr: nil,
-		},
-		{
-			description: "deserialize hash 128",
-			input:       "4173734B611DDA23D3F5F62E20A173B78A",
-			expected:    map[string]any{"EmailHash": "73734B611DDA23D3F5F62E20A173B78A"},
-			expectedErr: nil,
-		},
-		{
-			description: "deserialize hash 160",
-			input:       "011173734B611DDA23D3F5F62E20A173B78AB8406AC5",
-			expected:    map[string]any{"TakerPaysCurrency": "73734B611DDA23D3F5F62E20A173B78AB8406AC5"},
-			expectedErr: nil,
-		},
-		{
-			description: "deserialize hash 256",
-			input:       "501573734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C",
-			expected:    map[string]any{"Digest": "73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C"},
-			expectedErr: nil,
-		},
-		{
-			description: "deserialize PathSet",
-			input:       "011201F3B1997562FD742B54D4EBDEA1D6AEA3D4906B8F100000000000000000000000000000000000000000FF014B4E9C06F24296074F7BC48F92A97916C6DC5EA901DD39C650A96EDA48334E70CC4A85B8B2E8502CD310000000000000000000000000000000000000000000",
-			expected: map[string]any{
 				"Paths": []any{
 					[]any{
 						map[string]any{
@@ -561,13 +587,24 @@ func TestDecode(t *testing.T) {
 							"type_hex": "0000000000000010",
 						},
 					},
+					[]any{
+						map[string]any{
+							"account":  "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+							"type":     1,
+							"type_hex": "0000000000000001",
+						},
+						map[string]any{
+							"account":  "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
+							"type":     1,
+							"type_hex": "0000000000000001",
+						},
+						map[string]any{
+							"currency": "XRP",
+							"type":     16,
+							"type_hex": "0000000000000010",
+						},
+					},
 				},
-			},
-		},
-		{
-			description: "deserialize STArray",
-			input:       "F9EA7D0F04C4D46544659A2D58525043686174E1F1",
-			expected: map[string]any{
 				"Memos": []any{
 					map[string]any{
 						"Memo": map[string]any{
@@ -575,7 +612,88 @@ func TestDecode(t *testing.T) {
 						},
 					},
 				},
+				"LedgerEntryType": "RippleState",
+				"TransferFee":     30874,
+				"CloseResolution": 25,
+				"OwnerNode":       "0000018446744073",
+				"Amendments": []string{
+					"73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C",
+					"73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C",
+				},
+				"EmailHash":         "73734B611DDA23D3F5F62E20A173B78A",
+				"TakerPaysCurrency": "73734B611DDA23D3F5F62E20A173B78AB8406AC5",
+				"Digest":            "73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C",
 			},
+			expectedErr: nil,
+		},
+		{
+			description: "decode tx1",
+			input:       "120007220008000024001ABED82A2380BF2C2019001ABED764D55920AC9391400000000000000000000000000055534400000000000A20B3C85F482532A9578DBB3950B85CA06594D165400000037E11D60068400000000000000A732103EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3744630440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C8114DD76483FACDEE26E60D8A586BB58D09F27045C46",
+			output: map[string]any{
+				"Account":       "rMBzp8CgpE441cp5PVyA9rpVV7oT8hP3ys",
+				"Expiration":    595640108,
+				"Fee":           "10",
+				"Flags":         524288,
+				"OfferSequence": 1752791,
+				"Sequence":      1752792,
+				"SigningPubKey": "03EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3",
+				"TakerGets":     "15000000000",
+				"TakerPays": map[string]any{
+					"currency": "USD",
+					"issuer":   "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+					"value":    "7072.8",
+				},
+				"TransactionType": "OfferCreate",
+				"TxnSignature":    "30440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C",
+			},
+			expectedErr: nil,
+		},
+		{
+			description: "deserialize Uint64 correctly",
+			input:       "34000000044B82FA09",
+			output:      map[string]any{"OwnerNode": "000000044B82FA09"},
+			expectedErr: nil,
+		},
+		{
+			description: "deserialize Uint16 LedgerEntryType",
+			input:       "110072",
+			output:      map[string]any{"LedgerEntryType": "RippleState"},
+			expectedErr: nil,
+		},
+		{
+			description: "deserialize Uint16 TransferFee",
+			input:       "14789A",
+			output:      map[string]any{"TransferFee": 30874},
+			expectedErr: nil,
+		},
+		{
+			description: "deserialize Uint8 int correctly",
+			input:       "011019",
+			output:      map[string]any{"CloseResolution": 25},
+			expectedErr: nil,
+		},
+		{
+			description: "deserialize Vector256 successfully,",
+			input:       "03134073734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C",
+			output:      map[string]any{"Amendments": []string{"73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C", "73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C"}},
+			expectedErr: nil,
+		},
+		{
+			description: "deserialize hash 128",
+			input:       "4173734B611DDA23D3F5F62E20A173B78A",
+			output:      map[string]any{"EmailHash": "73734B611DDA23D3F5F62E20A173B78A"},
+			expectedErr: nil,
+		},
+		{
+			description: "deserialize hash 160",
+			input:       "011173734B611DDA23D3F5F62E20A173B78AB8406AC5",
+			output:      map[string]any{"TakerPaysCurrency": "73734B611DDA23D3F5F62E20A173B78AB8406AC5"},
+			expectedErr: nil,
+		},
+		{
+			description: "deserialize hash 256",
+			input:       "501573734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C",
+			output:      map[string]any{"Digest": "73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C"},
 			expectedErr: nil,
 		},
 	}
@@ -588,7 +706,7 @@ func TestDecode(t *testing.T) {
 				require.Nil(t, act)
 			} else {
 				require.NoError(t, err)
-				require.EqualValues(t, tc.expected, act)
+				require.EqualValues(t, tc.output, act)
 			}
 		})
 	}

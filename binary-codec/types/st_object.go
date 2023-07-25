@@ -54,13 +54,20 @@ func (t *STObject) FromJson(json any) ([]byte, error) {
 func (t *STObject) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
 	m := make(map[string]any)
 	for p.HasMore() {
+		peek, _ := p.Peek()
+		if peek == ObjectEndMarker {
+			_, err := p.ReadByte()
+			if err != nil {
+				return nil, err
+			}
+			break
+		}
+		if peek == ArrayEndMarker {
+			break
+		}
 		f, err := p.ReadField()
 		if err != nil {
 			return nil, err
-		}
-
-		if f.FieldName == "ObjectEndMarker" || f.FieldName == "ArrayEndMarker" {
-			continue
 		}
 
 		st := GetSerializedType(f.Type)

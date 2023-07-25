@@ -44,6 +44,19 @@ func (p PathSet) ToJson(parser *serdes.BinaryParser, opts ...int) (any, error) {
 	var pathSet []any
 
 	for parser.HasMore() {
+		peek, err := parser.Peek()
+		if err != nil {
+			return nil, err
+		}
+
+		if peek == pathsetEndByte {
+			_, err := parser.ReadByte()
+			if err != nil {
+				return nil, err
+			}
+			break
+		}
+
 		path, err := parsePath(parser)
 		if err != nil {
 			return nil, err
@@ -193,7 +206,11 @@ func parsePath(parser *serdes.BinaryParser) ([]any, error) {
 			return nil, err
 		}
 
-		if peek == pathsetEndByte || peek == pathSeparatorByte {
+		if peek == pathsetEndByte {
+			break
+		}
+
+		if peek == pathSeparatorByte {
 			_, err := parser.ReadByte()
 			if err != nil {
 				return nil, err
@@ -209,22 +226,4 @@ func parsePath(parser *serdes.BinaryParser) ([]any, error) {
 	}
 
 	return path, nil
-}
-
-// parsePathSet decodes a path set from a binary representation using a provided binary parser.
-// It returns a slice representing the path set, or an error if the path set could not be decoded.
-func parsePathSet(parser *serdes.BinaryParser) ([]any, error) {
-	var pathSet []any
-
-	for parser.HasMore() {
-		path, err := parsePath(parser)
-		if err != nil {
-			return nil, err
-		}
-		if len(path) > 0 {
-			pathSet = append(pathSet, path)
-		}
-	}
-
-	return pathSet, nil
 }
