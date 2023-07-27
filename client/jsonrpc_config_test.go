@@ -42,7 +42,7 @@ func TestConfigCreation(t *testing.T) {
 	t.Run("Pass in custom HTTP client", func(t *testing.T) {
 
 		c := customHttpClient{}
-		cfg, _ := NewJsonRpcConfigWithHttpClient("http://s1.ripple.com:51234", c)
+		cfg, _ := NewJsonRpcConfig("http://s1.ripple.com:51234", WithHttpClient(c))
 
 		req, err := http.NewRequest(http.MethodPost, "http://s1.ripple.com:51234/", nil)
 		headers := map[string][]string{

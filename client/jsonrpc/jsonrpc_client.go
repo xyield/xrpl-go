@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"reflect"
 	"strings"
 	"time"
 
@@ -116,20 +115,13 @@ func CreateRequest(reqParams common.XRPLRequest) ([]byte, error) {
 
 	var body jsonRpcRequest
 
-	// catches if var req *utility.PingRequest passed in
-	if reflect.ValueOf(reqParams).IsZero() {
-		body = jsonRpcRequest{
-			Method: reqParams.Method(),
-		}
-	} else {
-		body = jsonRpcRequest{
-			Method: reqParams.Method(),
-			// each param object will have a struct with json serialising tags
-			Params: [1]interface{}{reqParams},
-		}
+	body = jsonRpcRequest{
+		Method: reqParams.Method(),
+		// each param object will have a struct with json serialising tags
+		Params: [1]interface{}{reqParams},
 	}
 
-	// Omit the Params field if method doesn't require any - check whether params is [{}] and remove if so
+	// Omit the Params field if method doesn't require any
 	paramBytes, err := jsoniter.Marshal(body.Params)
 	if err != nil {
 		return nil, err
@@ -140,6 +132,13 @@ func CreateRequest(reqParams common.XRPLRequest) ([]byte, error) {
 		body = jsonRpcRequest{
 			Method: reqParams.Method(),
 		}
+
+		jsonBytes, err := jsoniter.Marshal(body)
+		if err != nil {
+			return nil, err
+		}
+
+		return jsonBytes, nil
 	}
 
 	jsonBytes, err := jsoniter.Marshal(body)

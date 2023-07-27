@@ -188,9 +188,8 @@ func TestSendRequest(t *testing.T) {
 
 		resStruct := &account.AccountChannelsResponse{}
 
-		cfg, err := client.NewJsonRpcConfig("http://testnode/")
+		cfg, err := client.NewJsonRpcConfig("http://testnode/", client.WithHttpClient(mc))
 		assert.NoError(t, err)
-		cfg.AddHttpClient(mc)
 
 		jsonRpcClient := NewJsonRpcClient(cfg)
 		xrplClient := client.NewXRPLClient(jsonRpcClient)
@@ -231,9 +230,8 @@ func TestSendRequest(t *testing.T) {
 
 		resStruct := &account.AccountChannelsResponse{}
 
-		cfg, err := client.NewJsonRpcConfig("http://testnode/")
+		cfg, err := client.NewJsonRpcConfig("http://testnode/", client.WithHttpClient(mc))
 		assert.NoError(t, err)
-		cfg.AddHttpClient(mc)
 
 		jsonRpcClient := NewJsonRpcClient(cfg)
 		xrplClient := client.NewXRPLClient(jsonRpcClient)
@@ -273,9 +271,8 @@ func TestSendRequest(t *testing.T) {
 		mc := &rpcutils.MockClient{}
 		mc.DoFunc = rpcutils.MockResponse(response, 200, mc)
 
-		cfg, err := client.NewJsonRpcConfig("http://testnode/")
+		cfg, err := client.NewJsonRpcConfig("http://testnode/", client.WithHttpClient(mc))
 		assert.NoError(t, err)
-		cfg.AddHttpClient(mc)
 
 		resStruct := &account.AccountChannelsResponse{}
 
@@ -304,9 +301,8 @@ func TestSendRequest(t *testing.T) {
 			return rpcutils.MockResponse(response, 503, mc)(req)
 		}
 
-		cfg, err := client.NewJsonRpcConfig("http://testnode/")
+		cfg, err := client.NewJsonRpcConfig("http://testnode/", client.WithHttpClient(mc))
 		assert.NoError(t, err)
-		cfg.AddHttpClient(mc)
 
 		resStruct := &account.AccountChannelsResponse{}
 
@@ -350,9 +346,8 @@ func TestSendRequest(t *testing.T) {
 			return rpcutils.MockResponse(sucessResponse, 200, mc)(req)
 		}
 
-		cfg, err := client.NewJsonRpcConfig("http://testnode/")
+		cfg, err := client.NewJsonRpcConfig("http://testnode/", client.WithHttpClient(mc))
 		assert.NoError(t, err)
-		cfg.AddHttpClient(mc)
 
 		resStruct := &account.AccountChannelsResponse{}
 
@@ -388,9 +383,8 @@ func TestSendRequest(t *testing.T) {
 			return nil, errors.New("timeout")
 		}
 
-		cfg, err := client.NewJsonRpcConfig("http://testnode/")
+		cfg, err := client.NewJsonRpcConfig("http://testnode/", client.WithHttpClient(mc))
 		assert.NoError(t, err)
-		cfg.AddHttpClient(mc)
 
 		resStruct := &account.AccountChannelsResponse{}
 

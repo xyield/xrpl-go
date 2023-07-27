@@ -1,17 +1,13 @@
 package client
 
 import (
+	"errors"
 	"net/http"
 	"strings"
 	"time"
 )
 
-type EmptyUrlError struct {
-}
-
-func (e *EmptyUrlError) Error() string {
-	return "Empty port and IP provided"
-}
+var EmptyUrlError = errors.New("Empty port and IP provided")
 
 type HTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
@@ -23,25 +19,19 @@ type JsonRpcConfig struct {
 	Headers    map[string][]string
 }
 
-func NewJsonRpcConfigWithHttpClient(url string, c HTTPClient) (*JsonRpcConfig, error) {
+type JsonRpcConfigOpt func(c *JsonRpcConfig)
 
-	cfg, err := NewJsonRpcConfig(url)
-	if err != nil {
-		return nil, err
+func WithHttpClient(cl HTTPClient) JsonRpcConfigOpt {
+	return func(c *JsonRpcConfig) {
+		c.HTTPClient = cl
 	}
-
-	if c != nil {
-		cfg.HTTPClient = c
-	}
-
-	return cfg, nil
 }
 
-func NewJsonRpcConfig(url string) (*JsonRpcConfig, error) {
+func NewJsonRpcConfig(url string, opts ...JsonRpcConfigOpt) (*JsonRpcConfig, error) {
 
 	// validate a url has been passed in
 	if len(url) == 0 {
-		return nil, &EmptyUrlError{}
+		return nil, EmptyUrlError
 	}
 	// add slash if doesn't already end with one
 	if !strings.HasSuffix(url, "/") {
@@ -56,10 +46,8 @@ func NewJsonRpcConfig(url string) (*JsonRpcConfig, error) {
 		},
 	}
 
+	for _, opt := range opts {
+		opt(cfg)
+	}
 	return cfg, nil
-}
-
-// Method to set http client used for testing
-func (cfg *JsonRpcConfig) AddHttpClient(c HTTPClient) {
-	cfg.HTTPClient = c
 }
