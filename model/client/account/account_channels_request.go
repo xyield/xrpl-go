@@ -2,6 +2,7 @@ package account
 
 import (
 	"encoding/json"
+	"errors"
 
 	"github.com/xyield/xrpl-go/model/client/common"
 	"github.com/xyield/xrpl-go/model/transactions/types"
@@ -18,6 +19,14 @@ type AccountChannelsRequest struct {
 
 func (*AccountChannelsRequest) Method() string {
 	return "account_channels"
+}
+
+func (a *AccountChannelsRequest) Validate() error {
+	if a.Account == "" {
+		return errors.New("no account ID specified")
+	}
+
+	return nil
 }
 
 func (r *AccountChannelsRequest) UnmarshalJSON(data []byte) error {
