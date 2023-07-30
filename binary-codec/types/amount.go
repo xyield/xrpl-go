@@ -41,45 +41,53 @@ var (
 	zeroByteArray          = make([]byte, 20)
 )
 
+// InvalidAmountError is a custom error type for invalid amounts.
 type InvalidAmountError struct {
 	Amount string
 }
 
+// Error method for InvalidAmountError returns a formatted error string.
 func (e *InvalidAmountError) Error() string {
 	return fmt.Sprintf("value '%s' is an invalid amount", e.Amount)
 }
 
+// OutOfRangeError is a custom error type for out-of-range values.
 type OutOfRangeError struct {
 	Type string
 }
 
+// Error method for OutOfRangeError returns a formatted error string.
 func (e *OutOfRangeError) Error() string {
 	return fmt.Sprintf("%s is out of range", e.Type)
 }
 
+// InvalidCodeError is a custom error type for invalid currency codes.
 type InvalidCodeError struct {
 	Disallowed string
 }
 
+// Error method for InvalidCodeError returns a formatted error string.
 func (e *InvalidCodeError) Error() string {
 	return fmt.Sprintf("'%s' is/are disallowed or invalid", e.Disallowed)
 }
 
+// Amount is a struct that represents an XRPL Amount.
 type Amount struct{}
 
-// Serializes an issued currency amount to its bytes representation from json
+// FromJson serializes an issued currency amount to its bytes representation from JSON.
 func (a *Amount) FromJson(value any) ([]byte, error) {
 
 	switch value := value.(type) {
 	case string:
-		return SerializeXrpAmount(value)
+		return serializeXrpAmount(value)
 	case map[string]any:
-		return SerializeIssuedCurrencyAmount(value["value"].(string), value["currency"].(string), value["issuer"].(string))
+		return serializeIssuedCurrencyAmount(value["value"].(string), value["currency"].(string), value["issuer"].(string))
 	default:
 		return nil, errors.New("invalid amount type")
 	}
 }
 
+// ToJson deserializes a binary-encoded Amount object from a BinaryParser into a JSON representation.
 func (a *Amount) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
 	b, err := p.Peek()
 	if err != nil {
@@ -102,20 +110,20 @@ func (a *Amount) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
 		if err != nil {
 			return nil, err
 		}
-		return deserialiseToken(token)
+		return deserializeToken(token)
 	}
 }
 
-func deserialiseToken(data []byte) (map[string]any, error) {
-	value, err := deserialiseValue(data[:8])
+func deserializeToken(data []byte) (map[string]any, error) {
+	value, err := deserializeValue(data[:8])
 	if err != nil {
 		return nil, err
 	}
-	issuer, err := deserialiseIssuer(data[28:])
+	issuer, err := deserializeIssuer(data[28:])
 	if err != nil {
 		return nil, err
 	}
-	curr, err := deserialiseCurrencyCode(data[8:28])
+	curr, err := deserializeCurrencyCode(data[8:28])
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +134,7 @@ func deserialiseToken(data []byte) (map[string]any, error) {
 	}, nil
 }
 
-func deserialiseValue(data []byte) (string, error) {
+func deserializeValue(data []byte) (string, error) {
 	sign := ""
 	if !isPositive(data[0]) {
 		sign = "-"
@@ -151,7 +159,7 @@ func deserialiseValue(data []byte) (string, error) {
 	return val, nil
 }
 
-func deserialiseCurrencyCode(data []byte) (string, error) {
+func deserializeCurrencyCode(data []byte) (string, error) {
 	// Check for special xrp case
 	if bytes.Equal(data, zeroByteArray) {
 		return "XRP", nil
@@ -177,12 +185,12 @@ func deserialiseCurrencyCode(data []byte) (string, error) {
 	return iso, nil
 }
 
-func deserialiseIssuer(data []byte) (string, error) {
+func deserializeIssuer(data []byte) (string, error) {
 	return addresscodec.Encode(data, []byte{addresscodec.AccountAddressPrefix}, addresscodec.AccountAddressLength), nil
 }
 
-// validates the format of an XRP amount value
-// XRP values shouldn't contain a decimal point BECAUSE they are represented as integers as drops
+// verifyXrpValue validates the format of an XRP amount value.
+// XRP values should not contain a decimal point because they are represented as integers as drops.
 func verifyXrpValue(value string) error {
 
 	r := regexp.MustCompile(`\d+`) // regex to match only digits
@@ -210,7 +218,7 @@ func verifyXrpValue(value string) error {
 	return nil
 }
 
-// validates the format of an issued currency amount value
+// verifyIOUValue validates the format of an issued currency amount value.
 func verifyIOUValue(value string) error {
 
 	bigDecimal, err := bigdecimal.NewBigDecimal(value)
@@ -238,8 +246,8 @@ func verifyIOUValue(value string) error {
 	return err
 }
 
-// Serializes an XRP amount value
-func SerializeXrpAmount(value string) ([]byte, error) {
+// serializeXrpAmount serializes an XRP amount value.
+func serializeXrpAmount(value string) ([]byte, error) {
 
 	if verifyXrpValue(value) != nil {
 		return nil, verifyXrpValue(value)
@@ -267,7 +275,7 @@ func SerializeXrpAmount(value string) ([]byte, error) {
 // so it always maintains 15 decimal digits of precision. Multiplication and division have adjustments to compensate for
 // over-rounding in the least significant digits.
 
-// Serializes the value field of an issued currency amount to its bytes representation
+// SerializeIssuedCurrencyValue serializes the value field of an issued currency amount to its bytes representation.
 func SerializeIssuedCurrencyValue(value string) ([]byte, error) {
 
 	if verifyIOUValue(value) != nil {
@@ -333,7 +341,8 @@ func SerializeIssuedCurrencyValue(value string) ([]byte, error) {
 	return serialReturn, nil
 }
 
-// Serializes an issued currency code to its bytes representation. The currency code can be 3 allowed string characters, or 20 bytes of hex
+// serializeIssuedCurrencyCode serializes an issued currency code to its bytes representation.
+// The currency code can be 3 allowed string characters, or 20 bytes of hex.
 func serializeIssuedCurrencyCode(currency string) ([]byte, error) {
 
 	currency = strings.TrimPrefix(currency, "0x")                                    // remove the 0x prefix if it exists
@@ -388,9 +397,11 @@ func serializeIssuedCurrencyCodeChars(currency string) ([]byte, error) {
 	return currencyBytes[:], nil
 }
 
-// Serializes the currency field of an issued currency amount to its bytes representation from value, currency code, and issuer address in string form (e.g. "USD", "r123456789")
-// The currency code can be 3 allowed string characters, or 20 bytes of hex in standard currency format (e.g. with "00" prefix) or non-standard currency format (e.g. without "00" prefix)
-func SerializeIssuedCurrencyAmount(value, currency, issuer string) ([]byte, error) {
+// SerializeIssuedCurrencyAmount serializes the currency field of an issued currency amount to its bytes representation
+// from value, currency code, and issuer address in string form (e.g. "USD", "r123456789").
+// The currency code can be 3 allowed string characters, or 20 bytes of hex in standard currency format (e.g. with "00" prefix)
+// or non-standard currency format (e.g. without "00" prefix)
+func serializeIssuedCurrencyAmount(value, currency, issuer string) ([]byte, error) {
 
 	valBytes, err := SerializeIssuedCurrencyValue(value) // serialize the value
 

@@ -3,7 +3,7 @@ package keypairs
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestSha512Half(t *testing.T) {
@@ -22,7 +22,7 @@ func TestSha512Half(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.description, func(t *testing.T) {
 			got := sha512Half(tc.input)
-			assert.Equal(t, tc.expected, got)
+			require.Equal(t, tc.expected, got)
 		})
 	}
 }

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	addresscodec "github.com/xyield/xrpl-go/address-codec"
 )
 
@@ -59,11 +59,11 @@ func TestGenerateEncodeSeed(t *testing.T) {
 			a, err := GenerateSeed(tc.entropy, tc.algorithm)
 
 			if tc.expectedErr != nil {
-				assert.Zero(t, a)
-				assert.Error(t, err, tc.expectedErr.Error())
+				require.Zero(t, a)
+				require.Error(t, err, tc.expectedErr.Error())
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tc.expected, a)
+				require.NoError(t, err)
+				require.Equal(t, tc.expected, a)
 			}
 		})
 	}
@@ -93,13 +93,13 @@ func TestDeriveKeypair(t *testing.T) {
 			priv, pub, err := DeriveKeypair(tc.inputSeed, tc.inputValidator)
 
 			if tc.expectedErr != nil {
-				assert.Zero(t, pub)
-				assert.Zero(t, priv)
-				assert.Error(t, err, tc.expectedErr.Error())
+				require.Zero(t, pub)
+				require.Zero(t, priv)
+				require.Error(t, err, tc.expectedErr.Error())
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tc.pubKey, pub)
-				assert.Equal(t, tc.privKey, priv)
+				require.NoError(t, err)
+				require.Equal(t, tc.pubKey, pub)
+				require.Equal(t, tc.privKey, priv)
 			}
 		})
 	}
@@ -126,7 +126,7 @@ func TestGetCryptoImplementation(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.description, func(t *testing.T) {
 			actual := getCryptoImplementation(tc.input)
-			assert.Equal(t, tc.expected, actual)
+			require.Equal(t, tc.expected, actual)
 		})
 	}
 }
@@ -150,11 +150,11 @@ func TestDeriveClassicAddress(t *testing.T) {
 		t.Run(tc.description, func(t *testing.T) {
 			actual, err := DeriveClassicAddress(tc.input)
 			if tc.expectedErr != nil {
-				assert.Zero(t, actual)
-				assert.Error(t, err, tc.expectedErr.Error())
+				require.Zero(t, actual)
+				require.Error(t, err, tc.expectedErr.Error())
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tc.expected, actual)
+				require.NoError(t, err)
+				require.Equal(t, tc.expected, actual)
 			}
 		})
 	}
@@ -181,11 +181,11 @@ func TestSign(t *testing.T) {
 		t.Run(tc.description, func(t *testing.T) {
 			actual, err := Sign(tc.inputMsg, tc.inputPrivKey)
 			if tc.expectedErr != nil {
-				assert.Zero(t, actual)
-				assert.Error(t, err, tc.expectedErr.Error())
+				require.Zero(t, actual)
+				require.Error(t, err, tc.expectedErr.Error())
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tc.expected, actual)
+				require.NoError(t, err)
+				require.Equal(t, tc.expected, actual)
 			}
 		})
 	}
@@ -214,11 +214,11 @@ func TestValidate(t *testing.T) {
 		t.Run(tc.description, func(t *testing.T) {
 			actual, err := Validate(tc.inputMsg, tc.inputPubKey, tc.inputSig)
 			if tc.expectedErr != nil {
-				assert.Zero(t, actual)
-				assert.Error(t, err, tc.expectedErr.Error())
+				require.Zero(t, actual)
+				require.Error(t, err, tc.expectedErr.Error())
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tc.expected, actual)
+				require.NoError(t, err)
+				require.Equal(t, tc.expected, actual)
 			}
 		})
 	}
