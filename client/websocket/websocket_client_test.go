@@ -84,7 +84,7 @@ func TestSendRequest(t *testing.T) {
 			})
 			defer s.Close()
 			url, _ := test.ConvertHttpToWS(s.URL)
-			cl := &WebsocketClient{cfg: &websocketConfig{URL: url}}
+			cl := &WebsocketClient{cfg: &WebsocketConfig{URL: url}}
 
 			res, err := cl.SendRequest(tc.req)
 

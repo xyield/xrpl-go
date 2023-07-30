@@ -15,8 +15,15 @@ type XRPLClient struct {
 
 type XRPLResponse interface {
 	GetResult(v any)
+	CheckError() error
 	// Warnings()
 
+}
+
+type XRPLResponseWarning struct {
+	Id      string `json:"id"`
+	Message string `json:"message"`
+	Details any    `json:"details,omitempty"`
 }
 
 func NewXRPLClient(cl Client) *XRPLClient {
@@ -25,7 +32,3 @@ func NewXRPLClient(cl Client) *XRPLClient {
 		Account: &accountImpl{client: cl},
 	}
 }
-
-// func (c *XRPLClient) GetAccountChannels(req *account.AccountChannelsRequest) *account.AccountChannelsResponse {
-// 	return c.SendRequest(req).(*account.AccountChannelsResponse)
-// }

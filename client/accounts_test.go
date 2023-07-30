@@ -23,6 +23,10 @@ func (m *mockClientXrplResponse) GetResult(v any) {
 	_ = dec.Decode(m.Result)
 }
 
+func (m *mockClientXrplResponse) CheckError() error {
+	return nil
+}
+
 func (m *mockClient) SendRequest(req common.XRPLRequest) (XRPLResponse, error) {
 	args := m.Called(req)
 	return args.Get(0).(XRPLResponse), args.Error(1)

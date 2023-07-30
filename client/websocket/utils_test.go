@@ -9,11 +9,11 @@ import (
 )
 
 func TestFormatRequest(t *testing.T) {
-	ws := &WebsocketClient{cfg: &websocketConfig{}}
+	ws := &WebsocketClient{cfg: &WebsocketConfig{}}
 	tt := []struct {
 		description string
 		req         common.XRPLRequest
-		id          string
+		id          int
 		marker      any
 		expected    string
 		expectedErr error
@@ -25,10 +25,10 @@ func TestFormatRequest(t *testing.T) {
 				DestinationAccount: "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
 				Limit:              70,
 			},
-			id:     "1",
+			id:     1,
 			marker: nil,
 			expected: `{
-				"id": "1",
+				"id": 1,
 				"command":"account_channels",
 				"account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
 				"destination_account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
@@ -43,10 +43,10 @@ func TestFormatRequest(t *testing.T) {
 				DestinationAccount: "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
 				Limit:              70,
 			},
-			id:     "1",
+			id:     1,
 			marker: "hdsohdaoidhadasd",
 			expected: `{
-				"id": "1",
+				"id": 1,
 				"command":"account_channels",
 				"account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
 				"destination_account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",

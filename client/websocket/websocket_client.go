@@ -3,6 +3,8 @@ package websocket
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
+	"sync/atomic"
 
 	"github.com/gorilla/websocket"
 	"github.com/mitchellh/mapstructure"
@@ -12,13 +14,16 @@ import (
 
 var _ client.Client = (*WebsocketClient)(nil)
 
-type websocketConfig struct {
+var ErrIncorrectId = errors.New("incorrect id")
+
+type WebsocketConfig struct {
 	URL string
 }
 
 type WebsocketClient struct {
 	// websocket setup
-	cfg *websocketConfig
+	cfg       *WebsocketConfig
+	idCounter atomic.Uint32
 	// hub  *hub
 	// conn *websocket.Conn
 }
@@ -29,7 +34,7 @@ func (c *WebsocketClient) SendRequest(req common.XRPLRequest) (client.XRPLRespon
 		return nil, err
 	}
 	// websocket specific implementation
-	id := "1"
+	id := c.idCounter.Add(1)
 	// resChan := make(responseChan)
 	// defer close(resChan)
 	// c.hub.registerConnection(id, resChan)
@@ -40,7 +45,7 @@ func (c *WebsocketClient) SendRequest(req common.XRPLRequest) (client.XRPLRespon
 	}
 	defer conn.Close()
 
-	msg, err := c.formatRequest(req, id, nil)
+	msg, err := c.formatRequest(req, int(id), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -62,12 +67,27 @@ func (c *WebsocketClient) SendRequest(req common.XRPLRequest) (client.XRPLRespon
 	if err != nil {
 		return nil, err
 	}
+
+	if retID, ok := m["id"]; ok {
+		retID, err = retID.(json.Number).Int64()
+		if err != nil {
+			return nil, err
+		}
+		if retID != int64(id) {
+			return nil, ErrIncorrectId
+		}
+	}
+
 	var res WebSocketClientXrplResponse
 	dec, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{TagName: "json", Result: &res})
 	err = dec.Decode(&m)
 	if err != nil {
 		return nil, err
 	}
+	if err := res.CheckError(); err != nil {
+		return nil, err
+	}
+
 	return &res, nil
 }
 
@@ -78,7 +98,7 @@ This client will open and close a websocket connection for each request.
 
 TODO: implement a websocket connection pool to handle subscriptions
 */
-func NewWebsocketClient(cfg *websocketConfig) (client *WebsocketClient, err error) {
+func NewWebsocketClient(cfg *WebsocketConfig) (*WebsocketClient, error) {
 	return &WebsocketClient{
 		cfg: cfg,
 	}, nil

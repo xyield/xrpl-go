@@ -7,7 +7,7 @@ import (
 	"github.com/xyield/xrpl-go/model/client/common"
 )
 
-func (c *WebsocketClient) formatRequest(req common.XRPLRequest, id string, marker any) ([]byte, error) {
+func (c *WebsocketClient) formatRequest(req common.XRPLRequest, id int, marker any) ([]byte, error) {
 	m := make(map[string]any)
 	m["id"] = id
 	m["command"] = req.Method()

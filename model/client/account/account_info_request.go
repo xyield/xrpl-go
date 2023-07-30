@@ -20,6 +20,10 @@ func (*AccountInfoRequest) Method() string {
 	return "account_info"
 }
 
+func (*AccountInfoRequest) Validate() error {
+	return nil
+}
+
 func (r *AccountInfoRequest) UnmarshalJSON(data []byte) error {
 	type airHelper struct {
 		Account     types.Address     `json:"account"`
