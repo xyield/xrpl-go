@@ -156,7 +156,7 @@ func TestSerializeXrpAmount(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			got, err := SerializeXrpAmount(tt.input)
+			got, err := serializeXrpAmount(tt.input)
 			if tt.expErr != nil {
 				require.EqualError(t, tt.expErr, err.Error())
 			} else {
@@ -377,7 +377,7 @@ func TestSerializeIssuedCurrencyAmount(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			got, err := SerializeIssuedCurrencyAmount(tt.inputValue, tt.inputCurrency, tt.inputIssuer)
+			got, err := serializeIssuedCurrencyAmount(tt.inputValue, tt.inputCurrency, tt.inputIssuer)
 
 			if tt.expectedErr != nil {
 				require.EqualError(t, tt.expectedErr, err.Error())

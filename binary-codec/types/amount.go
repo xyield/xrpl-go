@@ -79,9 +79,9 @@ func (a *Amount) FromJson(value any) ([]byte, error) {
 
 	switch value := value.(type) {
 	case string:
-		return SerializeXrpAmount(value)
+		return serializeXrpAmount(value)
 	case map[string]any:
-		return SerializeIssuedCurrencyAmount(value["value"].(string), value["currency"].(string), value["issuer"].(string))
+		return serializeIssuedCurrencyAmount(value["value"].(string), value["currency"].(string), value["issuer"].(string))
 	default:
 		return nil, errors.New("invalid amount type")
 	}
@@ -246,8 +246,8 @@ func verifyIOUValue(value string) error {
 	return err
 }
 
-// SerializeXrpAmount serializes an XRP amount value.
-func SerializeXrpAmount(value string) ([]byte, error) {
+// serializeXrpAmount serializes an XRP amount value.
+func serializeXrpAmount(value string) ([]byte, error) {
 
 	if verifyXrpValue(value) != nil {
 		return nil, verifyXrpValue(value)
@@ -401,7 +401,7 @@ func serializeIssuedCurrencyCodeChars(currency string) ([]byte, error) {
 // from value, currency code, and issuer address in string form (e.g. "USD", "r123456789").
 // The currency code can be 3 allowed string characters, or 20 bytes of hex in standard currency format (e.g. with "00" prefix)
 // or non-standard currency format (e.g. without "00" prefix)
-func SerializeIssuedCurrencyAmount(value, currency, issuer string) ([]byte, error) {
+func serializeIssuedCurrencyAmount(value, currency, issuer string) ([]byte, error) {
 
 	valBytes, err := SerializeIssuedCurrencyValue(value) // serialize the value
 
