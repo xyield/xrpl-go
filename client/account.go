@@ -8,33 +8,27 @@ type Account interface {
 	GetAccountChannels(req *account.AccountChannelsRequest) (*account.AccountChannelsResponse, error)
 }
 
-type AccountImpl struct {
+type accountImpl struct {
 	Client Client
 }
 
-type AccountChannelsMissingAccountError struct {
-	ErrorString string
-}
+func (a *accountImpl) GetAccountChannels(req *account.AccountChannelsRequest) (*account.AccountChannelsResponse, error) {
 
-func (e *AccountChannelsMissingAccountError) Error() string {
-	return "Account value is missing"
-}
-
-func (a *AccountImpl) GetAccountChannels(req *account.AccountChannelsRequest) (*account.AccountChannelsResponse, error) {
-
-	// check required params are there + validate others + serialise (if required)
-	if req.Account == "" {
-		return nil, &AccountChannelsMissingAccountError{}
-	}
-
-	// serialise params will happen here??
-
-	response := &account.AccountChannelsResponse{}
-
-	err := a.Client.SendRequest(req, response)
+	err := req.Validate()
 	if err != nil {
 		return nil, err
 	}
 
-	return response, nil
+	result, err := a.Client.SendRequest(req)
+	if err != nil {
+		return nil, err
+	}
+
+	var channelResponse account.AccountChannelsResponse
+	err = result.GetResult(&channelResponse)
+	if err != nil {
+		return nil, err
+	}
+
+	return &channelResponse, nil
 }

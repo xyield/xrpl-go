@@ -28,7 +28,7 @@ func TestConfigCreation(t *testing.T) {
 		cfg, err := NewJsonRpcConfig("")
 
 		assert.Nil(t, cfg)
-		assert.EqualError(t, err, "Empty port and IP provided")
+		assert.EqualError(t, err, "empty port and IP provided")
 	})
 	t.Run("Format root path - add /", func(t *testing.T) {
 		cfg, _ := NewJsonRpcConfig("http://s1.ripple.com:51234")

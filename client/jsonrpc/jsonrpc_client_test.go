@@ -14,6 +14,7 @@ import (
 	rpcutils "github.com/xyield/xrpl-go/client/jsonrpc/utils"
 	"github.com/xyield/xrpl-go/model/client/account"
 	"github.com/xyield/xrpl-go/model/client/common"
+	"github.com/xyield/xrpl-go/model/client/jsonrpc"
 	"github.com/xyield/xrpl-go/model/client/utility"
 )
 
@@ -120,7 +121,7 @@ func TestCreateRequest(t *testing.T) {
 			LedgerIndex:        common.VALIDATED,
 		}
 
-		expetedBody := jsonRpcRequest{
+		expetedBody := jsonrpc.JsonRpcRequest{
 			Method: "account_channels",
 			Params: [1]interface{}{req},
 		}
@@ -138,7 +139,7 @@ func TestCreateRequest(t *testing.T) {
 
 		var req *utility.PingRequest // params sent in as zero value struct
 
-		expetedBody := jsonRpcRequest{
+		expetedBody := jsonrpc.JsonRpcRequest{
 			Method: "ping",
 		}
 		expectedRequestBytes, _ := jsoniter.Marshal(expetedBody)
@@ -156,7 +157,7 @@ func TestCreateRequest(t *testing.T) {
 
 		req := &utility.PingRequest{} // means params get set an empty object
 
-		expetedBody := jsonRpcRequest{
+		expetedBody := jsonrpc.JsonRpcRequest{
 			Method: "ping",
 		}
 		expectedRequestBytes, _ := jsoniter.Marshal(expetedBody)
@@ -186,15 +187,13 @@ func TestSendRequest(t *testing.T) {
 			return rpcutils.MockResponse(`{}`, 200, mc)(req)
 		}
 
-		resStruct := &account.AccountChannelsResponse{}
-
 		cfg, err := client.NewJsonRpcConfig("http://testnode/", client.WithHttpClient(mc))
 		assert.NoError(t, err)
 
 		jsonRpcClient := NewJsonRpcClient(cfg)
 		xrplClient := client.NewXRPLClient(jsonRpcClient)
 
-		err = xrplClient.SendRequest(req, resStruct)
+		_, err = xrplClient.SendRequest(req)
 
 		assert.NotNil(t, capturedRequest)
 		assert.NoError(t, err)
@@ -228,15 +227,16 @@ func TestSendRequest(t *testing.T) {
 		mc := &rpcutils.MockClient{}
 		mc.DoFunc = rpcutils.MockResponse(response, 200, mc)
 
-		resStruct := &account.AccountChannelsResponse{}
-
 		cfg, err := client.NewJsonRpcConfig("http://testnode/", client.WithHttpClient(mc))
 		assert.NoError(t, err)
 
 		jsonRpcClient := NewJsonRpcClient(cfg)
 		xrplClient := client.NewXRPLClient(jsonRpcClient)
 
-		err = xrplClient.SendRequest(req, resStruct)
+		xrplResponse, err := xrplClient.SendRequest(req)
+
+		var channelsResponse account.AccountChannelsResponse
+		_ = xrplResponse.GetResult(&channelsResponse)
 
 		expected := &account.AccountChannelsResponse{
 			Account:     "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
@@ -245,9 +245,9 @@ func TestSendRequest(t *testing.T) {
 		}
 
 		assert.NoError(t, err)
-		assert.Equal(t, expected.Account, resStruct.Account)
-		assert.Equal(t, expected.LedgerIndex, resStruct.LedgerIndex)
-		assert.Equal(t, expected.LedgerHash, resStruct.LedgerHash)
+		assert.Equal(t, expected.Account, channelsResponse.Account)
+		assert.Equal(t, expected.LedgerIndex, channelsResponse.LedgerIndex)
+		assert.Equal(t, expected.LedgerHash, channelsResponse.LedgerHash)
 	})
 
 	t.Run("SendRequest - error response", func(t *testing.T) {
@@ -274,17 +274,11 @@ func TestSendRequest(t *testing.T) {
 		cfg, err := client.NewJsonRpcConfig("http://testnode/", client.WithHttpClient(mc))
 		assert.NoError(t, err)
 
-		resStruct := &account.AccountChannelsResponse{}
-
 		jsonRpcClient := NewJsonRpcClient(cfg)
 		xrplClient := client.NewXRPLClient(jsonRpcClient)
 
-		err = xrplClient.SendRequest(req, resStruct)
+		_, err = xrplClient.SendRequest(req)
 
-		expected := &account.AccountChannelsResponse{}
-
-		assert.Equal(t, expected.Account, resStruct.Account)
-		assert.Equal(t, expected.LedgerHash, resStruct.LedgerHash)
 		assert.EqualError(t, err, "ledgerIndexMalformed")
 	})
 
@@ -304,20 +298,13 @@ func TestSendRequest(t *testing.T) {
 		cfg, err := client.NewJsonRpcConfig("http://testnode/", client.WithHttpClient(mc))
 		assert.NoError(t, err)
 
-		resStruct := &account.AccountChannelsResponse{}
-
 		jsonRpcClient := NewJsonRpcClient(cfg)
 		xrplClient := client.NewXRPLClient(jsonRpcClient)
 
-		err = xrplClient.SendRequest(req, resStruct)
-
-		expected := &account.AccountChannelsResponse{}
+		_, err = xrplClient.SendRequest(req)
 
 		// Check that 3 extra requests were made
 		assert.Equal(t, 4, mc.RequestCount)
-
-		assert.Equal(t, expected.Account, resStruct.Account)
-		assert.Equal(t, expected.LedgerHash, resStruct.LedgerHash)
 		assert.EqualError(t, err, "Server is overloaded, rate limit exceeded")
 
 	})
@@ -349,12 +336,13 @@ func TestSendRequest(t *testing.T) {
 		cfg, err := client.NewJsonRpcConfig("http://testnode/", client.WithHttpClient(mc))
 		assert.NoError(t, err)
 
-		resStruct := &account.AccountChannelsResponse{}
-
 		jsonRpcClient := NewJsonRpcClient(cfg)
 		xrplClient := client.NewXRPLClient(jsonRpcClient)
 
-		err = xrplClient.SendRequest(req, resStruct)
+		xrplResponse, err := xrplClient.SendRequest(req)
+
+		var channelsResponse account.AccountChannelsResponse
+		_ = xrplResponse.GetResult(&channelsResponse)
 
 		expected := &account.AccountChannelsResponse{
 			Account:     "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
@@ -366,9 +354,9 @@ func TestSendRequest(t *testing.T) {
 		assert.Equal(t, 3, mc.RequestCount)
 
 		assert.NoError(t, err)
-		assert.Equal(t, expected.Account, resStruct.Account)
-		assert.Equal(t, expected.LedgerIndex, resStruct.LedgerIndex)
-		assert.Equal(t, expected.LedgerHash, resStruct.LedgerHash)
+		assert.Equal(t, expected.Account, channelsResponse.Account)
+		assert.Equal(t, expected.LedgerIndex, channelsResponse.LedgerIndex)
+		assert.Equal(t, expected.LedgerHash, channelsResponse.LedgerHash)
 	})
 
 	t.Run("SendRequest - timeout", func(t *testing.T) {
@@ -386,12 +374,10 @@ func TestSendRequest(t *testing.T) {
 		cfg, err := client.NewJsonRpcConfig("http://testnode/", client.WithHttpClient(mc))
 		assert.NoError(t, err)
 
-		resStruct := &account.AccountChannelsResponse{}
-
 		jsonRpcClient := NewJsonRpcClient(cfg)
 		xrplClient := client.NewXRPLClient(jsonRpcClient)
 
-		err = xrplClient.SendRequest(req, resStruct)
+		_, err = xrplClient.SendRequest(req)
 
 		// Check that the expected timeout error occurred
 		assert.Error(t, err)

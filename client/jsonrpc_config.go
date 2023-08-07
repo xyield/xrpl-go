@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-var EmptyUrlError = errors.New("Empty port and IP provided")
+var ErrEmptyUrl = errors.New("empty port and IP provided")
 
 type HTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
@@ -31,7 +31,7 @@ func NewJsonRpcConfig(url string, opts ...JsonRpcConfigOpt) (*JsonRpcConfig, err
 
 	// validate a url has been passed in
 	if len(url) == 0 {
-		return nil, EmptyUrlError
+		return nil, ErrEmptyUrl
 	}
 	// add slash if doesn't already end with one
 	if !strings.HasSuffix(url, "/") {

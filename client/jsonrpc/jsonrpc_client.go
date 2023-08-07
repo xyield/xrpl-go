@@ -12,34 +12,41 @@ import (
 	jsoniter "github.com/json-iterator/go"
 	"github.com/xyield/xrpl-go/client"
 	"github.com/xyield/xrpl-go/model/client/common"
+	"github.com/xyield/xrpl-go/model/client/jsonrpc"
 )
 
 type JsonRpcClient struct {
 	Config *client.JsonRpcConfig
 }
 
+type JsonRpcClientError struct {
+	ErrorString string
+}
+
+func (e *JsonRpcClientError) Error() string {
+	return e.ErrorString
+}
+
 func NewJsonRpcClient(cfg *client.JsonRpcConfig) *JsonRpcClient {
 
-	c := &JsonRpcClient{
+	return &JsonRpcClient{
 		Config: cfg,
 	}
-
-	return c
 }
 
 // satisfy the Client interface
-func (c *JsonRpcClient) SendRequest(reqParams common.XRPLRequest, responseStruct common.XRPLResponse) error {
+func (c *JsonRpcClient) SendRequest(reqParams common.XRPLRequest) (common.XRPLResponse, error) {
 
-	var jr jsonRpcResponse
+	var jr jsonrpc.JsonRpcResponse
 
 	body, err := CreateRequest(reqParams)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	req, err := http.NewRequest(http.MethodPost, c.Config.Url, bytes.NewReader(body))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// add timeout context to prevent hanging
@@ -53,7 +60,7 @@ func (c *JsonRpcClient) SendRequest(reqParams common.XRPLRequest, responseStruct
 
 	response, err = c.Config.HTTPClient.Do(req)
 	if err != nil || response == nil {
-		return err
+		return nil, err
 	}
 
 	// allow client to reuse persistant connection
@@ -71,7 +78,7 @@ func (c *JsonRpcClient) SendRequest(reqParams common.XRPLRequest, responseStruct
 			// Make request again after waiting
 			response, err = c.Config.HTTPClient.Do(req)
 			if err != nil {
-				return err
+				return nil, err
 			}
 
 			if response.StatusCode != 503 {
@@ -84,38 +91,26 @@ func (c *JsonRpcClient) SendRequest(reqParams common.XRPLRequest, responseStruct
 
 		if response.StatusCode == 503 {
 			// Return service unavailable error here after retry 3 times
-			return &JsonRpcClientError{ErrorString: "Server is overloaded, rate limit exceeded"}
+			return nil, &JsonRpcClientError{ErrorString: "Server is overloaded, rate limit exceeded"}
 		}
 
 	}
 
 	jr, err = CheckForError(response)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	// If no error unmarshall jsonRpcResponse.Result into the result struct
-	b, err := jsoniter.Marshal(jr.Result)
-	if err != nil {
-		return err
-	}
-
-	// Every response struct must impl this interface method
-	err = responseStruct.UnmarshallJSON(b)
-	if err != nil {
-		return err
-	}
-
-	return err
+	return &jr, nil
 }
 
 // CreateRequest formats the parameters and method name ready for sending request
 // Params will have been serialised if required and added to request struct before being passed to this method
 func CreateRequest(reqParams common.XRPLRequest) ([]byte, error) {
 
-	var body jsonRpcRequest
+	var body jsonrpc.JsonRpcRequest
 
-	body = jsonRpcRequest{
+	body = jsonrpc.JsonRpcRequest{
 		Method: reqParams.Method(),
 		// each param object will have a struct with json serialising tags
 		Params: [1]interface{}{reqParams},
@@ -129,7 +124,7 @@ func CreateRequest(reqParams common.XRPLRequest) ([]byte, error) {
 	paramString := string(paramBytes)
 	if strings.Compare(paramString, "[{}]") == 0 {
 		// need to remove params field from the body if it is empty
-		body = jsonRpcRequest{
+		body = jsonrpc.JsonRpcRequest{
 			Method: reqParams.Method(),
 		}
 
@@ -150,9 +145,9 @@ func CreateRequest(reqParams common.XRPLRequest) ([]byte, error) {
 }
 
 // CheckForError reads the http response and formats the error if it exists
-func CheckForError(res *http.Response) (jsonRpcResponse, error) {
+func CheckForError(res *http.Response) (jsonrpc.JsonRpcResponse, error) {
 
-	var jr jsonRpcResponse
+	var jr jsonrpc.JsonRpcResponse
 
 	b, err := ioutil.ReadAll(res.Body)
 	if err != nil || b == nil {

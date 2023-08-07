@@ -1,8 +1,6 @@
 package account
 
 import (
-	"encoding/json"
-
 	"github.com/xyield/xrpl-go/model/client/common"
 	"github.com/xyield/xrpl-go/model/transactions/types"
 )
@@ -15,14 +13,4 @@ type AccountChannelsResponse struct {
 	Validated   bool               `json:"validated,omitempty"`
 	Limit       int                `json:"limit,omitempty"`
 	Marker      any                `json:"marker,omitempty"`
-}
-
-func (r *AccountChannelsResponse) UnmarshallJSON(data []byte) error {
-	type Alias AccountChannelsResponse
-	var aux Alias
-	if err := json.Unmarshal(data, &aux); err != nil {
-		return err
-	}
-	*r = AccountChannelsResponse(aux)
-	return nil
 }
