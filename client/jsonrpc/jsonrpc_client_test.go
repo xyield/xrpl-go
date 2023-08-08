@@ -191,9 +191,8 @@ func TestSendRequest(t *testing.T) {
 		assert.NoError(t, err)
 
 		jsonRpcClient := NewJsonRpcClient(cfg)
-		xrplClient := client.NewXRPLClient(jsonRpcClient)
 
-		_, err = xrplClient.SendRequest(req)
+		_, err = jsonRpcClient.SendRequest(req)
 
 		assert.NotNil(t, capturedRequest)
 		assert.NoError(t, err)
@@ -231,9 +230,8 @@ func TestSendRequest(t *testing.T) {
 		assert.NoError(t, err)
 
 		jsonRpcClient := NewJsonRpcClient(cfg)
-		xrplClient := client.NewXRPLClient(jsonRpcClient)
 
-		xrplResponse, err := xrplClient.SendRequest(req)
+		xrplResponse, err := jsonRpcClient.SendRequest(req)
 
 		var channelsResponse account.AccountChannelsResponse
 		_ = xrplResponse.GetResult(&channelsResponse)
@@ -275,9 +273,8 @@ func TestSendRequest(t *testing.T) {
 		assert.NoError(t, err)
 
 		jsonRpcClient := NewJsonRpcClient(cfg)
-		xrplClient := client.NewXRPLClient(jsonRpcClient)
 
-		_, err = xrplClient.SendRequest(req)
+		_, err = jsonRpcClient.SendRequest(req)
 
 		assert.EqualError(t, err, "ledgerIndexMalformed")
 	})
@@ -299,9 +296,8 @@ func TestSendRequest(t *testing.T) {
 		assert.NoError(t, err)
 
 		jsonRpcClient := NewJsonRpcClient(cfg)
-		xrplClient := client.NewXRPLClient(jsonRpcClient)
 
-		_, err = xrplClient.SendRequest(req)
+		_, err = jsonRpcClient.SendRequest(req)
 
 		// Check that 3 extra requests were made
 		assert.Equal(t, 4, mc.RequestCount)
@@ -337,9 +333,8 @@ func TestSendRequest(t *testing.T) {
 		assert.NoError(t, err)
 
 		jsonRpcClient := NewJsonRpcClient(cfg)
-		xrplClient := client.NewXRPLClient(jsonRpcClient)
 
-		xrplResponse, err := xrplClient.SendRequest(req)
+		xrplResponse, err := jsonRpcClient.SendRequest(req)
 
 		var channelsResponse account.AccountChannelsResponse
 		_ = xrplResponse.GetResult(&channelsResponse)
@@ -375,9 +370,8 @@ func TestSendRequest(t *testing.T) {
 		assert.NoError(t, err)
 
 		jsonRpcClient := NewJsonRpcClient(cfg)
-		xrplClient := client.NewXRPLClient(jsonRpcClient)
 
-		_, err = xrplClient.SendRequest(req)
+		_, err = jsonRpcClient.SendRequest(req)
 
 		// Check that the expected timeout error occurred
 		assert.Error(t, err)

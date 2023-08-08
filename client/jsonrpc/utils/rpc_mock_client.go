@@ -2,8 +2,14 @@ package rpcutils
 
 import (
 	"bytes"
+	"errors"
 	"io"
+	"io/ioutil"
 	"net/http"
+
+	jsoniter "github.com/json-iterator/go"
+	"github.com/xyield/xrpl-go/model/client/common"
+	"github.com/xyield/xrpl-go/model/client/jsonrpc"
 )
 
 type MockClient struct {
@@ -28,4 +34,30 @@ func MockResponse(resString string, statusCode int, m *MockClient) func(req *htt
 			Body:       io.NopCloser(bytes.NewReader([]byte(resString))),
 		}, nil
 	}
+}
+
+// Method to be able to set mock client as a Client object in each interface
+func (m *MockClient) SendRequest(reqParams common.XRPLRequest) (common.XRPLResponse, error) {
+	req := http.Request{}
+	res, err := m.Do(&req)
+	if err != nil {
+		return nil, err
+	}
+
+	// map res to XRPLResponse and return this
+	b, err := ioutil.ReadAll(res.Body)
+	if err != nil || b == nil {
+		return nil, err
+	}
+
+	var jr jsonrpc.JsonRpcResponse
+	err = jsoniter.Unmarshal(b, &jr)
+	if err != nil {
+		return jr, err
+	}
+
+	if _, ok := jr.Result["error"]; ok {
+		return jr, errors.New(jr.Result["error"].(string))
+	}
+	return jr, nil
 }

@@ -28,7 +28,6 @@ func (e *JsonRpcClientError) Error() string {
 }
 
 func NewJsonRpcClient(cfg *client.JsonRpcConfig) *JsonRpcClient {
-
 	return &JsonRpcClient{
 		Config: cfg,
 	}

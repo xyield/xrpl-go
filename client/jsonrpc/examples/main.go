@@ -10,19 +10,21 @@ import (
 
 func main() {
 
+	// init new config object with desired node address
 	cfg, err := client.NewJsonRpcConfig("http://testnode/")
 	if err != nil {
 		log.Panicln(err)
 	}
 
 	// Initialise new json client with json config
-	jsonrpc := jsonrpcclient.NewJsonRpcClient(cfg)
+	jsonrpcClient := jsonrpcclient.NewJsonRpcClient(cfg)
 
 	// create new XRPL client with the json client
-	xrplClient := client.NewXRPLClient(jsonrpc)
+	xrplClient := client.NewXRPLClient(jsonrpcClient)
 
 	var req *account.AccountChannelsRequest
 
+	// call the desired methodx
 	xrplClient.Account.GetAccountChannels(req)
 
 }
