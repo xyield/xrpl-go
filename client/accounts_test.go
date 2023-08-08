@@ -60,7 +60,7 @@ func TestGetAccountChannels(t *testing.T) {
 		},
 	}, nil)
 
-	res, _ := a.GetAccountChannels(&account.AccountChannelsRequest{Account: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+	res, _, _ := a.GetAccountChannels(&account.AccountChannelsRequest{Account: "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
 		DestinationAccount: "ra5nK24KXen9AHvsdFTKHSANinZseWnPcX",
 		LedgerIndex:        common.VALIDATED})
 	require.Equal(t, &account.AccountChannelsResponse{
