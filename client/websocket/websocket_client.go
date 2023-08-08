@@ -33,11 +33,8 @@ func (c *WebsocketClient) SendRequest(req common.XRPLRequest) (client.XRPLRespon
 	if err != nil {
 		return nil, err
 	}
-	// websocket specific implementation
+
 	id := c.idCounter.Add(1)
-	// resChan := make(responseChan)
-	// defer close(resChan)
-	// c.hub.registerConnection(id, resChan)
 
 	conn, _, err := websocket.DefaultDialer.Dial(c.cfg.URL, nil)
 	if err != nil {
@@ -50,7 +47,6 @@ func (c *WebsocketClient) SendRequest(req common.XRPLRequest) (client.XRPLRespon
 		return nil, err
 	}
 
-	// v := <-resChan
 	err = conn.WriteMessage(websocket.TextMessage, msg)
 	if err != nil {
 		return nil, err
@@ -95,20 +91,9 @@ func (c *WebsocketClient) SendRequest(req common.XRPLRequest) (client.XRPLRespon
 Creates a new websocket client with cfg.
 
 This client will open and close a websocket connection for each request.
-
-TODO: implement a websocket connection pool to handle subscriptions
 */
 func NewWebsocketClient(cfg *WebsocketConfig) (*WebsocketClient, error) {
 	return &WebsocketClient{
 		cfg: cfg,
 	}, nil
 }
-
-// func (c *WebsocketClient) open() error {
-// 	conn, _, err := websocket.DefaultDialer.Dial(c.cfg.URL, nil)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	c.conn = conn
-// 	return nil
-// }
