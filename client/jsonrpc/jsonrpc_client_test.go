@@ -2,9 +2,11 @@ package jsonrpcclient
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"testing"
 	"time"
 
@@ -232,18 +234,19 @@ func TestSendRequest(t *testing.T) {
 
 		xrplResponse, err := jsonRpcClient.SendRequest(req)
 
-		// expectedXrplResponse := jsonrpcmodels.JsonRpcResponse{
-		// 	Result: jsonrpcmodels.AnyJson{
-		// 		"account":      "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-		// 		"ledger_hash":  "27F530E5C93ED5C13994812787C1ED073C822BAEC7597964608F2C049C2ACD2D",
-		// 		"ledger_index": 71766343},
-		// 	Warning: "none",
-		// 	Warnings: []jsonrpcmodels.ApiWarning{{
-		// 		Id:      1,
-		// 		Message: "message",
-		// 	},
-		// 	},
-		// }
+		expectedXrplResponse := &jsonrpcmodels.JsonRpcResponse{
+			Result: jsonrpcmodels.AnyJson{
+				"account":      "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+				"ledger_hash":  "27F530E5C93ED5C13994812787C1ED073C822BAEC7597964608F2C049C2ACD2D",
+				"ledger_index": json.Number(strconv.FormatInt(71766343, 10)),
+			},
+			Warning: "none",
+			Warnings: []client.XRPLResponseWarning{{
+				Id:      "1",
+				Message: "message",
+			},
+			},
+		}
 
 		var channelsResponse account.AccountChannelsResponse
 		_ = xrplResponse.GetResult(&channelsResponse)
@@ -256,7 +259,7 @@ func TestSendRequest(t *testing.T) {
 
 		assert.NoError(t, err)
 
-		// assert.Equal(t, expectedXrplResponse, xrplResponse) // TODO: failing due to floats
+		assert.Equal(t, expectedXrplResponse, xrplResponse)
 
 		assert.Equal(t, expected.Account, channelsResponse.Account)
 		assert.Equal(t, expected.LedgerIndex, channelsResponse.LedgerIndex)

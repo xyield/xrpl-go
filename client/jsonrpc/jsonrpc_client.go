@@ -3,6 +3,8 @@ package jsonrpcclient
 import (
 	"bytes"
 	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -10,9 +12,9 @@ import (
 	"time"
 
 	jsoniter "github.com/json-iterator/go"
+	"github.com/mitchellh/mapstructure"
 	"github.com/xyield/xrpl-go/client"
 	jsonrpcmodels "github.com/xyield/xrpl-go/client/jsonrpc/models"
-	"github.com/xyield/xrpl-go/model/client/common"
 )
 
 type JsonRpcClient struct {
@@ -26,6 +28,8 @@ type JsonRpcClientError struct {
 func (e *JsonRpcClientError) Error() string {
 	return e.ErrorString
 }
+
+var ErrIncorrectId = errors.New("incorrect id")
 
 func NewJsonRpcClient(cfg *client.JsonRpcConfig) *JsonRpcClient {
 	return &JsonRpcClient{
@@ -41,9 +45,7 @@ func NewClient(cfg *client.JsonRpcConfig) *client.XRPLClient {
 }
 
 // satisfy the Client interface
-func (c *JsonRpcClient) SendRequest(reqParams common.XRPLRequest) (common.XRPLResponse, error) {
-
-	var jr jsonrpcmodels.JsonRpcResponse
+func (c *JsonRpcClient) SendRequest(reqParams client.XRPLRequest) (client.XRPLResponse, error) {
 
 	body, err := CreateRequest(reqParams)
 	if err != nil {
@@ -102,6 +104,7 @@ func (c *JsonRpcClient) SendRequest(reqParams common.XRPLRequest) (common.XRPLRe
 
 	}
 
+	var jr jsonrpcmodels.JsonRpcResponse
 	jr, err = CheckForError(response)
 	if err != nil {
 		return nil, err
@@ -112,7 +115,7 @@ func (c *JsonRpcClient) SendRequest(reqParams common.XRPLRequest) (common.XRPLRe
 
 // CreateRequest formats the parameters and method name ready for sending request
 // Params will have been serialised if required and added to request struct before being passed to this method
-func CreateRequest(reqParams common.XRPLRequest) ([]byte, error) {
+func CreateRequest(reqParams client.XRPLRequest) ([]byte, error) {
 
 	var body jsonrpcmodels.JsonRpcRequest
 
@@ -165,7 +168,16 @@ func CheckForError(res *http.Response) (jsonrpcmodels.JsonRpcResponse, error) {
 		return jr, &JsonRpcClientError{ErrorString: string(b)}
 	}
 
-	err = jsoniter.Unmarshal(b, &jr)
+	jDec := json.NewDecoder(bytes.NewReader(b))
+	jDec.UseNumber()
+	var m map[string]any
+	err = jDec.Decode(&m)
+	if err != nil {
+		return jr, err
+	}
+
+	dec, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{TagName: "json", Result: &jr})
+	err = dec.Decode(&m)
 	if err != nil {
 		return jr, err
 	}

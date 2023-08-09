@@ -2,19 +2,18 @@ package client
 
 import (
 	"github.com/xyield/xrpl-go/model/client/account"
-	"github.com/xyield/xrpl-go/model/client/common"
 )
 
 type Account interface {
 	// return result struct, fill xrpl response for warnings etc, error
-	GetAccountChannels(req *account.AccountChannelsRequest) (*account.AccountChannelsResponse, common.XRPLResponse, error)
+	GetAccountChannels(req *account.AccountChannelsRequest) (*account.AccountChannelsResponse, XRPLResponse, error)
 }
 
 type accountImpl struct {
 	Client Client
 }
 
-func (a *accountImpl) GetAccountChannels(req *account.AccountChannelsRequest) (*account.AccountChannelsResponse, common.XRPLResponse, error) {
+func (a *accountImpl) GetAccountChannels(req *account.AccountChannelsRequest) (*account.AccountChannelsResponse, XRPLResponse, error) {
 
 	err := req.Validate()
 	if err != nil {
