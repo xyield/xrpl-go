@@ -11,8 +11,8 @@ import (
 
 	jsoniter "github.com/json-iterator/go"
 	"github.com/xyield/xrpl-go/client"
+	jsonrpcmodels "github.com/xyield/xrpl-go/client/jsonrpc/models"
 	"github.com/xyield/xrpl-go/model/client/common"
-	"github.com/xyield/xrpl-go/model/client/jsonrpc"
 )
 
 type JsonRpcClient struct {
@@ -33,10 +33,17 @@ func NewJsonRpcClient(cfg *client.JsonRpcConfig) *JsonRpcClient {
 	}
 }
 
+func NewClient(cfg *client.JsonRpcConfig) *client.XRPLClient {
+	jc := &JsonRpcClient{
+		Config: cfg,
+	}
+	return client.NewXRPLClient(jc)
+}
+
 // satisfy the Client interface
 func (c *JsonRpcClient) SendRequest(reqParams common.XRPLRequest) (common.XRPLResponse, error) {
 
-	var jr jsonrpc.JsonRpcResponse
+	var jr jsonrpcmodels.JsonRpcResponse
 
 	body, err := CreateRequest(reqParams)
 	if err != nil {
@@ -107,9 +114,9 @@ func (c *JsonRpcClient) SendRequest(reqParams common.XRPLRequest) (common.XRPLRe
 // Params will have been serialised if required and added to request struct before being passed to this method
 func CreateRequest(reqParams common.XRPLRequest) ([]byte, error) {
 
-	var body jsonrpc.JsonRpcRequest
+	var body jsonrpcmodels.JsonRpcRequest
 
-	body = jsonrpc.JsonRpcRequest{
+	body = jsonrpcmodels.JsonRpcRequest{
 		Method: reqParams.Method(),
 		// each param object will have a struct with json serialising tags
 		Params: [1]interface{}{reqParams},
@@ -123,7 +130,7 @@ func CreateRequest(reqParams common.XRPLRequest) ([]byte, error) {
 	paramString := string(paramBytes)
 	if strings.Compare(paramString, "[{}]") == 0 {
 		// need to remove params field from the body if it is empty
-		body = jsonrpc.JsonRpcRequest{
+		body = jsonrpcmodels.JsonRpcRequest{
 			Method: reqParams.Method(),
 		}
 
@@ -144,9 +151,9 @@ func CreateRequest(reqParams common.XRPLRequest) ([]byte, error) {
 }
 
 // CheckForError reads the http response and formats the error if it exists
-func CheckForError(res *http.Response) (jsonrpc.JsonRpcResponse, error) {
+func CheckForError(res *http.Response) (jsonrpcmodels.JsonRpcResponse, error) {
 
-	var jr jsonrpc.JsonRpcResponse
+	var jr jsonrpcmodels.JsonRpcResponse
 
 	b, err := ioutil.ReadAll(res.Body)
 	if err != nil || b == nil {

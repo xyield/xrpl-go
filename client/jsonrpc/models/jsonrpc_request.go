@@ -1,4 +1,4 @@
-package jsonrpc
+package jsonrpcmodels
 
 type JsonRpcRequest struct {
 	Method string         `json:"method"`

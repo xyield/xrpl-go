@@ -1,6 +1,7 @@
-package jsonrpcexamples
+package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/xyield/xrpl-go/client"
@@ -17,14 +18,14 @@ func main() {
 	}
 
 	// Initialise new json client with json config
-	jsonrpcClient := jsonrpcclient.NewJsonRpcClient(cfg)
+	client := jsonrpcclient.NewClient(cfg)
 
-	// create new XRPL client with the json client
-	xrplClient := client.NewXRPLClient(jsonrpcClient)
-
+	// call the desired method
 	var req *account.AccountChannelsRequest
-
-	// call the desired methodx
-	xrplClient.Account.GetAccountChannels(req)
-
+	ac, xrplRes, err := client.Account.GetAccountChannels(req)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	fmt.Printf("Full XRPL response: %v\n", xrplRes)
+	fmt.Printf("Results mapped to struct: %v\n", ac)
 }

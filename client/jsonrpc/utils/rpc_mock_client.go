@@ -1,5 +1,7 @@
 package rpcutils
 
+// TODO: delete this file
+
 import (
 	"bytes"
 	"errors"
@@ -8,8 +10,8 @@ import (
 	"net/http"
 
 	jsoniter "github.com/json-iterator/go"
+	jsonrpcmodels "github.com/xyield/xrpl-go/client/jsonrpc/models"
 	"github.com/xyield/xrpl-go/model/client/common"
-	"github.com/xyield/xrpl-go/model/client/jsonrpc"
 )
 
 type MockClient struct {
@@ -50,7 +52,7 @@ func (m *MockClient) SendRequest(reqParams common.XRPLRequest) (common.XRPLRespo
 		return nil, err
 	}
 
-	var jr jsonrpc.JsonRpcResponse
+	var jr jsonrpcmodels.JsonRpcResponse
 	err = jsoniter.Unmarshal(b, &jr)
 	if err != nil {
 		return jr, err

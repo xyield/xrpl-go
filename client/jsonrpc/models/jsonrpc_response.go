@@ -1,12 +1,13 @@
-package jsonrpc
+package jsonrpcmodels
 
 import "github.com/mitchellh/mapstructure"
 
 type JsonRpcResponse struct {
-	Result    AnyJson      `json:"result"`
-	Warning   string       `json:"warning,omitempty"`
-	Warnings  []ApiWarning `json:"warnings,omitempty"`
-	Forwarded bool         `json:"forwarded,omitempty"`
+	Result   AnyJson      `json:"result"`
+	Warning  string       `json:"warning,omitempty"`
+	Warnings []ApiWarning `json:"warnings,omitempty"` // TODO: update this to use the XRPLResponseWarning
+	// Warnings  []client.XRPLResponseWarning `json:"warnings,omitempty"`
+	Forwarded bool `json:"forwarded,omitempty"`
 }
 
 type AnyJson map[string]interface{}
