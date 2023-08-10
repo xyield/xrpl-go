@@ -8,7 +8,7 @@ type FeatureResponse struct {
 
 type Feature struct {
 	Enabled   bool   `json:"enabled"`
-	Name      string `json:"name"`
+	Name      string `json:"name,omitempty"`
 	Supported bool   `json:"supported"`
 	Vetoed    bool   `json:"vetoed"`
 }
