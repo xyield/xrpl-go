@@ -15,11 +15,6 @@ type accountImpl struct {
 
 func (a *accountImpl) GetAccountChannels(req *account.AccountChannelsRequest) (*account.AccountChannelsResponse, XRPLResponse, error) {
 
-	err := req.Validate()
-	if err != nil {
-		return nil, nil, err
-	}
-
 	result, err := a.Client.SendRequest(req)
 	if err != nil {
 		return nil, nil, err

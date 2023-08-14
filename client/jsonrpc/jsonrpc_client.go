@@ -47,6 +47,11 @@ func NewClient(cfg *client.JsonRpcConfig) *client.XRPLClient {
 // satisfy the Client interface
 func (c *JsonRpcClient) SendRequest(reqParams client.XRPLRequest) (client.XRPLResponse, error) {
 
+	err := reqParams.Validate()
+	if err != nil {
+		return nil, err
+	}
+
 	body, err := CreateRequest(reqParams)
 	if err != nil {
 		return nil, err

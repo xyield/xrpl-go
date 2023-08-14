@@ -10,6 +10,7 @@ type XRPLClient struct {
 
 type XRPLRequest interface {
 	Method() string
+	Validate() error
 }
 
 type XRPLResponse interface {

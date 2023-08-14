@@ -24,7 +24,10 @@ func (m *mockClientXrplResponse) GetResult(v any) error {
 	if err != nil {
 		return err
 	}
-	_ = dec.Decode(m.Result)
+	err = dec.Decode(m.Result)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -43,16 +46,6 @@ func TestGetAccountChannels(t *testing.T) {
 		expectedErr       error
 	}{
 		{
-			description: "validate failed on account type",
-			input: account.AccountChannelsRequest{
-				Account:            "",
-				DestinationAccount: "rnZvsWuLem5Ha46AZs61jLWR9R5esinkG3",
-				LedgerIndex:        common.VALIDATED,
-			},
-			output:      account.AccountChannelsResponse{},
-			expectedErr: errors.New("no account ID specified"),
-		},
-		{
 			description: "GetResult returns an error",
 			input: account.AccountChannelsRequest{
 				Account:            "rLHmBn4fT92w4F6ViyYbjoizLTo83tHTHu",
@@ -65,7 +58,7 @@ func TestGetAccountChannels(t *testing.T) {
 				},
 			},
 			output:      account.AccountChannelsResponse{},
-			expectedErr: errors.New("1 error(s) decoding:\n\n* 'account' expected type 'types.Address', got unconvertible type 'float64', value: '134'"),
+			expectedErr: errors.New("1 error(s) decoding:\n\n* 'account' expected type 'types.Address', got unconvertible type 'int', value: '123'"),
 		},
 		{
 			description: "successful response",
@@ -127,8 +120,8 @@ func TestGetAccountChannels(t *testing.T) {
 
 			res, _, err := a.GetAccountChannels(&tc.input)
 
-			if err != nil {
-				require.Equal(t, tc.expectedErr, err)
+			if tc.expectedErr != nil {
+				require.EqualError(t, err, tc.expectedErr.Error())
 			} else {
 				require.Equal(t, &tc.output, res)
 			}
