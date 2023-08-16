@@ -3,7 +3,7 @@ package definitions
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGetTypeNameByFieldName(t *testing.T) {
@@ -36,11 +36,11 @@ func TestGetTypeNameByFieldName(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			got, err := definitions.GetTypeNameByFieldName(test.input)
 			if test.expectedError != nil {
-				assert.EqualError(t, err, test.expectedError.Error())
-				assert.Zero(t, got)
+				require.EqualError(t, err, test.expectedError.Error())
+				require.Zero(t, got)
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, test.expected, got)
+				require.NoError(t, err)
+				require.Equal(t, test.expected, got)
 			}
 		})
 
@@ -84,11 +84,11 @@ func TestGetTypeCodeByTypeName(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			got, err := definitions.GetTypeCodeByTypeName(test.input)
 			if test.expectedError != nil {
-				assert.EqualError(t, err, test.expectedError.Error())
-				assert.Zero(t, got)
+				require.EqualError(t, err, test.expectedError.Error())
+				require.Zero(t, got)
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, test.expected, got)
+				require.NoError(t, err)
+				require.Equal(t, test.expected, got)
 			}
 		})
 
@@ -131,11 +131,11 @@ func TestGetTypeCodeByFieldName(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			got, err := definitions.GetTypeCodeByFieldName(test.input)
 			if test.expectedError != nil {
-				assert.EqualError(t, err, test.expectedError.Error())
-				assert.Zero(t, got)
+				require.EqualError(t, err, test.expectedError.Error())
+				require.Zero(t, got)
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, test.expected, got)
+				require.NoError(t, err)
+				require.Equal(t, test.expected, got)
 			}
 		})
 	}
@@ -171,11 +171,11 @@ func TestGetFieldCodeByFieldName(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			got, err := definitions.GetFieldCodeByFieldName(test.input)
 			if test.expectedError != nil {
-				assert.EqualError(t, err, test.expectedError.Error())
-				assert.Zero(t, got)
+				require.EqualError(t, err, test.expectedError.Error())
+				require.Zero(t, got)
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, test.expected, got)
+				require.NoError(t, err)
+				require.Equal(t, test.expected, got)
 			}
 		})
 	}
@@ -213,11 +213,11 @@ func TestGetFieldHeaderByFieldName(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			got, err := definitions.GetFieldHeaderByFieldName(test.input)
 			if test.expectedError != nil {
-				assert.EqualError(t, err, test.expectedError.Error())
-				assert.Nil(t, got)
+				require.EqualError(t, err, test.expectedError.Error())
+				require.Nil(t, got)
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, test.expected, got)
+				require.NoError(t, err)
+				require.Equal(t, test.expected, got)
 			}
 		})
 	}
@@ -269,11 +269,11 @@ func TestGetFieldNameByFieldHeader(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			got, err := definitions.GetFieldNameByFieldHeader(test.input)
 			if test.expectedError != nil {
-				assert.Error(t, err, test.expectedError.Error())
-				assert.Zero(t, got)
+				require.Error(t, err, test.expectedError.Error())
+				require.Zero(t, got)
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, test.expected, got)
+				require.NoError(t, err)
+				require.Equal(t, test.expected, got)
 			}
 		})
 	}
@@ -313,11 +313,11 @@ func TestGetFieldInfoByFieldName(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			got, err := definitions.GetFieldInfoByFieldName(test.input)
 			if test.expectedError != nil {
-				assert.EqualError(t, err, test.expectedError.Error())
-				assert.Nil(t, got)
+				require.EqualError(t, err, test.expectedError.Error())
+				require.Nil(t, got)
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, test.expected, got)
+				require.NoError(t, err)
+				require.Equal(t, test.expected, got)
 			}
 
 		})
@@ -366,11 +366,11 @@ func TestGetFieldInstanceByFieldName(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			got, err := definitions.GetFieldInstanceByFieldName(test.input)
 			if test.expectedError != nil {
-				assert.EqualError(t, err, test.expectedError.Error())
-				assert.Nil(t, got)
+				require.EqualError(t, err, test.expectedError.Error())
+				require.Nil(t, got)
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, test.expected, got)
+				require.NoError(t, err)
+				require.Equal(t, test.expected, got)
 			}
 		})
 	}
@@ -404,11 +404,11 @@ func TestGetTransactionTypeCodeByTransactionTypeName(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			got, err := definitions.GetTransactionTypeCodeByTransactionTypeName(test.input)
 			if test.expectedError != nil {
-				assert.EqualError(t, err, test.expectedError.Error())
-				assert.Zero(t, got)
+				require.EqualError(t, err, test.expectedError.Error())
+				require.Zero(t, got)
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, test.expected, got)
+				require.NoError(t, err)
+				require.Equal(t, test.expected, got)
 			}
 		})
 	}
@@ -442,11 +442,11 @@ func TestGetTransactionTypeNameByTransactionTypeCode(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			got, err := definitions.GetTransactionTypeNameByTransactionTypeCode(test.input)
 			if test.expectedError != nil {
-				assert.EqualError(t, err, test.expectedError.Error())
-				assert.Zero(t, got)
+				require.EqualError(t, err, test.expectedError.Error())
+				require.Zero(t, got)
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, test.expected, got)
+				require.NoError(t, err)
+				require.Equal(t, test.expected, got)
 			}
 		})
 	}
@@ -480,11 +480,11 @@ func TestGetTransactionResultNameByTransactionResultTypeCode(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			got, err := definitions.GetTransactionResultNameByTransactionResultTypeCode(test.input)
 			if test.expectedError != nil {
-				assert.EqualError(t, err, test.expectedError.Error())
-				assert.Zero(t, got)
+				require.EqualError(t, err, test.expectedError.Error())
+				require.Zero(t, got)
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, test.expected, got)
+				require.NoError(t, err)
+				require.Equal(t, test.expected, got)
 			}
 		})
 	}
@@ -518,11 +518,11 @@ func TestGetTransactionResultTypeCodeByTransactionResultName(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			got, err := definitions.GetTransactionResultTypeCodeByTransactionResultName(test.input)
 			if test.expectedError != nil {
-				assert.EqualError(t, err, test.expectedError.Error())
-				assert.Zero(t, got)
+				require.EqualError(t, err, test.expectedError.Error())
+				require.Zero(t, got)
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, test.expected, got)
+				require.NoError(t, err)
+				require.Equal(t, test.expected, got)
 			}
 		})
 	}
@@ -556,11 +556,11 @@ func TestGetLedgerEntryTypeCodeByLedgerEntryTypeName(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			got, err := definitions.GetLedgerEntryTypeCodeByLedgerEntryTypeName(test.input)
 			if test.expectedError != nil {
-				assert.EqualError(t, err, test.expectedError.Error())
-				assert.Zero(t, got)
+				require.EqualError(t, err, test.expectedError.Error())
+				require.Zero(t, got)
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, test.expected, got)
+				require.NoError(t, err)
+				require.Equal(t, test.expected, got)
 			}
 		})
 	}
@@ -595,11 +595,11 @@ func TestGetLedgerEntryTypeNameByLedgerEntryTypeCode(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			got, err := definitions.GetLedgerEntryTypeNameByLedgerEntryTypeCode(test.input)
 			if test.expectedError != nil {
-				assert.EqualError(t, err, test.expectedError.Error())
-				assert.Zero(t, got)
+				require.EqualError(t, err, test.expectedError.Error())
+				require.Zero(t, got)
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, test.expected, got)
+				require.NoError(t, err)
+				require.Equal(t, test.expected, got)
 			}
 		})
 	}

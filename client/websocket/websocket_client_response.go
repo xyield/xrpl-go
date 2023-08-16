@@ -28,9 +28,12 @@ type WebSocketClientXrplResponse struct {
 	Forwarded bool                         `json:"forwarded,omitempty"`
 }
 
-func (r *WebSocketClientXrplResponse) GetResult(v any) {
-	dec, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{TagName: "json", Result: &v})
-	_ = dec.Decode(r.Result)
+func (r *WebSocketClientXrplResponse) GetResult(v any) error {
+	dec, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{TagName: "json", Result: &v})
+	if err != nil {
+		return err
+	}
+	return dec.Decode(r.Result)
 }
 
 func (r *WebSocketClientXrplResponse) CheckError() error {

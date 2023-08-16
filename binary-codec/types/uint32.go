@@ -7,9 +7,11 @@ import (
 	"github.com/xyield/xrpl-go/binary-codec/serdes"
 )
 
+// UInt32 represents a 32-bit unsigned integer.
 type UInt32 struct{}
 
-// Serializes the given json value to a 32-bit UInt byte slice.
+// FromJson converts a JSON value into a serialized byte slice representing a 32-bit unsigned integer.
+// The input value is assumed to be an integer. If the serialization fails, an error is returned.
 func (u *UInt32) FromJson(value any) ([]byte, error) {
 	buf := new(bytes.Buffer)
 	err := binary.Write(buf, binary.BigEndian, uint32(value.(int)))
@@ -20,6 +22,9 @@ func (u *UInt32) FromJson(value any) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
+// ToJson takes a BinaryParser and optional parameters, and converts the serialized byte data
+// back into a JSON integer value. This method assumes the parser contains data representing
+// a 32-bit unsigned integer. If the parsing fails, an error is returned.
 func (u *UInt32) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
 	b, err := p.ReadBytes(4)
 	if err != nil {

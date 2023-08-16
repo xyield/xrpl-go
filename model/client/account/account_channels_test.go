@@ -3,6 +3,7 @@ package account
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/xyield/xrpl-go/model/client/common"
 	"github.com/xyield/xrpl-go/test"
 )
@@ -62,4 +63,14 @@ func TestAccountChannelsResponse(t *testing.T) {
 	if err := test.SerializeAndDeserialize(t, s, j); err != nil {
 		t.Error(err)
 	}
+}
+
+func TestValidate(t *testing.T) {
+	s := AccountChannelsRequest{
+		Account: "",
+	}
+
+	err := s.Validate()
+
+	assert.EqualError(t, err, "no account ID specified")
 }

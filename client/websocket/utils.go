@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 
 	"github.com/mitchellh/mapstructure"
-	"github.com/xyield/xrpl-go/model/client/common"
+	"github.com/xyield/xrpl-go/client"
 )
 
-func (c *WebsocketClient) formatRequest(req common.XRPLRequest, id int, marker any) ([]byte, error) {
+func (c *WebsocketClient) formatRequest(req client.XRPLRequest, id int, marker any) ([]byte, error) {
 	m := make(map[string]any)
 	m["id"] = id
 	m["command"] = req.Method()

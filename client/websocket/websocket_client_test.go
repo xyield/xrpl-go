@@ -8,14 +8,13 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/xyield/xrpl-go/client"
 	"github.com/xyield/xrpl-go/model/client/account"
-	"github.com/xyield/xrpl-go/model/client/common"
 	"github.com/xyield/xrpl-go/test"
 )
 
 func TestSendRequest(t *testing.T) {
 	tt := []struct {
 		description    string
-		req            common.XRPLRequest
+		req            client.XRPLRequest
 		res            client.XRPLResponse
 		expectedErr    error
 		serverMessages []map[string]any

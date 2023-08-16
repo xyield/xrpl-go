@@ -21,6 +21,7 @@ func (*AccountChannelsRequest) Method() string {
 	return "account_channels"
 }
 
+// Validate method to be added to each request struct
 func (a *AccountChannelsRequest) Validate() error {
 	if a.Account == "" {
 		return errors.New("no account ID specified")

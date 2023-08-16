@@ -19,7 +19,10 @@ func (a *accountImpl) GetAccountChannels(req *account.AccountChannelsRequest) (*
 		return nil, nil, err
 	}
 	var acr account.AccountChannelsResponse
-	res.GetResult(&acr)
+	err = res.GetResult(&acr)
+	if err != nil {
+		return nil, nil, err
+	}
 	return &acr, res, nil
 }
 
@@ -29,6 +32,9 @@ func (a *accountImpl) GetAccountInfo(req *account.AccountInfoRequest) (*account.
 		return nil, nil, err
 	}
 	var air account.AccountInfoResponse
-	res.GetResult(&air)
+	err = res.GetResult(&air)
+	if err != nil {
+		return nil, nil, err
+	}
 	return &air, res, nil
 }

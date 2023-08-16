@@ -4,15 +4,15 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"github.com/xyield/xrpl-go/client"
 	"github.com/xyield/xrpl-go/model/client/account"
-	"github.com/xyield/xrpl-go/model/client/common"
 )
 
 func TestFormatRequest(t *testing.T) {
 	ws := &WebsocketClient{cfg: &WebsocketConfig{}}
 	tt := []struct {
 		description string
-		req         common.XRPLRequest
+		req         client.XRPLRequest
 		id          int
 		marker      any
 		expected    string

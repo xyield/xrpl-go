@@ -1,11 +1,7 @@
 package client
 
-import (
-	"github.com/xyield/xrpl-go/model/client/common"
-)
-
 type Client interface {
-	SendRequest(req common.XRPLRequest) (XRPLResponse, error)
+	SendRequest(req XRPLRequest) (XRPLResponse, error)
 }
 
 type XRPLClient struct {
@@ -13,11 +9,13 @@ type XRPLClient struct {
 	Account Account
 }
 
-type XRPLResponse interface {
-	GetResult(v any)
-	CheckError() error
-	// Warnings()
+type XRPLRequest interface {
+	Method() string
+	Validate() error
+}
 
+type XRPLResponse interface {
+	GetResult(v any) error
 }
 
 type XRPLResponseWarning struct {

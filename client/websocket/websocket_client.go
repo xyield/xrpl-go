@@ -9,7 +9,6 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/mitchellh/mapstructure"
 	"github.com/xyield/xrpl-go/client"
-	"github.com/xyield/xrpl-go/model/client/common"
 )
 
 var _ client.Client = (*WebsocketClient)(nil)
@@ -21,14 +20,11 @@ type WebsocketConfig struct {
 }
 
 type WebsocketClient struct {
-	// websocket setup
 	cfg       *WebsocketConfig
 	idCounter atomic.Uint32
-	// hub  *hub
-	// conn *websocket.Conn
 }
 
-func (c *WebsocketClient) SendRequest(req common.XRPLRequest) (client.XRPLResponse, error) {
+func (c *WebsocketClient) SendRequest(req client.XRPLRequest) (client.XRPLResponse, error) {
 	err := req.Validate()
 	if err != nil {
 		return nil, err
