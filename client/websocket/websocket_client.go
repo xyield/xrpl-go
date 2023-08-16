@@ -88,8 +88,15 @@ Creates a new websocket client with cfg.
 
 This client will open and close a websocket connection for each request.
 */
-func NewWebsocketClient(cfg *WebsocketConfig) (*WebsocketClient, error) {
+func NewWebsocketClient(cfg *WebsocketConfig) *WebsocketClient {
 	return &WebsocketClient{
 		cfg: cfg,
-	}, nil
+	}
+}
+
+func NewClient(cfg *WebsocketConfig) *client.XRPLClient {
+	wcl := &WebsocketClient{
+		cfg: cfg,
+	}
+	return client.NewXRPLClient(wcl)
 }
