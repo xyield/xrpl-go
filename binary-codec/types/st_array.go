@@ -43,7 +43,6 @@ func (t *STArray) FromJson(json any) ([]byte, error) {
 // The method loops until the BinaryParser has no more data, and for each loop,
 // it calls the ToJson method of an STObject, appending the resulting JSON value to a "value" slice.
 func (t *STArray) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
-
 	var value []any
 
 	for p.HasMore() {
@@ -52,6 +51,11 @@ func (t *STArray) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		if v != nil { // Only append if the object is non-nil
+			value = append(value, v)
+		}
+
 		peek, err := p.Peek()
 		if err != nil {
 			return nil, err
@@ -62,11 +66,8 @@ func (t *STArray) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
 			if err != nil {
 				return nil, err
 			}
-			value = append(value, v)
 			break
 		}
-		value = append(value, v)
 	}
-
 	return value, nil
 }

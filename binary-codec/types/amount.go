@@ -164,23 +164,15 @@ func deserializeCurrencyCode(data []byte) (string, error) {
 	if bytes.Equal(data, zeroByteArray) {
 		return "XRP", nil
 	}
-	if data[0] != 0 {
+
+	if bytes.Equal(data[0:12], make([]byte, 12)) && bytes.Equal(data[12:15], []byte{0x58, 0x52, 0x50}) && bytes.Equal(data[15:20], make([]byte, 5)) { // XRP in bytes
 		return "", ErrInvalidCurrencyCode
-	}
-	// the next 88 bits (11 bytes) are reserved and should all be zero
-	for _, i := range data[1:12] {
-		if i != 0 {
-			return "", ErrInvalidCurrencyCode
-		}
 	}
 	iso := strings.ToUpper(string(data[12:15]))
-	if iso == "XRP" {
-		return "", ErrInvalidCurrencyCode
-	}
 	ok, _ := regexp.MatchString(IOUCodeRegex, iso)
 
 	if !ok {
-		return "", ErrInvalidCurrencyCode
+		return strings.ToUpper(hex.EncodeToString(data)), nil
 	}
 	return iso, nil
 }

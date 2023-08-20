@@ -53,18 +53,21 @@ func (t *STObject) FromJson(json any) ([]byte, error) {
 // or an array, or until the parser has no more data.
 func (t *STObject) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
 	m := make(map[string]any)
+
 	for p.HasMore() {
 		peek, _ := p.Peek()
+
 		if peek == ObjectEndMarker {
 			_, err := p.ReadByte()
 			if err != nil {
 				return nil, err
 			}
 			break
-		}
-		if peek == ArrayEndMarker {
+		} else if peek == ArrayEndMarker {
+			// Do not consume the ArrayEndMarker, just exit the STObject loop
 			break
 		}
+
 		f, err := p.ReadField()
 		if err != nil {
 			return nil, err
@@ -72,6 +75,7 @@ func (t *STObject) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
 
 		st := GetSerializedType(f.Type)
 		var res any
+
 		if f.IsVLEncoded {
 			size, err := p.ReadVariableLength()
 			if err != nil {
@@ -81,17 +85,29 @@ func (t *STObject) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
 			if err != nil {
 				return nil, err
 			}
+
 		} else {
 			res, err = st.ToJson(p)
-			if err != nil {
-				return nil, err
-			}
 		}
+
+		if err != nil {
+			return nil, err
+		}
+
 		res, err = enumToStr(f.FieldName, res)
 		if err != nil {
 			return nil, err
 		}
+
 		m[f.FieldName] = res
+
+		peek, _ = p.Peek()
+		if peek == ObjectEndMarker {
+			break
+		}
+	}
+	if len(m) == 0 {
+		return nil, nil
 	}
 	return m, nil
 }
