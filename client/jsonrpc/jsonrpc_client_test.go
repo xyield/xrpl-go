@@ -242,7 +242,7 @@ func TestSendRequest(t *testing.T) {
 			},
 			Warning: "none",
 			Warnings: []client.XRPLResponseWarning{{
-				Id:      "1",
+				Id:      1,
 				Message: "message",
 			},
 			},

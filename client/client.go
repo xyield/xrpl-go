@@ -5,7 +5,7 @@ type Client interface {
 }
 
 type XRPLClient struct {
-	Client
+	client  Client
 	Account Account
 }
 
@@ -19,14 +19,18 @@ type XRPLResponse interface {
 }
 
 type XRPLResponseWarning struct {
-	Id      string `json:"id"`
+	Id      int    `json:"id"`
 	Message string `json:"message"`
 	Details any    `json:"details,omitempty"`
 }
 
 func NewXRPLClient(cl Client) *XRPLClient {
 	return &XRPLClient{
-		Client:  cl,
+		client:  cl,
 		Account: &accountImpl{client: cl},
 	}
+}
+
+func (c *XRPLClient) Client() Client {
+	return c.client
 }
