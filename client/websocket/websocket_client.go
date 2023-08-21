@@ -7,7 +7,6 @@ import (
 	"sync/atomic"
 
 	"github.com/gorilla/websocket"
-	"github.com/mitchellh/mapstructure"
 	"github.com/xyield/xrpl-go/client"
 )
 
@@ -52,29 +51,16 @@ func (c *WebsocketClient) SendRequest(req client.XRPLRequest) (client.XRPLRespon
 	if err != nil {
 		return nil, err
 	}
-	jDec := json.NewDecoder(bytes.NewReader(v))
+	jDec := json.NewDecoder(bytes.NewReader(json.RawMessage(v)))
 	jDec.UseNumber()
-	var m map[string]any
-	err = jDec.Decode(&m)
-	if err != nil {
-		return nil, err
-	}
-
-	if retID, ok := m["id"]; ok {
-		retID, err = retID.(json.Number).Int64()
-		if err != nil {
-			return nil, err
-		}
-		if retID != int64(id) {
-			return nil, ErrIncorrectId
-		}
-	}
-
 	var res WebSocketClientXrplResponse
-	dec, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{TagName: "json", Result: &res})
-	err = dec.Decode(&m)
+	err = jDec.Decode(&res)
 	if err != nil {
 		return nil, err
+	}
+
+	if res.ID != int(id) {
+		return nil, ErrIncorrectId
 	}
 	if err := res.CheckError(); err != nil {
 		return nil, err

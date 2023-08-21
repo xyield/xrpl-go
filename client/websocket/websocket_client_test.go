@@ -25,6 +25,7 @@ func TestSendRequest(t *testing.T) {
 				Account: "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
 			},
 			res: &WebSocketClientXrplResponse{
+				ID: 1,
 				Result: map[string]any{
 					"account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
 					"channels": []any{
@@ -47,6 +48,7 @@ func TestSendRequest(t *testing.T) {
 			expectedErr: nil,
 			serverMessages: []map[string]any{
 				{
+					"id": 1,
 					"result": map[string]any{
 						"account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
 						"channels": []any{
@@ -124,6 +126,7 @@ func TestSendRequest(t *testing.T) {
 				Account: "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
 			},
 			res: &WebSocketClientXrplResponse{
+				ID: 1,
 				Result: map[string]any{
 					"account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
 					"channels": []any{
@@ -151,6 +154,7 @@ func TestSendRequest(t *testing.T) {
 			},
 			serverMessages: []map[string]any{
 				{
+					"id":    1,
 					"error": "invalidParams",
 					"value": map[string]any{
 						"account": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
