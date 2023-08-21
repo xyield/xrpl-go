@@ -2,6 +2,7 @@ package account
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/xyield/xrpl-go/model/client/common"
 	"github.com/xyield/xrpl-go/model/transactions/types"
@@ -17,6 +18,18 @@ type AccountNFTsRequest struct {
 
 func (*AccountNFTsRequest) Method() string {
 	return "account_nfts"
+}
+
+func (r *AccountNFTsRequest) Validate() error {
+	if err := r.Account.Validate(); err != nil {
+		return err
+	}
+
+	if r.Limit != 0 && (r.Limit < 10 || r.Limit > 400) {
+		return fmt.Errorf("invalid limit, must be 10 <= limit <= 400")
+	}
+
+	return nil
 }
 
 func (r *AccountNFTsRequest) UnmarshalJSON(data []byte) error {

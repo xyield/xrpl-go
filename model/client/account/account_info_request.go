@@ -20,7 +20,11 @@ func (*AccountInfoRequest) Method() string {
 	return "account_info"
 }
 
-func (*AccountInfoRequest) Validate() error {
+func (r *AccountInfoRequest) Validate() error {
+	if err := r.Account.Validate(); err != nil {
+		return err
+	}
+
 	return nil
 }
 

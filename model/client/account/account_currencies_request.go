@@ -18,6 +18,14 @@ func (*AccountCurrenciesRequest) Method() string {
 	return "account_currencies"
 }
 
+func (r *AccountCurrenciesRequest) Validate() error {
+	if err := r.Account.Validate(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *AccountCurrenciesRequest) UnmarshalJSON(data []byte) error {
 	type acrHelper struct {
 		Account     types.Address     `json:"account"`

@@ -2,6 +2,7 @@ package account
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/xyield/xrpl-go/model/client/common"
 	"github.com/xyield/xrpl-go/model/transactions/types"
@@ -33,6 +34,18 @@ type AccountObjectsRequest struct {
 
 func (*AccountObjectsRequest) Method() string {
 	return "account_objects"
+}
+
+func (r *AccountObjectsRequest) Validate() error {
+	if err := r.Account.Validate(); err != nil {
+		return err
+	}
+
+	if r.Limit != 0 && (r.Limit < 10 || r.Limit > 400) {
+		return fmt.Errorf("invalid limit, must be 10 <= limit <= 400")
+	}
+
+	return nil
 }
 
 func (r *AccountObjectsRequest) UnmarshalJSON(data []byte) error {
