@@ -12,3 +12,7 @@ type ChannelVerifyRequest struct {
 func (*ChannelVerifyRequest) Method() string {
 	return "channel_verify"
 }
+
+func (*ChannelVerifyRequest) Validate() error {
+	return nil
+}

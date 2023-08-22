@@ -20,6 +20,14 @@ func (*ChannelAuthorizeRequest) Method() string {
 	return "channel_authorize"
 }
 
+func (r *ChannelAuthorizeRequest) Validate() error {
+	if r.ChannelID == "" {
+		return fmt.Errorf("channel authorize request: missing channel id")
+	}
+
+	return nil
+}
+
 // do not allow secrets to be printed
 func (c *ChannelAuthorizeRequest) Format(s fmt.State, v rune) {
 	type fHelper struct {
