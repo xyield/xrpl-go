@@ -17,6 +17,10 @@ func (*NFTInfoRequest) Method() string {
 	return "nft_info"
 }
 
+func (*NFTInfoRequest) Validate() error {
+	return nil
+}
+
 func (r *NFTInfoRequest) UnmarshalJSON(data []byte) error {
 	type nirHelper struct {
 		NFTokenID   types.NFTokenID   `json:"nft_id"`
