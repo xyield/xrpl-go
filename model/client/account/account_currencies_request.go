@@ -2,6 +2,7 @@ package account
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/xyield/xrpl-go/model/client/common"
 	"github.com/xyield/xrpl-go/model/transactions/types"
@@ -20,7 +21,7 @@ func (*AccountCurrenciesRequest) Method() string {
 
 func (r *AccountCurrenciesRequest) Validate() error {
 	if err := r.Account.Validate(); err != nil {
-		return err
+		return fmt.Errorf("account currencies request: %w", err)
 	}
 
 	return nil

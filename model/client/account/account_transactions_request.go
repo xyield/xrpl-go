@@ -26,11 +26,11 @@ func (*AccountTransactionsRequest) Method() string {
 
 func (r *AccountTransactionsRequest) Validate() error {
 	if err := r.Account.Validate(); err != nil {
-		return err
+		return fmt.Errorf("account transactions request: %w", err)
 	}
 
 	if r.Limit != 0 && (r.Limit < 10 || r.Limit > 400) {
-		return fmt.Errorf("invalid limit, must be 10 <= limit <= 400")
+		return fmt.Errorf("account transactions request: invalid limit, must be 10 <= limit <= 400")
 	}
 
 	return nil

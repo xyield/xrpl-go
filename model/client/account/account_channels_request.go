@@ -23,16 +23,14 @@ func (*AccountChannelsRequest) Method() string {
 
 func (r *AccountChannelsRequest) Validate() error {
 	if err := r.Account.Validate(); err != nil {
-		return err
+		return fmt.Errorf("account channels request: %w", err)
 	}
 	if len(r.DestinationAccount) > 0 {
 		if err := r.DestinationAccount.Validate(); err != nil {
-			return err
+			return fmt.Errorf("account channels request: %w", err)
 		}
 	}
-	if r.Limit != 0 && (r.Limit < 10 || r.Limit > 400) {
-		return fmt.Errorf("invalid limit, must be 10 <= limit <= 400")
-	}
+
 	return nil
 }
 

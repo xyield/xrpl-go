@@ -38,11 +38,11 @@ func (*AccountObjectsRequest) Method() string {
 
 func (r *AccountObjectsRequest) Validate() error {
 	if err := r.Account.Validate(); err != nil {
-		return err
+		return fmt.Errorf("account objects request: %w", err)
 	}
 
 	if r.Limit != 0 && (r.Limit < 10 || r.Limit > 400) {
-		return fmt.Errorf("invalid limit, must be 10 <= limit <= 400")
+		return fmt.Errorf("account objects request: invalid limit, must be 10 <= limit <= 400")
 	}
 
 	return nil

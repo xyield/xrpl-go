@@ -22,11 +22,11 @@ func (*AccountNFTsRequest) Method() string {
 
 func (r *AccountNFTsRequest) Validate() error {
 	if err := r.Account.Validate(); err != nil {
-		return err
+		return fmt.Errorf("account nfts request: %w", err)
 	}
 
-	if r.Limit != 0 && (r.Limit < 10 || r.Limit > 400) {
-		return fmt.Errorf("invalid limit, must be 10 <= limit <= 400")
+	if r.Limit != 0 && (r.Limit < 20 || r.Limit > 400) {
+		return fmt.Errorf("account nfts request: invalid limit, must be 20 <= limit <= 400")
 	}
 
 	return nil
