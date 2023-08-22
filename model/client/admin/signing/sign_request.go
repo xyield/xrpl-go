@@ -2,6 +2,7 @@ package signing
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/xyield/xrpl-go/model/transactions"
 )
@@ -21,6 +22,14 @@ type SignRequest struct {
 
 func (*SignRequest) Method() string {
 	return "sign"
+}
+
+func (r *SignRequest) Validate() error {
+	if r.TxJson == nil {
+		return fmt.Errorf("sign request: empty tx")
+	}
+
+	return nil
 }
 
 func (r *SignRequest) UnmarshalJSON(data []byte) error {

@@ -7,3 +7,7 @@ type GetCountsRequest struct {
 func (*GetCountsRequest) Method() string {
 	return "get_counts"
 }
+
+func (*GetCountsRequest) Validate() error {
+	return nil
+}

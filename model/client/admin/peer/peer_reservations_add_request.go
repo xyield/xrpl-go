@@ -8,3 +8,7 @@ type PeerReservationAddRequest struct {
 func (*PeerReservationAddRequest) Method() string {
 	return "peer_reservations_add"
 }
+
+func (*PeerReservationAddRequest) Validate() error {
+	return nil
+}

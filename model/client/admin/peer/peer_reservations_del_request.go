@@ -7,3 +7,7 @@ type PeerReservationDelRequest struct {
 func (*PeerReservationDelRequest) Method() string {
 	return "peer_reservations_del"
 }
+
+func (*PeerReservationDelRequest) Validate() error {
+	return nil
+}

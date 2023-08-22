@@ -15,3 +15,7 @@ type LedgerCleanerRequest struct {
 func (*LedgerCleanerRequest) Method() string {
 	return "ledger_cleaner"
 }
+
+func (*LedgerCleanerRequest) Validate() error {
+	return nil
+}

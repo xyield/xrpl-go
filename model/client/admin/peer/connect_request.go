@@ -8,3 +8,7 @@ type ConnectRequest struct {
 func (*ConnectRequest) Method() string {
 	return "connect"
 }
+
+func (*ConnectRequest) Validate() error {
+	return nil
+}

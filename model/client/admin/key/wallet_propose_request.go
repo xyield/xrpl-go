@@ -10,3 +10,7 @@ type WalletProposeRequest struct {
 func (*WalletProposeRequest) Method() string {
 	return "wallet_propose"
 }
+
+func (*WalletProposeRequest) Validate() error {
+	return nil
+}

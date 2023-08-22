@@ -14,3 +14,7 @@ type ShardDescriptor struct {
 func (*DownloadShardRequest) Method() string {
 	return "download_shard"
 }
+
+func (*DownloadShardRequest) Validate() error {
+	return nil
+}
