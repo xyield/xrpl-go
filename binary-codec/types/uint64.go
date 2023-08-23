@@ -28,6 +28,10 @@ func (u *UInt64) FromJson(value any) ([]byte, error) {
 	}
 
 	if !isNumeric(value.(string)) {
+		if hex, err := hex.DecodeString(value.(string)); err == nil {
+			buf.Write(hex)
+			return buf.Bytes(), nil
+		}
 		stringToUint64, err := strconv.ParseUint(value.(string), 10, 64)
 		if err != nil {
 			return nil, err

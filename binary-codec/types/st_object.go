@@ -102,7 +102,7 @@ func (t *STObject) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
 		m[f.FieldName] = res
 
 		peek, _ = p.Peek()
-		if peek == ObjectEndMarker {
+		if peek == ObjectEndMarker && f.Type == "STObject" {
 			break
 		}
 	}
