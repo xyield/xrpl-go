@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -163,7 +163,7 @@ func CheckForError(res *http.Response) (jsonrpcmodels.JsonRpcResponse, error) {
 
 	var jr jsonrpcmodels.JsonRpcResponse
 
-	b, err := ioutil.ReadAll(res.Body)
+	b, err := io.ReadAll(res.Body)
 	if err != nil || b == nil {
 		return jr, err
 	}

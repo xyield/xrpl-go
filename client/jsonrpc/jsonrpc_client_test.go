@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 	"testing"
@@ -48,7 +48,7 @@ func TestCheckForError(t *testing.T) {
 			}
 		}`
 
-		b := ioutil.NopCloser(bytes.NewReader([]byte(json)))
+		b := io.NopCloser(bytes.NewReader([]byte(json)))
 		res := &http.Response{
 			StatusCode: 200, // error response still returns a 200
 			Body:       b,
@@ -64,7 +64,7 @@ func TestCheckForError(t *testing.T) {
 
 		json := "Null Method" // https://xrpl.org/error-formatting.html#universal-errors
 
-		b := ioutil.NopCloser(bytes.NewReader([]byte(json)))
+		b := io.NopCloser(bytes.NewReader([]byte(json)))
 		res := &http.Response{
 			StatusCode: 400,
 			Body:       b,
@@ -100,7 +100,7 @@ func TestCheckForError(t *testing.T) {
 			}
 		  }`
 
-		b := ioutil.NopCloser(bytes.NewReader([]byte(json)))
+		b := io.NopCloser(bytes.NewReader([]byte(json)))
 		res := &http.Response{
 			StatusCode: 200,
 			Body:       b,
@@ -242,7 +242,7 @@ func TestSendRequest(t *testing.T) {
 			},
 			Warning: "none",
 			Warnings: []client.XRPLResponseWarning{{
-				Id:      "1",
+				Id:      1,
 				Message: "message",
 			},
 			},

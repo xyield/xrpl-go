@@ -69,3 +69,13 @@ func (a *XRPCurrencyAmount) UnmarshalJSON(data []byte) error {
 	*a = XRPCurrencyAmount(v)
 	return nil
 }
+
+func (a *XRPCurrencyAmount) UnmarshalText(data []byte) error {
+
+	v, err := strconv.ParseUint(string(data), 10, 64)
+	if err != nil {
+		return err
+	}
+	*a = XRPCurrencyAmount(v)
+	return nil
+}
