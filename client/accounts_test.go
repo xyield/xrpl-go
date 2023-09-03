@@ -114,7 +114,7 @@ func TestGetAccountChannels(t *testing.T) {
 		t.Run(tc.description, func(t *testing.T) {
 
 			cl := new(mockClient)
-			a := &accountImpl{Client: cl}
+			a := &accountImpl{client: cl}
 
 			cl.On("SendRequest", &tc.input).Return(&tc.sendRequestResult, nil)
 

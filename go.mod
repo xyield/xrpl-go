@@ -3,6 +3,7 @@ module github.com/xyield/xrpl-go
 go 1.19
 
 require (
+	github.com/gorilla/websocket v1.5.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/stretchr/testify v1.7.5
 	github.com/ugorji/go/codec v1.2.11
