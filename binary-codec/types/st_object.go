@@ -55,59 +55,41 @@ func (t *STObject) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
 	m := make(map[string]any)
 
 	for p.HasMore() {
-		peek, _ := p.Peek()
 
-		if peek == ObjectEndMarker {
-			_, err := p.ReadByte()
-			if err != nil {
-				return nil, err
-			}
-			break
-		} else if peek == ArrayEndMarker {
-			// Do not consume the ArrayEndMarker, just exit the STObject loop
-			break
-		}
-
-		f, err := p.ReadField()
+		fi, err := p.ReadField()
 		if err != nil {
 			return nil, err
 		}
 
-		st := GetSerializedType(f.Type)
-		var res any
+		if fi.FieldName == "ObjectEndMarker" || fi.FieldName == "ArrayEndMarker" {
+			break
+		}
 
-		if f.IsVLEncoded {
-			size, err := p.ReadVariableLength()
+		st := GetSerializedType(fi.Type)
+
+		var res any
+		if fi.IsVLEncoded {
+			vlen, err := p.ReadVariableLength()
 			if err != nil {
 				return nil, err
 			}
-			res, err = st.ToJson(p, size)
+			res, err = st.ToJson(p, vlen)
 			if err != nil {
 				return nil, err
 			}
 
 		} else {
 			res, err = st.ToJson(p)
+			if err != nil {
+				return nil, err
+			}
 		}
-
+		res, err = enumToStr(fi.FieldName, res)
 		if err != nil {
 			return nil, err
 		}
 
-		res, err = enumToStr(f.FieldName, res)
-		if err != nil {
-			return nil, err
-		}
-
-		m[f.FieldName] = res
-
-		peek, _ = p.Peek()
-		if peek == ObjectEndMarker && f.Type == "STObject" {
-			break
-		}
-	}
-	if len(m) == 0 {
-		return nil, nil
+		m[fi.FieldName] = res
 	}
 	return m, nil
 }

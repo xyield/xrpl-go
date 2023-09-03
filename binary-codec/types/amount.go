@@ -115,9 +115,16 @@ func (a *Amount) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
 }
 
 func deserializeToken(data []byte) (map[string]any, error) {
-	value, err := deserializeValue(data[:8])
-	if err != nil {
-		return nil, err
+
+	var value string
+	var err error
+	if bytes.Equal(data[0:8], []byte{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}) {
+		value = "0"
+	} else {
+		value, err = deserializeValue(data[:8])
+		if err != nil {
+			return nil, err
+		}
 	}
 	issuer, err := deserializeIssuer(data[28:])
 	if err != nil {
@@ -395,7 +402,14 @@ func serializeIssuedCurrencyCodeChars(currency string) ([]byte, error) {
 // or non-standard currency format (e.g. without "00" prefix)
 func serializeIssuedCurrencyAmount(value, currency, issuer string) ([]byte, error) {
 
-	valBytes, err := SerializeIssuedCurrencyValue(value) // serialize the value
+	var valBytes []byte
+	var err error
+	if value == "0" {
+		valBytes = make([]byte, 8)
+		binary.BigEndian.PutUint64(valBytes, uint64(ZeroCurrencyAmountHex))
+	} else {
+		valBytes, err = SerializeIssuedCurrencyValue(value) // serialize the value
+	}
 
 	if err != nil {
 		return nil, err
