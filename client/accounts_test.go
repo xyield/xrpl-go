@@ -42,7 +42,7 @@ func TestGetAccountChannels(t *testing.T) {
 		description       string
 		input             account.AccountChannelsRequest
 		sendRequestResult mockClientXrplResponse
-		output            account.AccountChannelsResponse
+		output            []account.AccountChannelsResponse
 		expectedErr       error
 	}{
 		{
@@ -57,7 +57,7 @@ func TestGetAccountChannels(t *testing.T) {
 					"destination_account": "rnZvsWuLem5Ha46AZs61jLWR9R5esinkG3",
 				},
 			},
-			output:      account.AccountChannelsResponse{},
+			output:      []account.AccountChannelsResponse{},
 			expectedErr: errors.New("1 error(s) decoding:\n\n* 'account' expected type 'types.Address', got unconvertible type 'int', value: '123'"),
 		},
 		{
@@ -87,7 +87,7 @@ func TestGetAccountChannels(t *testing.T) {
 					"validated":    true,
 				},
 			},
-			output: account.AccountChannelsResponse{
+			output: []account.AccountChannelsResponse{{
 				Account:     "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
 				LedgerIndex: 71766314,
 				LedgerHash:  "1EDBBA3C793863366DF5B31C2174B6B5E6DF6DB89A7212B86838489148E2A581",
@@ -104,7 +104,7 @@ func TestGetAccountChannels(t *testing.T) {
 					},
 				},
 				Validated: true,
-			},
+			}},
 			expectedErr: nil,
 		},
 	}
@@ -123,9 +123,75 @@ func TestGetAccountChannels(t *testing.T) {
 			if tc.expectedErr != nil {
 				require.EqualError(t, err, tc.expectedErr.Error())
 			} else {
-				require.Equal(t, &tc.output, res)
+				require.Equal(t, tc.output, res)
 			}
 
 		})
 	}
+}
+
+func TestNew(t *testing.T) {
+
+	t.Run("Pagination calls", func(t *testing.T) {
+
+		req1 := account.AccountChannelsRequest{
+			Account: "rLHmBn4fT92w4F6ViyYbjoizLTo83tHTHu",
+		}
+		req2 := account.AccountChannelsRequest{
+			Account: "rLHmBn4fT92w4F6ViyYbjoizLTo83tHTHu",
+			Marker:  "pageMarker1",
+		}
+		req3 := account.AccountChannelsRequest{
+			Account: "rLHmBn4fT92w4F6ViyYbjoizLTo83tHTHu",
+			Marker:  "pageMarker2",
+		}
+
+		res1 := mockClientXrplResponse{
+			Result: map[string]any{
+				"account":      "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+				"ledger_index": 71766343,
+				"marker":       "pageMarker1",
+			},
+		}
+		res2 := mockClientXrplResponse{
+			Result: map[string]any{
+				"account":      "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+				"ledger_index": 71766343,
+				"marker":       "pageMarker2",
+			},
+		}
+		res3 := mockClientXrplResponse{
+			Result: map[string]any{
+				"account":      "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+				"ledger_index": 71766343,
+			},
+		}
+
+		cl := new(mockClient)
+		a := &accountImpl{client: cl}
+
+		cl.On("SendRequest", &req1).Return(&res1, nil).Once()
+		cl.On("SendRequest", &req2).Return(&res2, nil)
+		cl.On("SendRequest", &req3).Return(&res3, nil) // returns no marker as final call
+
+		res, _, err := a.GetAccountChannels(&req1)
+
+		expectedRes := []account.AccountChannelsResponse{{
+			Account:     "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+			LedgerIndex: 71766343,
+			Marker:      "pageMarker1",
+		},
+			{
+				Account:     "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+				LedgerIndex: 71766343,
+				Marker:      "pageMarker2",
+			},
+			{
+				Account:     "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+				LedgerIndex: 71766343,
+			}}
+
+		require.Equal(t, expectedRes, res)
+		require.NoError(t, err)
+	})
 }

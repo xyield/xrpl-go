@@ -194,3 +194,46 @@ func CheckForError(res *http.Response) (jsonrpcmodels.JsonRpcResponse, error) {
 
 	return jr, nil
 }
+
+// CALL getPages if request is paginated, not sendRequest
+
+// to make generic pass in the json and check for "marker" in this, pass in the struct you wanna return
+// func (c *JsonRpcClient) GetPages(reqParams client.XRPLRequest, responsePages *[]interface{}) (client.XRPLResponse, error) {
+
+// 	// get first page of results
+// 	result, err := c.SendRequest(reqParams)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	fmt.Printf("Paginated response %v : ", result)
+
+// 	// map results to struct
+// 	var acr account.AccountChannelsResponse
+// 	err = result.GetResult(&acr)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	// add page to array
+// 	*responsePages = append(*responsePages, acr)
+
+// 	// check if marker present and make new call if exists
+// 	if acr.Marker != nil {
+
+// 		// create new value
+// 		newParams := reflect.ValueOf(reqParams)
+
+// 		// Get the field of the slice element that we want to set.
+// 		m := newParams.FieldByName("Marker")
+
+// 		// Set the value!
+// 		m.Set(reflect.ValueOf(acr.Marker))
+
+// 		// req.Marker = acr.Marker
+
+// 		return c.GetPages(reqParams, responsePages)
+// 	}
+
+// 	return result, nil
+// }
