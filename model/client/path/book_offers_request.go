@@ -2,6 +2,7 @@ package path
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/xyield/xrpl-go/model/client/common"
 	"github.com/xyield/xrpl-go/model/transactions/types"
@@ -18,6 +19,21 @@ type BookOffersRequest struct {
 
 func (*BookOffersRequest) Method() string {
 	return "book_offers"
+}
+
+func (r *BookOffersRequest) Validate() error {
+	if err := r.TakerGets.Validate(); err != nil {
+		return fmt.Errorf("book offers taker gets: %w", err)
+	}
+	if err := r.TakerPays.Validate(); err != nil {
+		return fmt.Errorf("book offers taker pays: %w", err)
+	}
+
+	if err := r.Taker.Validate(); r.Taker != "" && err != nil {
+		return fmt.Errorf("book offers taker: %w", err)
+	}
+
+	return nil
 }
 
 func (r *BookOffersRequest) UnmarshalJSON(data []byte) error {

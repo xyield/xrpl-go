@@ -2,6 +2,7 @@ package path
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/xyield/xrpl-go/model/client/common"
 	"github.com/xyield/xrpl-go/model/transactions/types"
@@ -17,6 +18,13 @@ type NFTokenSellOffersRequest struct {
 
 func (*NFTokenSellOffersRequest) Method() string {
 	return "nft_sell_offers"
+}
+
+func (r *NFTokenSellOffersRequest) Validate() error {
+	if r.NFTokenID == "" {
+		return fmt.Errorf("nft sell offer missing token id")
+	}
+	return nil
 }
 
 func (r *NFTokenSellOffersRequest) UnmarshalJSON(data []byte) error {
