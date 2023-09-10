@@ -12,7 +12,6 @@ import (
 	"time"
 
 	jsoniter "github.com/json-iterator/go"
-	"github.com/mitchellh/mapstructure"
 	"github.com/xyield/xrpl-go/client"
 	jsonrpcmodels "github.com/xyield/xrpl-go/client/jsonrpc/models"
 )
@@ -175,14 +174,7 @@ func CheckForError(res *http.Response) (jsonrpcmodels.JsonRpcResponse, error) {
 
 	jDec := json.NewDecoder(bytes.NewReader(b))
 	jDec.UseNumber()
-	var m map[string]any
-	err = jDec.Decode(&m)
-	if err != nil {
-		return jr, err
-	}
-
-	dec, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{TagName: "json", Result: &jr})
-	err = dec.Decode(&m)
+	err = jDec.Decode(&jr)
 	if err != nil {
 		return jr, err
 	}

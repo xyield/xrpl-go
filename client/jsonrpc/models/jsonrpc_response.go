@@ -21,7 +21,9 @@ type ApiWarning struct {
 }
 
 func (r JsonRpcResponse) GetResult(v any) error {
-	dec, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{TagName: "json", Result: &v})
+	dec, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{TagName: "json",
+		Result: &v, DecodeHook: mapstructure.TextUnmarshallerHookFunc()})
+
 	if err != nil {
 		return err
 	}
