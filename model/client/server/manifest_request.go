@@ -7,3 +7,7 @@ type ManifestRequest struct {
 func (*ManifestRequest) Method() string {
 	return "manifest"
 }
+
+func (*ManifestRequest) Validate() error {
+	return nil
+}
