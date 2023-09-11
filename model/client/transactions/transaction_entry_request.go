@@ -38,3 +38,7 @@ func (t *TransactionEntryRequest) UnmarshalJSON(data []byte) error {
 	t.LedgerIndex = i
 	return nil
 }
+
+func (*TransactionEntryRequest) Validate() error {
+	return nil
+}

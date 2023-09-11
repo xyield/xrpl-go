@@ -35,3 +35,7 @@ func (r *SubmitMultisignedRequest) UnmarshalJSON(data []byte) error {
 
 	return nil
 }
+
+func (*SubmitMultisignedRequest) Validate() error {
+	return nil
+}

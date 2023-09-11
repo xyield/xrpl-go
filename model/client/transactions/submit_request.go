@@ -8,3 +8,7 @@ type SubmitRequest struct {
 func (*SubmitRequest) Method() string {
 	return "submit"
 }
+
+func (*SubmitRequest) Validate() error {
+	return nil
+}

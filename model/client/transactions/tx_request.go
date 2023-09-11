@@ -12,3 +12,7 @@ type TxRequest struct {
 func (*TxRequest) Method() string {
 	return "tx"
 }
+
+func (*TxRequest) Validate() error {
+	return nil
+}
