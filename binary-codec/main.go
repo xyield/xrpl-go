@@ -25,6 +25,21 @@ const (
 func Encode(json map[string]any) (string, error) {
 
 	st := &types.STObject{}
+
+	// Iterate over the keys in the provided JSON
+	for k := range json {
+
+		// Get the FieldIdNameMap from the definitions package
+		fh := definitions.Get().Fields[k]
+
+		// If the field is not found in the FieldIdNameMap, delete it from the JSON
+
+		if fh == nil {
+			delete(json, k)
+			continue
+		}
+	}
+
 	b, err := st.FromJson(json)
 	if err != nil {
 		return "", err
