@@ -1,13 +1,11 @@
 package client
 
 import (
-	"fmt"
-
 	"github.com/xyield/xrpl-go/model/client/account"
 )
 
 type Account interface {
-	GetAccountChannels(req *account.AccountChannelsRequest) ([]account.AccountChannelsResponse, XRPLResponse, error)
+	GetAccountChannels(req *account.AccountChannelsRequest, params XRPLPaginatedRequest) ([]account.AccountChannelsResponse, []XRPLResponse, error)
 	GetAccountInfo(req *account.AccountInfoRequest) (*account.AccountInfoResponse, XRPLResponse, error)
 }
 
@@ -15,51 +13,37 @@ type accountImpl struct {
 	client Client
 }
 
-func (a *accountImpl) GetAccountChannels(req *account.AccountChannelsRequest) ([]account.AccountChannelsResponse, XRPLResponse, error) {
+func (a *accountImpl) GetAccountChannels(req *account.AccountChannelsRequest, params XRPLPaginatedRequest) ([]account.AccountChannelsResponse, []XRPLResponse, error) {
+
+	// TODO; set timer to exit recurssion if continues too long?
 
 	err := req.Validate()
 	if err != nil {
 		return nil, nil, err
 	}
 
-	pages := []account.AccountChannelsResponse{}
-	xrplResult, err := GetPages(a, req, &pages)
+	XRPLResponsePages, err := a.client.SendRequestPaginated(req, params.Limit, params.Paginated)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	return pages, xrplResult, nil
-}
+	acrPages := []account.AccountChannelsResponse{}
 
-// TODO: have a way for user to choose if they re-try with marker? That would require the 10 min rule being followed - trigger go routine to run and watch timer
-// Call this method instead of SendRequest when response is paginated
-func GetPages(a *accountImpl, req *account.AccountChannelsRequest, pages *[]account.AccountChannelsResponse) (XRPLResponse, error) {
+	// loop through pages and get result
+	for _, page := range XRPLResponsePages {
 
-	// get first page of results
-	result, err := a.client.SendRequest(req)
-	if err != nil {
-		return nil, err
+		var acr account.AccountChannelsResponse
+
+		err = page.GetResult(&acr)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		// append result to array
+		acrPages = append(acrPages, acr)
 	}
 
-	fmt.Printf("Paginated response %v : ", result)
-
-	// map results to struct
-	var acr account.AccountChannelsResponse
-	err = result.GetResult(&acr)
-	if err != nil {
-		return nil, err
-	}
-
-	// add page to array
-	*pages = append(*pages, acr)
-
-	// check if marker present and make new call if exists
-	if acr.Marker != nil {
-		req.Marker = acr.Marker
-		return GetPages(a, req, pages)
-	}
-
-	return result, nil
+	return acrPages, XRPLResponsePages, nil
 }
 
 func (a *accountImpl) GetAccountInfo(req *account.AccountInfoRequest) (*account.AccountInfoResponse, XRPLResponse, error) {

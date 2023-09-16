@@ -45,3 +45,9 @@ func (r *WebSocketClientXrplResponse) CheckError() error {
 	}
 	return nil
 }
+
+func (r WebSocketClientXrplResponse) GetMarker() any {
+
+	// TODO: impl this method
+	return nil
+}

@@ -9,3 +9,6 @@ func (*PingRequest) Method() string {
 func (*PingRequest) Validate() error {
 	return nil
 }
+
+func (*PingRequest) SetMarker(m any) {
+}

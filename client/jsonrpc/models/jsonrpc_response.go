@@ -31,3 +31,15 @@ func (r JsonRpcResponse) GetResult(v any) error {
 	}
 	return nil
 }
+
+func (r JsonRpcResponse) GetMarker() any {
+	if _, ok := r.Result["marker"]; ok {
+		return r.Result["marker"]
+	}
+	return nil
+}
+
+// // this will impl the XRPLPaginatedResponse
+// type JsonRpcPaginatedResponse struct {
+// 	results []JsonRpcResponse
+// }

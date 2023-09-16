@@ -334,7 +334,7 @@ func TestSendRequest(t *testing.T) {
 			  "ledger_hash": "27F530E5C93ED5C13994812787C1ED073C822BAEC7597964608F2C049C2ACD2D",
 			  "ledger_index": 71766343
 				}
-			}`
+		}`
 
 		mc := &mockClient{}
 		mc.DoFunc = func(req *http.Request) (*http.Response, error) {
@@ -371,7 +371,6 @@ func TestSendRequest(t *testing.T) {
 		assert.Equal(t, expected.LedgerIndex, channelsResponse.LedgerIndex)
 		assert.Equal(t, expected.LedgerHash, channelsResponse.LedgerHash)
 	})
-
 	t.Run("SendRequest - timeout", func(t *testing.T) {
 		req := &account.AccountChannelsRequest{
 			Account: "rLHmBn4fT92w4F6ViyYbjoizLTo83tHTHu",
@@ -394,5 +393,165 @@ func TestSendRequest(t *testing.T) {
 		// Check that the expected timeout error occurred
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "timeout")
+	})
+}
+
+func TestSendRequestPagination(t *testing.T) {
+
+	req1 := account.AccountChannelsRequest{
+		Account: "rLHmBn4fT92w4F6ViyYbjoizLTo83tHTHu",
+	}
+	paginatedParams := client.XRPLPaginatedRequest{
+		Limit:     3,
+		Paginated: true,
+	}
+
+	markerResponse1 := `{
+		"result": {
+		  "account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+		  "ledger_index": 71766343,
+		  "marker":       "pageMarker1"
+		}
+	}`
+	markerResponse2 := `{
+		"result": {
+		  "account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+		  "ledger_index": 71766343,
+		  "marker":       "pageMarker2"
+		}
+	}`
+	noMarkerResponse := `{
+		"result": {
+		  "account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+		  "ledger_index": 71766343
+		}
+	}`
+
+	t.Run("Pagination calls", func(t *testing.T) {
+
+		expectedRes := []account.AccountChannelsResponse{
+			{
+				Account:     "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+				LedgerIndex: 71766343,
+				Marker:      "pageMarker1",
+			},
+			{
+				Account:     "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+				LedgerIndex: 71766343,
+				Marker:      "pageMarker2",
+			},
+			{
+				Account:     "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+				LedgerIndex: 71766343,
+			},
+		}
+
+		mc := &mockClient{}
+		mc.DoFunc = func(req *http.Request) (*http.Response, error) {
+			if mc.RequestCount < 1 {
+				// Return marker for first
+				mc.RequestCount++
+				return mockResponse(markerResponse1, 200, mc)(req)
+			}
+			if mc.RequestCount < 2 {
+				// Return marker for second
+				mc.RequestCount++
+				return mockResponse(markerResponse2, 200, mc)(req)
+			}
+			// Return no marker
+			return mockResponse(noMarkerResponse, 200, mc)(req)
+		}
+		cfg, err := client.NewJsonRpcConfig("http://testnode/", client.WithHttpClient(mc))
+		assert.NoError(t, err)
+		jsonRpcClient := NewJsonRpcClient(cfg)
+
+		pages, err := jsonRpcClient.SendRequestPaginated(&req1, paginatedParams.Limit, paginatedParams.Paginated)
+		assert.NoError(t, err)
+
+		// TODO: is this ok to set equal? Is it useful to the user?
+		expectedFirstPage := jsonrpcmodels.JsonRpcResponse{
+			Result: jsonrpcmodels.AnyJson{
+				"account":      "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+				"ledger_index": json.Number(strconv.FormatInt(71766343, 10)),
+				"marker":       "pageMarker1",
+			}}
+		firstPage := pages[0]
+		assert.Equal(t, &expectedFirstPage, firstPage)
+
+		// unmarshall into specified type
+		acrPages := []account.AccountChannelsResponse{}
+
+		for _, page := range pages {
+
+			var acr account.AccountChannelsResponse
+
+			err = page.GetResult(&acr)
+			assert.NoError(t, err)
+
+			acrPages = append(acrPages, acr)
+		}
+
+		assert.Equal(t, expectedRes, acrPages)
+	})
+
+	t.Run("No Pagination", func(t *testing.T) {
+
+		mc := &mockClient{}
+		mc.DoFunc = func(req *http.Request) (*http.Response, error) {
+			// Return no marker
+			return mockResponse(markerResponse1, 200, mc)(req)
+		}
+
+		cfg, err := client.NewJsonRpcConfig("http://testnode/", client.WithHttpClient(mc))
+		assert.NoError(t, err)
+		jsonRpcClient := NewJsonRpcClient(cfg)
+
+		pages, err := jsonRpcClient.SendRequestPaginated(&req1, 10, false)
+		assert.NoError(t, err)
+		assert.Equal(t, 1, len(pages))
+	})
+
+	t.Run("Limit set", func(t *testing.T) {
+
+		mc := &mockClient{}
+		mc.DoFunc = func(req *http.Request) (*http.Response, error) {
+			if mc.RequestCount < 1 {
+				// Return marker for first
+				mc.RequestCount++
+				return mockResponse(markerResponse1, 200, mc)(req)
+			}
+			if mc.RequestCount < 2 {
+				// Return marker for second
+				mc.RequestCount++
+				return mockResponse(markerResponse2, 200, mc)(req)
+			}
+			// Return no marker
+			return mockResponse(noMarkerResponse, 200, mc)(req)
+		}
+
+		cfg, err := client.NewJsonRpcConfig("http://testnode/", client.WithHttpClient(mc))
+		assert.NoError(t, err)
+		jsonRpcClient := NewJsonRpcClient(cfg)
+
+		pages, err := jsonRpcClient.SendRequestPaginated(&req1, 2, true)
+		assert.NoError(t, err)
+		assert.Equal(t, 2, len(pages))
+	})
+
+	t.Run("Default limit", func(t *testing.T) {
+		mc := &mockClient{}
+
+		mc.DoFunc = func(req *http.Request) (*http.Response, error) {
+			// Return no marker
+			return mockResponse(markerResponse1, 200, mc)(req)
+		}
+
+		cfg, err := client.NewJsonRpcConfig("http://testnode/", client.WithHttpClient(mc))
+		assert.NoError(t, err)
+		jsonRpcClient := NewJsonRpcClient(cfg)
+
+		pages, err := jsonRpcClient.SendRequestPaginated(&req1, 0, true)
+		assert.NoError(t, err)
+		assert.Equal(t, 10, len(pages))
 	})
 }

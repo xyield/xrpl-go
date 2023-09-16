@@ -195,45 +195,71 @@ func CheckForError(res *http.Response) (jsonrpcmodels.JsonRpcResponse, error) {
 	return jr, nil
 }
 
-// CALL getPages if request is paginated, not sendRequest
+func (c *JsonRpcClient) SendRequestPaginated(reqParams client.XRPLRequest, limit int, pagination bool) ([]client.XRPLResponse, error) {
 
-// to make generic pass in the json and check for "marker" in this, pass in the struct you wanna return
-// func (c *JsonRpcClient) GetPages(reqParams client.XRPLRequest, responsePages *[]interface{}) (client.XRPLResponse, error) {
+	responsePages := []client.XRPLResponse{}
 
-// 	// get first page of results
-// 	result, err := c.SendRequest(reqParams)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	if !pagination {
 
-// 	fmt.Printf("Paginated response %v : ", result)
+		res, err := c.SendRequest(reqParams)
+		if err != nil {
+			return nil, err
+		}
 
-// 	// map results to struct
-// 	var acr account.AccountChannelsResponse
-// 	err = result.GetResult(&acr)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+		responsePages = append(responsePages, res)
 
-// 	// add page to array
-// 	*responsePages = append(*responsePages, acr)
+	} else {
 
-// 	// check if marker present and make new call if exists
-// 	if acr.Marker != nil {
+		// set default limit if nothing passed in
+		if limit == 0 {
+			limit = 10
+		}
 
-// 		// create new value
-// 		newParams := reflect.ValueOf(reqParams)
+		err := GetPages(c, reqParams, &responsePages, limit, 0)
+		if err != nil {
+			return nil, err
+		}
+	}
 
-// 		// Get the field of the slice element that we want to set.
-// 		m := newParams.FieldByName("Marker")
+	return responsePages, nil
+}
 
-// 		// Set the value!
-// 		m.Set(reflect.ValueOf(acr.Marker))
+func GetPages(c *JsonRpcClient, reqParams client.XRPLRequest, responsePages *[]client.XRPLResponse, limit int, counter int) error {
 
-// 		// req.Marker = acr.Marker
+	if limit == counter {
+		return nil
+	}
 
-// 		return c.GetPages(reqParams, responsePages)
-// 	}
+	// get first page of results
+	result, err := c.SendRequest(reqParams)
+	if err != nil {
+		return err
+	}
 
-// 	return result, nil
-// }
+	fmt.Printf("Paginated response %v : ", result)
+
+	// cast to JsonRpcResponse
+	jr, ok := result.(*jsonrpcmodels.JsonRpcResponse)
+	if !ok {
+		return errors.New("problem casting XRPLResponse to JsonRpcResponse")
+	}
+
+	// add result to array
+	*responsePages = append(*responsePages, jr)
+
+	// check for marker
+	marker := jr.GetMarker()
+	if marker != nil {
+
+		// set marker in request to get next page
+		reqParams.SetMarker(marker)
+
+		// increase counter
+		counter++
+
+		// make next request
+		return GetPages(c, reqParams, responsePages, limit, counter) // TODO: check this!!!
+	}
+
+	return nil
+}
