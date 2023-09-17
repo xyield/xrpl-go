@@ -23,6 +23,11 @@ type WebsocketClient struct {
 	idCounter atomic.Uint32
 }
 
+func (c *WebsocketClient) SendRequestPaginated(reqParams client.XRPLPaginatedRequest, limit int, pagination bool) (client.XRPLPaginatedResponse, error) {
+	// TODO: impl this method
+	return nil, nil
+}
+
 func (c *WebsocketClient) SendRequest(req client.XRPLRequest) (client.XRPLResponse, error) {
 	err := req.Validate()
 	if err != nil {

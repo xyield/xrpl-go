@@ -5,7 +5,7 @@ import (
 )
 
 type Account interface {
-	GetAccountChannels(req *account.AccountChannelsRequest) (*account.AccountChannelsResponse, XRPLResponse, error)
+	GetAccountChannels(req *account.AccountChannelsRequest, params XRPLPaginatedParams) ([]account.AccountChannelsResponse, []XRPLResponse, error)
 	GetAccountInfo(req *account.AccountInfoRequest) (*account.AccountInfoResponse, XRPLResponse, error)
 }
 
@@ -13,17 +13,37 @@ type accountImpl struct {
 	client Client
 }
 
-func (a *accountImpl) GetAccountChannels(req *account.AccountChannelsRequest) (*account.AccountChannelsResponse, XRPLResponse, error) {
-	res, err := a.client.SendRequest(req)
+func (a *accountImpl) GetAccountChannels(req *account.AccountChannelsRequest, params XRPLPaginatedParams) ([]account.AccountChannelsResponse, []XRPLResponse, error) {
+
+	err := req.Validate()
 	if err != nil {
 		return nil, nil, err
 	}
-	var acr account.AccountChannelsResponse
-	err = res.GetResult(&acr)
+
+	XRPLResponse, err := a.client.SendRequestPaginated(req, params.Limit, params.Paginated)
 	if err != nil {
 		return nil, nil, err
 	}
-	return &acr, res, nil
+
+	XRPLResponsePages := XRPLResponse.GetXRPLPages()
+
+	acrPages := []account.AccountChannelsResponse{}
+
+	// loop through pages and get result
+	for _, page := range XRPLResponsePages {
+
+		var acr account.AccountChannelsResponse
+
+		err = page.GetResult(&acr)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		// append result to array
+		acrPages = append(acrPages, acr)
+	}
+
+	return acrPages, XRPLResponsePages, nil
 }
 
 func (a *accountImpl) GetAccountInfo(req *account.AccountInfoRequest) (*account.AccountInfoResponse, XRPLResponse, error) {

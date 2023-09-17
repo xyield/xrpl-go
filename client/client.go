@@ -2,6 +2,7 @@ package client
 
 type Client interface {
 	SendRequest(req XRPLRequest) (XRPLResponse, error)
+	SendRequestPaginated(reqParams XRPLPaginatedRequest, limit int, pagination bool) (XRPLPaginatedResponse, error)
 }
 
 type XRPLClient struct {
@@ -16,6 +17,22 @@ type XRPLRequest interface {
 
 type XRPLResponse interface {
 	GetResult(v any) error
+	GetMarker() any
+}
+
+type XRPLPaginatedParams struct {
+	Limit     int
+	Paginated bool
+}
+
+type XRPLPaginatedRequest interface {
+	Method() string
+	Validate() error
+	SetMarker(m any)
+}
+
+type XRPLPaginatedResponse interface {
+	GetXRPLPages() []XRPLResponse
 }
 
 type XRPLResponseWarning struct {

@@ -21,6 +21,11 @@ func (*AccountChannelsRequest) Method() string {
 	return "account_channels"
 }
 
+// Below mean struct satisfies paginated response interface
+func (a *AccountChannelsRequest) SetMarker(m any) {
+	a.Marker = m
+}
+
 // Validate method to be added to each request struct
 func (a *AccountChannelsRequest) Validate() error {
 	if a.Account == "" {

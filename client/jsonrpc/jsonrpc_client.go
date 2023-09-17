@@ -186,3 +186,80 @@ func CheckForError(res *http.Response) (jsonrpcmodels.JsonRpcResponse, error) {
 
 	return jr, nil
 }
+
+func (c *JsonRpcClient) SendRequestPaginated(reqParams client.XRPLPaginatedRequest, limit int, pagination bool) (client.XRPLPaginatedResponse, error) {
+
+	responsePages := []jsonrpcmodels.JsonRpcResponse{}
+
+	if !pagination {
+
+		res, err := c.SendRequest(reqParams)
+		if err != nil {
+			return nil, err
+		}
+		jr, ok := res.(*jsonrpcmodels.JsonRpcResponse)
+		if !ok {
+			return nil, errors.New("problem casting XRPLResponse to JsonRpcResponse")
+		}
+
+		responsePages = append(responsePages, *jr)
+
+	} else {
+
+		// set default limit if nothing passed in
+		if limit == 0 {
+			limit = 10
+		}
+
+		err := GetPages(c, reqParams, &responsePages, limit, 0)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	res := jsonrpcmodels.JsonRpcPaginationResponse{
+		Pages: responsePages,
+	}
+
+	return res, nil
+}
+
+func GetPages(c *JsonRpcClient, reqParams client.XRPLPaginatedRequest, responsePages *[]jsonrpcmodels.JsonRpcResponse, limit int, counter int) error {
+
+	if limit == counter {
+		return nil
+	}
+
+	// get first page of results
+	result, err := c.SendRequest(reqParams)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Paginated response %v : ", result)
+
+	// cast to JsonRpcResponse
+	jr, ok := result.(*jsonrpcmodels.JsonRpcResponse)
+	if !ok {
+		return errors.New("problem casting XRPLResponse to JsonRpcResponse")
+	}
+
+	// add result to array
+	*responsePages = append(*responsePages, *jr)
+
+	// check for marker
+	marker := jr.GetMarker()
+	if marker != nil {
+
+		// set marker in request to get next page
+		reqParams.SetMarker(marker)
+
+		// increase counter
+		counter++
+
+		// make next request
+		return GetPages(c, reqParams, responsePages, limit, counter)
+	}
+
+	return nil
+}

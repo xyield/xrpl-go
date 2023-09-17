@@ -33,3 +33,24 @@ func (r JsonRpcResponse) GetResult(v any) error {
 	}
 	return nil
 }
+
+func (r JsonRpcResponse) GetMarker() any {
+	if _, ok := r.Result["marker"]; ok {
+		return r.Result["marker"]
+	}
+	return nil
+}
+
+type JsonRpcPaginationResponse struct {
+	Pages []JsonRpcResponse
+}
+
+func (r JsonRpcPaginationResponse) GetXRPLPages() []client.XRPLResponse {
+
+	res := make([]client.XRPLResponse, len(r.Pages))
+	for i, page := range r.Pages {
+		res[i] = page
+	}
+
+	return res
+}

@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/xyield/xrpl-go/client"
 	"github.com/xyield/xrpl-go/model/client/account"
 )
@@ -36,8 +36,8 @@ func TestGetResult(t *testing.T) {
 		var acr account.AccountChannelsResponse
 		err := jr.GetResult(&acr)
 
-		assert.NoError(t, err)
-		assert.Equal(t, expected, acr)
+		require.NoError(t, err)
+		require.Equal(t, expected, acr)
 	})
 	t.Run("throws error for incorrect mapping", func(t *testing.T) {
 
@@ -58,6 +58,6 @@ func TestGetResult(t *testing.T) {
 		var acr account.AccountChannelsResponse
 		err := jr.GetResult(&acr)
 
-		assert.Error(t, err)
+		require.Error(t, err)
 	})
 }

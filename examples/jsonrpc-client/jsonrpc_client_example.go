@@ -17,12 +17,18 @@ func main() {
 		log.Panicln(err)
 	}
 
+	paginatedParams := client.XRPLPaginatedParams{
+		Limit:     3,
+		Paginated: true,
+	}
+
 	// Initialise new json client with json config
 	client := jsonrpcclient.NewClient(cfg)
 
 	// call the desired method
 	var req *account.AccountChannelsRequest
-	ac, xrplRes, err := client.Account.GetAccountChannels(req)
+
+	ac, xrplRes, err := client.Account.GetAccountChannels(req, paginatedParams)
 	if err != nil {
 		fmt.Println(err.Error())
 	}

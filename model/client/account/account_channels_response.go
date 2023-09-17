@@ -14,3 +14,12 @@ type AccountChannelsResponse struct {
 	Limit       int                `json:"limit,omitempty"`
 	Marker      any                `json:"marker,omitempty"`
 }
+
+// below to satisfy the paginated response struct
+func (a *AccountChannelsResponse) GetMarker() any {
+	if a.Marker != nil {
+		return a.Marker
+	} else {
+		return nil
+	}
+}

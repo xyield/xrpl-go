@@ -10,7 +10,7 @@ import (
 	"time"
 
 	jsoniter "github.com/json-iterator/go"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/xyield/xrpl-go/client"
 	jsonrpcmodels "github.com/xyield/xrpl-go/client/jsonrpc/models"
 	"github.com/xyield/xrpl-go/model/client/account"
@@ -26,7 +26,7 @@ func TestJsonRpcClientCreation(t *testing.T) {
 
 		jsonRpcClient := NewJsonRpcClient(cfg)
 
-		assert.Equal(t, &JsonRpcClient{Config: cfg}, jsonRpcClient)
+		require.Equal(t, &JsonRpcClient{Config: cfg}, jsonRpcClient)
 	})
 }
 
@@ -54,9 +54,9 @@ func TestCheckForError(t *testing.T) {
 		}
 
 		bodyBytes, err := CheckForError(res)
-		assert.NotNil(t, bodyBytes)
+		require.NotNil(t, bodyBytes)
 		expError := &JsonRpcClientError{ErrorString: "ledgerIndexMalformed"}
-		assert.Equal(t, expError, err)
+		require.Equal(t, expError, err)
 	})
 
 	t.Run("Error Response with error code", func(t *testing.T) {
@@ -70,9 +70,9 @@ func TestCheckForError(t *testing.T) {
 		}
 
 		bodyBytes, err := CheckForError(res)
-		assert.NotNil(t, bodyBytes)
+		require.NotNil(t, bodyBytes)
 		expErrpr := &JsonRpcClientError{ErrorString: "Null Method"}
-		assert.Equal(t, expErrpr, err)
+		require.Equal(t, expErrpr, err)
 	})
 
 	t.Run("No error Response", func(t *testing.T) {
@@ -107,8 +107,8 @@ func TestCheckForError(t *testing.T) {
 
 		bodyBytes, err := CheckForError(res)
 
-		assert.Nil(t, err)
-		assert.NotNil(t, bodyBytes)
+		require.Nil(t, err)
+		require.NotNil(t, bodyBytes)
 	})
 }
 
@@ -129,11 +129,11 @@ func TestCreateRequest(t *testing.T) {
 
 		byteRequest, err := CreateRequest(req)
 
-		assert.NoError(t, err)
-		// assert bytes equal
-		assert.Equal(t, expectedRequestBytes, byteRequest)
-		// assert json equal
-		assert.Equal(t, string(expectedRequestBytes), string(byteRequest))
+		require.NoError(t, err)
+		// require bytes equal
+		require.Equal(t, expectedRequestBytes, byteRequest)
+		// require json equal
+		require.Equal(t, string(expectedRequestBytes), string(byteRequest))
 	})
 	t.Run("Create request - no parameters with using pointer declaration", func(t *testing.T) {
 
@@ -146,11 +146,11 @@ func TestCreateRequest(t *testing.T) {
 
 		byteRequest, err := CreateRequest(req)
 
-		assert.NoError(t, err)
-		// assert bytes equal
-		assert.Equal(t, expectedRequestBytes, byteRequest)
-		// assert json equal
-		assert.Equal(t, string(expectedRequestBytes), string(byteRequest))
+		require.NoError(t, err)
+		// require bytes equal
+		require.Equal(t, expectedRequestBytes, byteRequest)
+		// require json equal
+		require.Equal(t, string(expectedRequestBytes), string(byteRequest))
 	})
 
 	t.Run("Create request - no parameters with struct initialisation", func(t *testing.T) {
@@ -164,11 +164,11 @@ func TestCreateRequest(t *testing.T) {
 
 		byteRequest, err := CreateRequest(req)
 
-		assert.NoError(t, err)
-		// assert bytes equal
-		assert.Equal(t, expectedRequestBytes, byteRequest)
-		// assert json equal
-		assert.Equal(t, string(expectedRequestBytes), string(byteRequest))
+		require.NoError(t, err)
+		// require bytes equal
+		require.Equal(t, expectedRequestBytes, byteRequest)
+		// require json equal
+		require.Equal(t, string(expectedRequestBytes), string(byteRequest))
 	})
 }
 
@@ -188,17 +188,17 @@ func TestSendRequest(t *testing.T) {
 		}
 
 		cfg, err := client.NewJsonRpcConfig("http://testnode/", client.WithHttpClient(mc))
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		jsonRpcClient := NewJsonRpcClient(cfg)
 
 		_, err = jsonRpcClient.SendRequest(req)
 
-		assert.NotNil(t, capturedRequest)
-		assert.NoError(t, err)
-		assert.Equal(t, "POST", capturedRequest.Method)
-		assert.Equal(t, "http://testnode/", capturedRequest.URL.String())
-		assert.Equal(t, "application/json", capturedRequest.Header.Get("Content-Type"))
+		require.NotNil(t, capturedRequest)
+		require.NoError(t, err)
+		require.Equal(t, "POST", capturedRequest.Method)
+		require.Equal(t, "http://testnode/", capturedRequest.URL.String())
+		require.Equal(t, "application/json", capturedRequest.Header.Get("Content-Type"))
 	})
 
 	t.Run("SendRequest - sucessful response", func(t *testing.T) {
@@ -240,7 +240,7 @@ func TestSendRequest(t *testing.T) {
 		mc.DoFunc = mockResponse(response, 200, mc)
 
 		cfg, err := client.NewJsonRpcConfig("http://testnode/", client.WithHttpClient(mc))
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		jsonRpcClient := NewJsonRpcClient(cfg)
 
@@ -282,13 +282,13 @@ func TestSendRequest(t *testing.T) {
 			LedgerHash:  "1EDBBA3C793863366DF5B31C2174B6B5E6DF6DB89A7212B86838489148E2A581",
 		}
 
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
-		assert.Equal(t, expectedXrplResponse, xrplResponse)
+		require.Equal(t, expectedXrplResponse, xrplResponse)
 
-		assert.Equal(t, expected.Account, channelsResponse.Account)
-		assert.Equal(t, expected.LedgerIndex, channelsResponse.LedgerIndex)
-		assert.Equal(t, expected.LedgerHash, channelsResponse.LedgerHash)
+		require.Equal(t, expected.Account, channelsResponse.Account)
+		require.Equal(t, expected.LedgerIndex, channelsResponse.LedgerIndex)
+		require.Equal(t, expected.LedgerHash, channelsResponse.LedgerHash)
 	})
 
 	t.Run("SendRequest - error response", func(t *testing.T) {
@@ -313,13 +313,13 @@ func TestSendRequest(t *testing.T) {
 		mc.DoFunc = mockResponse(response, 200, mc)
 
 		cfg, err := client.NewJsonRpcConfig("http://testnode/", client.WithHttpClient(mc))
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		jsonRpcClient := NewJsonRpcClient(cfg)
 
 		_, err = jsonRpcClient.SendRequest(req)
 
-		assert.EqualError(t, err, "ledgerIndexMalformed")
+		require.EqualError(t, err, "ledgerIndexMalformed")
 	})
 
 	t.Run("SendRequest - 503 response", func(t *testing.T) {
@@ -336,15 +336,15 @@ func TestSendRequest(t *testing.T) {
 		}
 
 		cfg, err := client.NewJsonRpcConfig("http://testnode/", client.WithHttpClient(mc))
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		jsonRpcClient := NewJsonRpcClient(cfg)
 
 		_, err = jsonRpcClient.SendRequest(req)
 
 		// Check that 3 extra requests were made
-		assert.Equal(t, 4, mc.RequestCount)
-		assert.EqualError(t, err, "Server is overloaded, rate limit exceeded")
+		require.Equal(t, 4, mc.RequestCount)
+		require.EqualError(t, err, "Server is overloaded, rate limit exceeded")
 
 	})
 
@@ -359,7 +359,7 @@ func TestSendRequest(t *testing.T) {
 			  "ledger_hash": "27F530E5C93ED5C13994812787C1ED073C822BAEC7597964608F2C049C2ACD2D",
 			  "ledger_index": 71766343
 				}
-			}`
+		}`
 
 		mc := &mockClient{}
 		mc.DoFunc = func(req *http.Request) (*http.Response, error) {
@@ -373,7 +373,7 @@ func TestSendRequest(t *testing.T) {
 		}
 
 		cfg, err := client.NewJsonRpcConfig("http://testnode/", client.WithHttpClient(mc))
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		jsonRpcClient := NewJsonRpcClient(cfg)
 
@@ -389,14 +389,13 @@ func TestSendRequest(t *testing.T) {
 		}
 
 		// Check that only 2 extra requests were made
-		assert.Equal(t, 3, mc.RequestCount)
+		require.Equal(t, 3, mc.RequestCount)
 
-		assert.NoError(t, err)
-		assert.Equal(t, expected.Account, channelsResponse.Account)
-		assert.Equal(t, expected.LedgerIndex, channelsResponse.LedgerIndex)
-		assert.Equal(t, expected.LedgerHash, channelsResponse.LedgerHash)
+		require.NoError(t, err)
+		require.Equal(t, expected.Account, channelsResponse.Account)
+		require.Equal(t, expected.LedgerIndex, channelsResponse.LedgerIndex)
+		require.Equal(t, expected.LedgerHash, channelsResponse.LedgerHash)
 	})
-
 	t.Run("SendRequest - timeout", func(t *testing.T) {
 		req := &account.AccountChannelsRequest{
 			Account: "rLHmBn4fT92w4F6ViyYbjoizLTo83tHTHu",
@@ -410,14 +409,178 @@ func TestSendRequest(t *testing.T) {
 		}
 
 		cfg, err := client.NewJsonRpcConfig("http://testnode/", client.WithHttpClient(mc))
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		jsonRpcClient := NewJsonRpcClient(cfg)
 
 		_, err = jsonRpcClient.SendRequest(req)
 
 		// Check that the expected timeout error occurred
-		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "timeout")
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "timeout")
+	})
+}
+
+func TestSendRequestPagination(t *testing.T) {
+
+	req1 := account.AccountChannelsRequest{
+		Account: "rLHmBn4fT92w4F6ViyYbjoizLTo83tHTHu",
+	}
+	paginatedParams := client.XRPLPaginatedParams{
+		Limit:     3,
+		Paginated: true,
+	}
+
+	markerResponse1 := `{
+		"result": {
+		  "account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+		  "ledger_index": 71766343,
+		  "marker":       "pageMarker1"
+		}
+	}`
+	markerResponse2 := `{
+		"result": {
+		  "account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+		  "ledger_index": 71766343,
+		  "marker":       "pageMarker2"
+		}
+	}`
+	noMarkerResponse := `{
+		"result": {
+		  "account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+		  "ledger_index": 71766343
+		}
+	}`
+
+	t.Run("Pagination calls", func(t *testing.T) {
+
+		expectedRes := []account.AccountChannelsResponse{
+			{
+				Account:     "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+				LedgerIndex: 71766343,
+				Marker:      "pageMarker1",
+			},
+			{
+				Account:     "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+				LedgerIndex: 71766343,
+				Marker:      "pageMarker2",
+			},
+			{
+				Account:     "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+				LedgerIndex: 71766343,
+			},
+		}
+
+		mc := &mockClient{}
+		mc.DoFunc = func(req *http.Request) (*http.Response, error) {
+			if mc.RequestCount < 1 {
+				// Return marker for first
+				mc.RequestCount++
+				return mockResponse(markerResponse1, 200, mc)(req)
+			}
+			if mc.RequestCount < 2 {
+				// Return marker for second
+				mc.RequestCount++
+				return mockResponse(markerResponse2, 200, mc)(req)
+			}
+			// Return no marker
+			return mockResponse(noMarkerResponse, 200, mc)(req)
+		}
+		cfg, err := client.NewJsonRpcConfig("http://testnode/", client.WithHttpClient(mc))
+		require.NoError(t, err)
+		jsonRpcClient := NewJsonRpcClient(cfg)
+
+		res, err := jsonRpcClient.SendRequestPaginated(&req1, paginatedParams.Limit, paginatedParams.Paginated)
+		require.NoError(t, err)
+
+		expectedFirstPage := jsonrpcmodels.JsonRpcResponse{
+			Result: jsonrpcmodels.AnyJson{
+				"account":      "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+				"ledger_index": json.Number("71766343"),
+				"marker":       "pageMarker1",
+			}}
+
+		pages := res.GetXRPLPages()
+		firstPage := pages[0]
+		require.Equal(t, expectedFirstPage, firstPage)
+
+		// unmarshall into specified type
+		acrPages := []account.AccountChannelsResponse{}
+
+		for _, page := range pages {
+
+			var acr account.AccountChannelsResponse
+
+			err = page.GetResult(&acr)
+			require.NoError(t, err)
+
+			acrPages = append(acrPages, acr)
+		}
+
+		require.Equal(t, expectedRes, acrPages)
+	})
+
+	t.Run("No Pagination", func(t *testing.T) {
+
+		mc := &mockClient{}
+		mc.DoFunc = func(req *http.Request) (*http.Response, error) {
+			// Return no marker
+			return mockResponse(markerResponse1, 200, mc)(req)
+		}
+
+		cfg, err := client.NewJsonRpcConfig("http://testnode/", client.WithHttpClient(mc))
+		require.NoError(t, err)
+		jsonRpcClient := NewJsonRpcClient(cfg)
+
+		res, err := jsonRpcClient.SendRequestPaginated(&req1, 10, false)
+		pages := res.GetXRPLPages()
+		require.NoError(t, err)
+		require.Equal(t, 1, len(pages))
+	})
+
+	t.Run("Limit set", func(t *testing.T) {
+
+		mc := &mockClient{}
+		mc.DoFunc = func(req *http.Request) (*http.Response, error) {
+			if mc.RequestCount < 1 {
+				// Return marker for first
+				mc.RequestCount++
+				return mockResponse(markerResponse1, 200, mc)(req)
+			}
+			if mc.RequestCount < 2 {
+				// Return marker for second
+				mc.RequestCount++
+				return mockResponse(markerResponse2, 200, mc)(req)
+			}
+			// Return no marker
+			return mockResponse(noMarkerResponse, 200, mc)(req)
+		}
+
+		cfg, err := client.NewJsonRpcConfig("http://testnode/", client.WithHttpClient(mc))
+		require.NoError(t, err)
+		jsonRpcClient := NewJsonRpcClient(cfg)
+
+		res, err := jsonRpcClient.SendRequestPaginated(&req1, 2, true)
+		pages := res.GetXRPLPages()
+		require.NoError(t, err)
+		require.Equal(t, 2, len(pages))
+	})
+
+	t.Run("Default limit", func(t *testing.T) {
+		mc := &mockClient{}
+
+		mc.DoFunc = func(req *http.Request) (*http.Response, error) {
+			// Return no marker
+			return mockResponse(markerResponse1, 200, mc)(req)
+		}
+
+		cfg, err := client.NewJsonRpcConfig("http://testnode/", client.WithHttpClient(mc))
+		require.NoError(t, err)
+		jsonRpcClient := NewJsonRpcClient(cfg)
+
+		res, err := jsonRpcClient.SendRequestPaginated(&req1, 0, true)
+		pages := res.GetXRPLPages()
+		require.NoError(t, err)
+		require.Equal(t, 10, len(pages))
 	})
 }
