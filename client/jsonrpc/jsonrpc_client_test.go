@@ -401,7 +401,7 @@ func TestSendRequestPagination(t *testing.T) {
 	req1 := account.AccountChannelsRequest{
 		Account: "rLHmBn4fT92w4F6ViyYbjoizLTo83tHTHu",
 	}
-	paginatedParams := client.XRPLPaginatedRequest{
+	paginatedParams := client.XRPLPaginatedParams{
 		Limit:     3,
 		Paginated: true,
 	}
@@ -465,18 +465,19 @@ func TestSendRequestPagination(t *testing.T) {
 		assert.NoError(t, err)
 		jsonRpcClient := NewJsonRpcClient(cfg)
 
-		pages, err := jsonRpcClient.SendRequestPaginated(&req1, paginatedParams.Limit, paginatedParams.Paginated)
+		res, err := jsonRpcClient.SendRequestPaginated(&req1, paginatedParams.Limit, paginatedParams.Paginated)
 		assert.NoError(t, err)
 
-		// TODO: is this ok to set equal? Is it useful to the user?
 		expectedFirstPage := jsonrpcmodels.JsonRpcResponse{
 			Result: jsonrpcmodels.AnyJson{
 				"account":      "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
 				"ledger_index": json.Number(strconv.FormatInt(71766343, 10)),
 				"marker":       "pageMarker1",
 			}}
+
+		pages := res.GetXRPLPages()
 		firstPage := pages[0]
-		assert.Equal(t, &expectedFirstPage, firstPage)
+		assert.Equal(t, expectedFirstPage, firstPage)
 
 		// unmarshall into specified type
 		acrPages := []account.AccountChannelsResponse{}
@@ -506,7 +507,8 @@ func TestSendRequestPagination(t *testing.T) {
 		assert.NoError(t, err)
 		jsonRpcClient := NewJsonRpcClient(cfg)
 
-		pages, err := jsonRpcClient.SendRequestPaginated(&req1, 10, false)
+		res, err := jsonRpcClient.SendRequestPaginated(&req1, 10, false)
+		pages := res.GetXRPLPages()
 		assert.NoError(t, err)
 		assert.Equal(t, 1, len(pages))
 	})
@@ -533,7 +535,8 @@ func TestSendRequestPagination(t *testing.T) {
 		assert.NoError(t, err)
 		jsonRpcClient := NewJsonRpcClient(cfg)
 
-		pages, err := jsonRpcClient.SendRequestPaginated(&req1, 2, true)
+		res, err := jsonRpcClient.SendRequestPaginated(&req1, 2, true)
+		pages := res.GetXRPLPages()
 		assert.NoError(t, err)
 		assert.Equal(t, 2, len(pages))
 	})
@@ -550,7 +553,8 @@ func TestSendRequestPagination(t *testing.T) {
 		assert.NoError(t, err)
 		jsonRpcClient := NewJsonRpcClient(cfg)
 
-		pages, err := jsonRpcClient.SendRequestPaginated(&req1, 0, true)
+		res, err := jsonRpcClient.SendRequestPaginated(&req1, 0, true)
+		pages := res.GetXRPLPages()
 		assert.NoError(t, err)
 		assert.Equal(t, 10, len(pages))
 	})

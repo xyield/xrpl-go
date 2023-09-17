@@ -195,9 +195,9 @@ func CheckForError(res *http.Response) (jsonrpcmodels.JsonRpcResponse, error) {
 	return jr, nil
 }
 
-func (c *JsonRpcClient) SendRequestPaginated(reqParams client.XRPLRequest, limit int, pagination bool) ([]client.XRPLResponse, error) {
+func (c *JsonRpcClient) SendRequestPaginated(reqParams client.XRPLPaginatedRequest, limit int, pagination bool) (client.XRPLPaginatedResponse, error) {
 
-	responsePages := []client.XRPLResponse{}
+	responsePages := []jsonrpcmodels.JsonRpcResponse{}
 
 	if !pagination {
 
@@ -205,8 +205,12 @@ func (c *JsonRpcClient) SendRequestPaginated(reqParams client.XRPLRequest, limit
 		if err != nil {
 			return nil, err
 		}
+		jr, ok := res.(*jsonrpcmodels.JsonRpcResponse)
+		if !ok {
+			return nil, errors.New("problem casting XRPLResponse to JsonRpcResponse")
+		}
 
-		responsePages = append(responsePages, res)
+		responsePages = append(responsePages, *jr)
 
 	} else {
 
@@ -221,10 +225,14 @@ func (c *JsonRpcClient) SendRequestPaginated(reqParams client.XRPLRequest, limit
 		}
 	}
 
-	return responsePages, nil
+	res := jsonrpcmodels.JsonRpcPaginationResponse{
+		Pages: responsePages,
+	}
+
+	return res, nil
 }
 
-func GetPages(c *JsonRpcClient, reqParams client.XRPLRequest, responsePages *[]client.XRPLResponse, limit int, counter int) error {
+func GetPages(c *JsonRpcClient, reqParams client.XRPLPaginatedRequest, responsePages *[]jsonrpcmodels.JsonRpcResponse, limit int, counter int) error {
 
 	if limit == counter {
 		return nil
@@ -245,7 +253,7 @@ func GetPages(c *JsonRpcClient, reqParams client.XRPLRequest, responsePages *[]c
 	}
 
 	// add result to array
-	*responsePages = append(*responsePages, jr)
+	*responsePages = append(*responsePages, *jr)
 
 	// check for marker
 	marker := jr.GetMarker()
@@ -258,7 +266,7 @@ func GetPages(c *JsonRpcClient, reqParams client.XRPLRequest, responsePages *[]c
 		counter++
 
 		// make next request
-		return GetPages(c, reqParams, responsePages, limit, counter) // TODO: check this!!!
+		return GetPages(c, reqParams, responsePages, limit, counter)
 	}
 
 	return nil

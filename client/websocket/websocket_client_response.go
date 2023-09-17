@@ -47,7 +47,6 @@ func (r *WebSocketClientXrplResponse) CheckError() error {
 }
 
 func (r WebSocketClientXrplResponse) GetMarker() any {
-
-	// TODO: impl this method
+	// TODO: impl this method for use in pagination method
 	return nil
 }

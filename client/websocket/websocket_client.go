@@ -23,7 +23,8 @@ type WebsocketClient struct {
 	idCounter atomic.Uint32
 }
 
-func (c *WebsocketClient) SendRequestPaginated(reqParams client.XRPLRequest, limit int, pagination bool) ([]client.XRPLResponse, error) {
+func (c *WebsocketClient) SendRequestPaginated(reqParams client.XRPLPaginatedRequest, limit int, pagination bool) (client.XRPLPaginatedResponse, error) {
+	// TODO: impl this method
 	return nil, nil
 }
 

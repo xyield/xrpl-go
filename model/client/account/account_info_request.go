@@ -16,10 +16,6 @@ type AccountInfoRequest struct {
 	Strict      bool                   `json:"strict,omitempty"`
 }
 
-func (a *AccountInfoRequest) SetMarker(m any) {
-	// empty as no marker to populate
-}
-
 func (*AccountInfoRequest) Method() string {
 	return "account_info"
 }

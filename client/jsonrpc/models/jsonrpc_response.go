@@ -39,7 +39,16 @@ func (r JsonRpcResponse) GetMarker() any {
 	return nil
 }
 
-// // this will impl the XRPLPaginatedResponse
-// type JsonRpcPaginatedResponse struct {
-// 	results []JsonRpcResponse
-// }
+type JsonRpcPaginationResponse struct {
+	Pages []JsonRpcResponse
+}
+
+func (r JsonRpcPaginationResponse) GetXRPLPages() []client.XRPLResponse {
+
+	res := make([]client.XRPLResponse, len(r.Pages))
+	for i, page := range r.Pages {
+		res[i] = page
+	}
+
+	return res
+}

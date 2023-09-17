@@ -2,7 +2,7 @@ package client
 
 type Client interface {
 	SendRequest(req XRPLRequest) (XRPLResponse, error)
-	SendRequestPaginated(reqParams XRPLRequest, limit int, pagination bool) ([]XRPLResponse, error)
+	SendRequestPaginated(reqParams XRPLPaginatedRequest, limit int, pagination bool) (XRPLPaginatedResponse, error)
 }
 
 type XRPLClient struct {
@@ -13,7 +13,6 @@ type XRPLClient struct {
 type XRPLRequest interface {
 	Method() string
 	Validate() error
-	SetMarker(m any) // TODO: take out of interface as only pag ones need it - make new ones for the req and response
 }
 
 type XRPLResponse interface {
@@ -21,14 +20,20 @@ type XRPLResponse interface {
 	GetMarker() any
 }
 
-type XRPLPaginatedRequest struct {
+type XRPLPaginatedParams struct {
 	Limit     int
 	Paginated bool
 }
 
-// type XRPLPaginatedResponse interface { // structs in both clients will impl this
-// 	GetMarker() any
-// }
+type XRPLPaginatedRequest interface {
+	Method() string
+	Validate() error
+	SetMarker(m any)
+}
+
+type XRPLPaginatedResponse interface {
+	GetXRPLPages() []XRPLResponse
+}
 
 type XRPLResponseWarning struct {
 	Id      int    `json:"id"`

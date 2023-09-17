@@ -5,7 +5,7 @@ import (
 )
 
 type Account interface {
-	GetAccountChannels(req *account.AccountChannelsRequest, params XRPLPaginatedRequest) ([]account.AccountChannelsResponse, []XRPLResponse, error)
+	GetAccountChannels(req *account.AccountChannelsRequest, params XRPLPaginatedParams) ([]account.AccountChannelsResponse, []XRPLResponse, error)
 	GetAccountInfo(req *account.AccountInfoRequest) (*account.AccountInfoResponse, XRPLResponse, error)
 }
 
@@ -13,19 +13,19 @@ type accountImpl struct {
 	client Client
 }
 
-func (a *accountImpl) GetAccountChannels(req *account.AccountChannelsRequest, params XRPLPaginatedRequest) ([]account.AccountChannelsResponse, []XRPLResponse, error) {
-
-	// TODO; set timer to exit recurssion if continues too long?
+func (a *accountImpl) GetAccountChannels(req *account.AccountChannelsRequest, params XRPLPaginatedParams) ([]account.AccountChannelsResponse, []XRPLResponse, error) {
 
 	err := req.Validate()
 	if err != nil {
 		return nil, nil, err
 	}
 
-	XRPLResponsePages, err := a.client.SendRequestPaginated(req, params.Limit, params.Paginated)
+	XRPLResponse, err := a.client.SendRequestPaginated(req, params.Limit, params.Paginated)
 	if err != nil {
 		return nil, nil, err
 	}
+
+	XRPLResponsePages := XRPLResponse.GetXRPLPages()
 
 	acrPages := []account.AccountChannelsResponse{}
 

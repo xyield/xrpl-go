@@ -17,7 +17,7 @@ func main() {
 		log.Panicln(err)
 	}
 
-	paginatedParams := client.XRPLPaginatedRequest{
+	paginatedParams := client.XRPLPaginatedParams{
 		Limit:     3,
 		Paginated: true,
 	}
