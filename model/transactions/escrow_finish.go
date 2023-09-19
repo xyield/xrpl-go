@@ -5,7 +5,7 @@ import (
 )
 
 type EscrowFinish struct {
-	BaseTx
+	BaseTx        `mapstructure:",squash"`
 	Owner         types.Address
 	OfferSequence uint
 	Condition     string `json:",omitempty"`

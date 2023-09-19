@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/xyield/xrpl-go/binary-codec/definitions"
+	"github.com/xyield/xrpl-go/model/transactions"
 
 	"github.com/xyield/xrpl-go/binary-codec/serdes"
 	"github.com/xyield/xrpl-go/binary-codec/types"
@@ -22,25 +23,9 @@ const (
 
 // Encode converts a JSON transaction object to a hex string in the canonical binary format.
 // The binary format is defined in XRPL's core codebase.
-func Encode(json map[string]any) (string, error) {
-
+func Encode(tx transactions.Tx) (string, error) {
 	st := &types.STObject{}
-
-	// Iterate over the keys in the provided JSON
-	for k := range json {
-
-		// Get the FieldIdNameMap from the definitions package
-		fh := definitions.Get().Fields[k]
-
-		// If the field is not found in the FieldIdNameMap, delete it from the JSON
-
-		if fh == nil {
-			delete(json, k)
-			continue
-		}
-	}
-
-	b, err := st.FromJson(json)
+	b, err := st.FromJson(tx)
 	if err != nil {
 		return "", err
 	}
@@ -51,39 +36,39 @@ func Encode(json map[string]any) (string, error) {
 // EncodeForMultiSign: encodes a transaction into binary format in preparation for providing one
 // signature towards a multi-signed transaction.
 // (Only encodes fields that are intended to be signed.)
-func EncodeForMultisigning(json map[string]any, xrpAccountID string) (string, error) {
+// func EncodeForMultisigning(json map[string]any, xrpAccountID string) (string, error) {
 
-	st := &types.AccountID{}
+// 	st := &types.AccountID{}
 
-	// SigningPubKey is required for multi-signing but should be set to empty string.
+// 	// SigningPubKey is required for multi-signing but should be set to empty string.
 
-	json["SigningPubKey"] = ""
+// 	json["SigningPubKey"] = ""
 
-	suffix, err := st.FromJson(xrpAccountID)
-	if err != nil {
-		return "", err
-	}
+// 	suffix, err := st.FromJson(xrpAccountID)
+// 	if err != nil {
+// 		return "", err
+// 	}
 
-	encoded, err := Encode(removeNonSigningFields(json))
+// 	encoded, err := Encode(removeNonSigningFields(json))
 
-	if err != nil {
-		return "", err
-	}
+// 	if err != nil {
+// 		return "", err
+// 	}
 
-	return strings.ToUpper(txMultiSigPrefix + encoded + hex.EncodeToString(suffix)), nil
-}
+// 	return strings.ToUpper(txMultiSigPrefix + encoded + hex.EncodeToString(suffix)), nil
+// }
 
 // Encodes a transaction into binary format in preparation for signing.
-func EncodeForSigning(json map[string]any) (string, error) {
+// func EncodeForSigning(json map[string]any) (string, error) {
 
-	encoded, err := Encode(removeNonSigningFields(json))
+// 	encoded, err := Encode(removeNonSigningFields(json))
 
-	if err != nil {
-		return "", err
-	}
+// 	if err != nil {
+// 		return "", err
+// 	}
 
-	return strings.ToUpper(txSigPrefix + encoded), nil
-}
+// 	return strings.ToUpper(txSigPrefix + encoded), nil
+// }
 
 // EncodeForPaymentChannelClaim: encodes a payment channel claim into binary format in preparation for signing.
 func EncodeForSigningClaim(json map[string]any) (string, error) {
@@ -142,3 +127,30 @@ func Decode(hexEncoded string) (map[string]any, error) {
 
 	return m.(map[string]any), nil
 }
+
+// func flattenTx(tx transactions.Tx) (map[string]any, error) {
+// 	rv := reflect.ValueOf(tx)
+// 	if rv.Kind() == reflect.Ptr {
+// 		rv = rv.Elem()
+// 	} else {
+// 		return nil, errors.New("invalid transaction")
+// 	}
+// 	m := make(map[string]any)
+// 	baseTx := rv.FieldByName("BaseTx")
+// 	if !baseTx.IsValid() {
+// 		return nil, errors.New("no base tx defined")
+// 	}
+// 	for i := 0; i < baseTx.NumField(); i++ {
+// 		if baseTx.Field(i).IsZero() {
+// 			continue
+// 		}
+// 		m[baseTx.Type().Field(i).Name] = baseTx.Field(i).Interface()
+// 	}
+// 	for i := 0; i < rv.NumField(); i++ {
+// 		if rv.Field(i).IsZero() || rv.Type().Field(i).Name == "BaseTx" {
+// 			continue
+// 		}
+// 		m[rv.Type().Field(i).Name] = rv.Field(i).Interface()
+// 	}
+// 	return m, nil
+// }
