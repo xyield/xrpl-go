@@ -31,7 +31,7 @@ type BaseTx struct {
 	Fee                types.XRPCurrencyAmount `json:",omitempty"`
 	Sequence           uint                    `json:",omitempty"`
 	AccountTxnID       types.Hash256           `json:",omitempty"`
-	Flags              uint                    `json:",omitempty"`
+	Flags              *uint                   `json:",omitempty"`
 	LastLedgerSequence uint                    `json:",omitempty"`
 	Memos              []MemoWrapper           `json:",omitempty"`
 	Signers            []Signer                `json:",omitempty"`

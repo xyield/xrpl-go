@@ -18,7 +18,7 @@ func TestTxResponse(t *testing.T) {
 				TransactionType:    transactions.OfferCreateTx,
 				Account:            "rhhh49pFH96roGyuC4E5P4CHaNjS1k8gzM",
 				Fee:                types.XRPCurrencyAmount(12),
-				Flags:              0,
+				Flags:              types.Uint(0),
 				LastLedgerSequence: 56865248,
 				Sequence:           5037710,
 				SigningPubKey:      "03B51A3EDF70E4098DA7FB053A01C5A6A0A163A30ED1445F14F87C7C3295FCB3BE",
