@@ -1,11 +1,11 @@
 package types
 
 import (
-	"fmt"
 	"sort"
 
 	"github.com/CreatureDev/xrpl-go/binary-codec/definitions"
 	"github.com/CreatureDev/xrpl-go/binary-codec/serdes"
+	"github.com/mitchellh/mapstructure"
 )
 
 // STObject represents a map of serialized field instances, where each key is a field name
@@ -19,10 +19,17 @@ type STObject struct{}
 // This method returns an error if the JSON input is not a valid object.
 func (t *STObject) FromJson(json any) ([]byte, error) {
 	s := serdes.NewSerializer()
-	if _, ok := json.(map[string]any); !ok {
-		return nil, fmt.Errorf("not a valid json node")
+	var m map[string]any
+	dec, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{TagName: "json", Result: &m, Squash: true})
+	if err != nil {
+		return nil, err
 	}
-	fimap, err := createFieldInstanceMapFromJson(json.(map[string]any))
+	err = dec.Decode(json)
+	if err != nil {
+		return nil, err
+	}
+
+	fimap, err := createFieldInstanceMapFromJson(m)
 
 	if err != nil {
 		return nil, err
@@ -94,6 +101,48 @@ func (t *STObject) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
 	return m, nil
 }
 
+// type fieldInstanceMap map[definitions.FieldInstance]any
+
+// func (f fieldInstanceMap) addFieldInstanceFromMap(rv reflect.Value) error {
+// 	if rv.Kind() != reflect.Map {
+// 		return errors.New("not of type map")
+// 	}
+
+// 	iter := rv.MapRange()
+// 	for iter.Next() {
+// 		fi, err := definitions.Get().GetFieldInstanceByFieldName(iter.Key().String())
+// 		if err != nil {
+// 			return err
+// 		}
+// 		f[*fi] = iter.Value().Interface()
+// 	}
+// 	return nil
+// }
+
+// func (f fieldInstanceMap) addFieldInstanceFromStruct(rv reflect.Value) error {
+// 	if rv.Kind() != reflect.Struct {
+// 		return errors.New("not of type struct")
+// 	}
+// 	for i := 0; i < rv.NumField(); i++ {
+
+// 		rvField := rv.Type().Field(i)
+// 		if rvField.Name == "BaseTx" {
+// 			continue
+// 		}
+// 		if rv.Field(i).IsZero() {
+// 			continue
+// 		}
+// 		fi, err := definitions.Get().GetFieldInstanceByFieldName(rvField.Name)
+
+// 		if err != nil {
+// 			return err
+// 		}
+
+// 		f[*fi] = rv.Field(i).Interface()
+// 	}
+// 	return nil
+// }
+
 // nolint
 // createFieldInstanceMapFromJson creates a map of field instances from a JSON object.
 // Each key-value pair in the JSON object is converted into a field instance, where the key
@@ -113,6 +162,23 @@ func createFieldInstanceMapFromJson(json map[string]any) (map[definitions.FieldI
 		m[*fi] = v
 	}
 	return m, nil
+	// rv := reflect.ValueOf(json)
+	// m := make(fieldInstanceMap)
+	// switch rv.Kind() {
+	// case reflect.Map:
+	// 	err := m.addFieldInstanceFromMap(rv)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// case reflect.Struct:
+	// 	err := m.addFieldInstanceFromStruct(rv)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// default:
+	// 	return nil, errors.New("not a valid json node")
+	// }
+	// return m, nil
 }
 
 // nolint

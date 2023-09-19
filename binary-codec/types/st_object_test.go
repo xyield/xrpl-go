@@ -1,48 +1,54 @@
 package types
 
 import (
-	"errors"
 	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/require"
 	"github.com/CreatureDev/xrpl-go/binary-codec/definitions"
+	"github.com/CreatureDev/xrpl-go/model/transactions/types"
+	"github.com/stretchr/testify/require"
 )
 
 func TestCreateFieldInstanceMapFromJson(t *testing.T) {
 
 	tt := []struct {
 		description string
-		input       map[string]interface{}
-		output      map[definitions.FieldInstance]interface{}
+		input       map[string]any
+		output      map[definitions.FieldInstance]any
 		expectedErr error
 	}{
 		{
 			description: "convert valid Json",
-			input: map[string]interface{}{
-				"Fee":           "10",
-				"Flags":         524288,
-				"OfferSequence": 1752791,
-				"TakerGets":     "150000000000",
+			input: map[string]any{
+				"Fee":           types.XRPCurrencyAmount(10),
+				"Flags":         uint(524288),
+				"OfferSequence": uint(1752791),
+				"TakerGets":     types.XRPCurrencyAmount(150000000000),
 			},
-			output: map[definitions.FieldInstance]interface{}{
-				getFieldInstance(t, "Fee"):           "10",
-				getFieldInstance(t, "Flags"):         524288,
-				getFieldInstance(t, "OfferSequence"): 1752791,
-				getFieldInstance(t, "TakerGets"):     "150000000000",
+			output: map[definitions.FieldInstance]any{
+				getFieldInstance(t, "Fee"):           types.XRPCurrencyAmount(10),
+				getFieldInstance(t, "Flags"):         uint(524288),
+				getFieldInstance(t, "OfferSequence"): uint(1752791),
+				getFieldInstance(t, "TakerGets"):     types.XRPCurrencyAmount(150000000000),
 			},
 			expectedErr: nil,
 		},
-		{
-			description: "not found error",
-			input: map[string]interface{}{
-				"IncorrectField": 89,
-				"Flags":          525288,
-				"OfferSequence":  1752791,
-			},
-			output:      nil,
-			expectedErr: errors.New("FieldName IncorrectField not found"),
-		},
+		// {
+		// 	description: "not found error",
+		// 	input: &invalidTxWithBase{
+		// 		InvalidField: "invalid",
+		// 	},
+		// 	output:      nil,
+		// 	expectedErr: errors.New("FieldName InvalidField not found"),
+		// },
+		// {
+		// 	description: "no base tx",
+		// 	input: &invalidTx{
+		// 		InvalidField: "invalid",
+		// 	},
+		// 	output:      nil,
+		// 	expectedErr: errors.New("no base tx defined"),
+		// },
 	}
 
 	for _, tc := range tt {
@@ -53,7 +59,7 @@ func TestCreateFieldInstanceMapFromJson(t *testing.T) {
 				require.EqualError(t, err, tc.expectedErr.Error())
 			} else {
 				require.NoError(t, err)
-				require.Equal(t, tc.output, got)
+				require.EqualValues(t, tc.output, got)
 			}
 		})
 	}

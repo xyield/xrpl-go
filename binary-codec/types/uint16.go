@@ -6,6 +6,8 @@ import (
 
 	"github.com/CreatureDev/xrpl-go/binary-codec/definitions"
 	"github.com/CreatureDev/xrpl-go/binary-codec/serdes"
+	"github.com/CreatureDev/xrpl-go/model/ledger"
+	"github.com/CreatureDev/xrpl-go/model/transactions"
 )
 
 // UInt16 represents a 16-bit unsigned integer.
@@ -15,25 +17,45 @@ type UInt16 struct{}
 // If the input value is a string, it's assumed to be a transaction type or ledger entry type name, and the
 // method will attempt to convert it into a corresponding type code. If the conversion fails, an error is returned.
 func (u *UInt16) FromJson(value any) ([]byte, error) {
-
-	if _, ok := value.(string); ok {
-		tc, err := definitions.Get().GetTransactionTypeCodeByTransactionTypeName(value.(string))
+	switch v := value.(type) {
+	case transactions.TxType:
+		tc, err := definitions.Get().GetTransactionTypeCodeByTransactionTypeName(string(v))
 		if err != nil {
-			tc, err = definitions.Get().GetLedgerEntryTypeCodeByLedgerEntryTypeName(value.(string))
-			if err != nil {
-				return nil, err
-			}
+			return nil, err
+		}
+		value = int(tc)
+	case ledger.LedgerEntryType:
+		tc, err := definitions.Get().GetLedgerEntryTypeCodeByLedgerEntryTypeName(string(v))
+		if err != nil {
+			return nil, err
 		}
 		value = int(tc)
 	}
-
 	buf := new(bytes.Buffer)
 	err := binary.Write(buf, binary.BigEndian, uint16(value.(int)))
-
 	if err != nil {
 		return nil, err
 	}
 	return buf.Bytes(), nil
+
+	// if _, ok := value.(string); ok {
+	// 	tc, err := definitions.Get().GetTransactionTypeCodeByTransactionTypeName(value.(string))
+	// 	if err != nil {
+	// 		tc, err = definitions.Get().GetLedgerEntryTypeCodeByLedgerEntryTypeName(value.(string))
+	// 		if err != nil {
+	// 			return nil, err
+	// 		}
+	// 	}
+	// 	value = int(tc)
+	// }
+
+	// buf := new(bytes.Buffer)
+	// err := binary.Write(buf, binary.BigEndian, uint16(value.(int)))
+
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// return buf.Bytes(), nil
 }
 
 // ToJson takes a BinaryParser and optional parameters, and converts the serialized byte data

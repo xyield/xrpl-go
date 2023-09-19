@@ -6,6 +6,7 @@ import (
 
 	addresscodec "github.com/CreatureDev/xrpl-go/address-codec"
 	"github.com/CreatureDev/xrpl-go/binary-codec/serdes"
+	"github.com/CreatureDev/xrpl-go/model/transactions"
 )
 
 const (
@@ -26,16 +27,20 @@ var ErrInvalidPathSet error = errors.New("invalid type to construct PathSet from
 // FromJson attempts to serialize a path set from a JSON representation of a slice of paths to a byte array.
 // It returns the byte array representation of the path set, or an error if the provided json does not represent a valid path set.
 func (p PathSet) FromJson(json any) ([]byte, error) {
-
-	if _, ok := json.([]any)[0].([]any); !ok {
+	// var pathSet [][]transactions.PathStep
+	// if pathSet, ok := json.([][]transactions.PathStep); !ok {
+	// 	return nil, ErrInvalidPathSet
+	// }
+	pathSet, ok := json.([][]transactions.PathStep)
+	if !ok {
 		return nil, ErrInvalidPathSet
 	}
 
-	if !isPathSet(json.([]any)) {
+	if !isPathSet(pathSet) {
 		return nil, ErrInvalidPathSet
 	}
 
-	return newPathSet(json.([]any)), nil
+	return newPathSet(pathSet), nil
 }
 
 // ToJson decodes a path set from a binary representation using a provided binary parser, then translates it to a JSON representation.
@@ -87,35 +92,35 @@ func (p PathSet) ToJson(parser *serdes.BinaryParser, opts ...int) (any, error) {
 
 // isPathSet determines if an array represents a valid path set.
 // It checks if the array is either empty or if its first element is a valid path step.
-func isPathSet(v []any) bool {
-	return len(v) == 0 || len(v[0].([]any)) == 0 || isPathStep(v[0].([]any)[0].(map[string]any))
+func isPathSet(v [][]transactions.PathStep) bool {
+	return len(v) == 0 || len(v[0]) == 0 || isPathStep(v[0][0])
 }
 
 // isPathStep determines if a map represents a valid path step.
 // It checks if any of the keys "account", "currency" or "issuer" are present in the map.
-func isPathStep(v map[string]any) bool {
-	return v["account"] != nil || v["currency"] != nil || v["issuer"] != nil
+func isPathStep(v transactions.PathStep) bool {
+	return v.Account != "" || v.Currency != "" || v.Issuer != ""
 }
 
 // newPathStep creates a path step from a map representation.
 // It generates a byte array representation of the path step, encoding account, currency, and issuer information as appropriate.
-func newPathStep(v map[string]any) []byte {
+func newPathStep(v transactions.PathStep) []byte {
 
 	dataType := 0x00
 	b := make([]byte, 0)
 
-	if v["account"] != nil {
-		_, account, _ := addresscodec.DecodeClassicAddressToAccountID(v["account"].(string))
+	if v.Account != "" {
+		_, account, _ := addresscodec.DecodeClassicAddressToAccountID(string(v.Account))
 		b = append(b, account...)
 		dataType |= typeAccount
 	}
-	if v["currency"] != nil {
-		currency, _ := serializeIssuedCurrencyCode(v["currency"].(string))
+	if v.Currency != "" {
+		currency, _ := serializeIssuedCurrencyCode(v.Currency)
 		b = append(b, currency...)
 		dataType |= typeCurrency
 	}
-	if v["issuer"] != nil {
-		_, issuer, _ := addresscodec.DecodeClassicAddressToAccountID(v["issuer"].(string))
+	if v.Issuer != "" {
+		_, issuer, _ := addresscodec.DecodeClassicAddressToAccountID(string(v.Issuer))
 		b = append(b, issuer...)
 		dataType |= typeIssuer
 	}
@@ -125,26 +130,26 @@ func newPathStep(v map[string]any) []byte {
 
 // newPath constructs a path from a slice of path steps.
 // It generates a byte array representation of the path, encoding each path step in turn.
-func newPath(v []any) []byte {
+func newPath(v []transactions.PathStep) []byte {
 	b := make([]byte, 0)
 
 	for _, step := range v { // for each step in the path (slice of path steps)
-		b = append(b, newPathStep(step.(map[string]any))...) // append the path step to the byte array
+		b = append(b, newPathStep(step)...) // append the path step to the byte array
 	}
 	return b
 }
 
 // newPathSet constructs a path set from a slice of paths.
 // It generates a byte array representation of the path set, encoding each path and adding padding and path separators as appropriate.
-func newPathSet(v []any) []byte {
+func newPathSet(v [][]transactions.PathStep) []byte {
 
 	b := make([]byte, 0)
 	padding := make([]byte, 20)
 
 	for _, path := range v { // for each path in the path set (slice of paths)
-		b = append(b, newPath(path.([]any))...) // append the path to the byte array
-		b = append(b, padding...)               // append 20 empty bytes to the byte array between paths
-		b = append(b, pathSeparatorByte)        // between each path, append a path separator byte
+		b = append(b, newPath(path)...)  // append the path to the byte array
+		b = append(b, padding...)        // append 20 empty bytes to the byte array between paths
+		b = append(b, pathSeparatorByte) // between each path, append a path separator byte
 	}
 
 	b[len(b)-1] = pathsetEndByte // replace last path separator with path set end byte

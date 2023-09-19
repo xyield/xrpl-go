@@ -2,6 +2,7 @@ package types
 
 import (
 	"errors"
+	"reflect"
 
 	"github.com/CreatureDev/xrpl-go/binary-codec/serdes"
 )
@@ -22,19 +23,29 @@ var ErrNotSTObjectInSTArray = errors.New("not STObject in STArray. Array fields 
 // of an STObject, appending the resulting byte slice to a "sink" slice.
 // The method returns an error if the JSON value is not a slice.
 func (t *STArray) FromJson(json any) ([]byte, error) {
-	if _, ok := json.([]any); !ok {
+	rv := reflect.ValueOf(json)
+	if rv.Kind() != reflect.Slice {
 		return nil, ErrNotSTObjectInSTArray
 	}
-
 	var sink []byte
-	for _, v := range json.([]any) {
+	for i := 0; i < rv.Len(); i++ {
 		st := &STObject{}
-		b, err := st.FromJson(v)
+		val := rv.Index(i).Interface()
+		b, err := st.FromJson(val)
 		if err != nil {
 			return nil, err
 		}
 		sink = append(sink, b...)
 	}
+
+	// for _, v := range json.([]any) {
+	// 	st := &STObject{}
+	// 	b, err := st.FromJson(v)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// 	sink = append(sink, b...)
+	// }
 	sink = append(sink, ArrayEndMarker)
 
 	return sink, nil
