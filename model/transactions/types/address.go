@@ -9,6 +9,9 @@ type Address string
 
 func (a Address) Validate() error {
 	characters := []string{"0", "O", "I", "l"}
+	if len(a) == 0 {
+		return fmt.Errorf("missing xrpl address")
+	}
 	if len(a) < 25 || len(a) > 35 {
 		return fmt.Errorf("invalid xrpl address length")
 	}

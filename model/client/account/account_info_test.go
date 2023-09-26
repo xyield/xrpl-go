@@ -3,6 +3,7 @@ package account
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/xyield/xrpl-go/model/client/common"
 	"github.com/xyield/xrpl-go/model/ledger"
 	"github.com/xyield/xrpl-go/model/transactions/types"
@@ -109,4 +110,14 @@ func TestAccountInfoResponse(t *testing.T) {
 	if err := test.SerializeAndDeserialize(t, s, j); err != nil {
 		t.Error(err)
 	}
+}
+
+func TestAccountInfoValidate(t *testing.T) {
+	s := AccountInfoRequest{
+		Account: "",
+	}
+
+	err := s.Validate()
+
+	assert.ErrorContains(t, err, "missing xrpl address")
 }

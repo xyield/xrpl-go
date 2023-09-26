@@ -93,7 +93,7 @@ func (r *LedgerEntryRequest) Validate() error {
 	}
 
 	if setCount != 1 {
-		return fmt.Errorf("ledger entry: exactly one ledger entry object may be requested")
+		return fmt.Errorf("ledger entry: exactly one ledger entry object may be requested, found %d", setCount)
 	}
 
 	return nil
@@ -133,7 +133,7 @@ func (*OfferEntryReq) LedgerEntryRequestField() {}
 
 func (r *OfferEntryReq) Validate() error {
 	if err := r.Account.Validate(); err != nil {
-		return fmt.Errorf("offer entry: %w", err)
+		return fmt.Errorf("offer entry account: %w", err)
 	}
 	return nil
 }
@@ -149,9 +149,9 @@ func (r *RippleStateEntryReq) Validate() error {
 	if len(r.Accounts) != 2 {
 		return fmt.Errorf("ripple state entry requires two accounts")
 	}
-	for _, a := range r.Accounts {
+	for i, a := range r.Accounts {
 		if err := a.Validate(); err != nil {
-			return fmt.Errorf("ripple state entry: %w", err)
+			return fmt.Errorf("ripple state entry account %d: %w", i+1, err)
 		}
 	}
 	return nil
@@ -166,7 +166,7 @@ func (*EscrowEntryReq) LedgerEntryRequestField() {}
 
 func (r *EscrowEntryReq) Validate() error {
 	if err := r.Owner.Validate(); err != nil {
-		return fmt.Errorf("escrow entry: %w", err)
+		return fmt.Errorf("escrow entry owner: %w", err)
 	}
 	return nil
 }
@@ -197,7 +197,7 @@ func (*TicketEntryReq) LedgerEntryRequestField() {}
 
 func (r *TicketEntryReq) Validate() error {
 	if err := r.Account.Validate(); err != nil {
-		return fmt.Errorf("ticket entry: %w", err)
+		return fmt.Errorf("ticket entry account: %w", err)
 	}
 	return nil
 }
