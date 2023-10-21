@@ -4,7 +4,7 @@ type LedgerAcceptRequest struct {
 }
 
 func (*LedgerAcceptRequest) Method() string {
-	return "leder_accept"
+	return "ledger_accept"
 }
 
 func (*LedgerAcceptRequest) Validate() error {
