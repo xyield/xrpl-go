@@ -6,11 +6,15 @@ import (
 	"github.com/CreatureDev/xrpl-go/model/transactions/types"
 )
 
-type OfferResultFlags uint
+type OfferResultFlags uint32
+
+func (f OfferResultFlags) ToUint() uint32 {
+	return uint32(f)
+}
 
 type OfferResult struct {
 	Flags      OfferResultFlags     `json:"flags"`
-	Sequence   uint                 `json:"seq"`
+	Sequence   uint32               `json:"seq"`
 	TakerGets  types.CurrencyAmount `json:"taker_gets"`
 	TakerPays  types.CurrencyAmount `json:"taker_pays"`
 	Quality    string               `json:"quality"`
@@ -20,7 +24,7 @@ type OfferResult struct {
 func (r *OfferResult) UnmarshalJSON(data []byte) error {
 	type orHelper struct {
 		Flags      OfferResultFlags `json:"flags"`
-		Sequence   uint             `json:"seq"`
+		Sequence   uint32           `json:"seq"`
 		TakerGets  json.RawMessage  `json:"taker_gets"`
 		TakerPays  json.RawMessage  `json:"taker_pays"`
 		Quality    string           `json:"quality"`

@@ -1,6 +1,7 @@
 package types
 
 import (
+	"reflect"
 	"sort"
 
 	"github.com/CreatureDev/xrpl-go/binary-codec/definitions"
@@ -38,6 +39,10 @@ func (t *STObject) FromJson(json any) ([]byte, error) {
 	sk := getSortedKeys(fimap)
 
 	for _, v := range sk {
+		if checkZero(fimap[v]) {
+			continue
+		}
+
 		if !v.IsSerialized {
 			continue
 		}
@@ -216,4 +221,10 @@ func enumToStr(fieldType string, value any) (any, error) {
 	default:
 		return value, nil
 	}
+}
+
+// check for zero value
+func checkZero(v any) bool {
+	rv := reflect.ValueOf(v)
+	return rv.IsZero()
 }

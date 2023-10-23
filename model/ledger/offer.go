@@ -6,7 +6,11 @@ import (
 	"github.com/CreatureDev/xrpl-go/model/transactions/types"
 )
 
-type OfferFlags uint
+type OfferFlags uint32
+
+func (f OfferFlags) ToUint() uint32 {
+	return uint32(f)
+}
 
 const (
 	PassiveOffer OfferFlags = 0x00010000
@@ -19,11 +23,11 @@ type Offer struct {
 	BookNode          string
 	Expiration        uint `json:",omitempty"`
 	Flags             OfferFlags
-	LedgerEntryType   LedgerEntryType
+	LedgerEntryType   LedgerEntryType `json:",omitempty"`
 	OwnerNode         string
 	PreviousTxnID     types.Hash256
-	PreviousTxnLgrSeq uint
-	Sequence          uint
+	PreviousTxnLgrSeq uint32
+	Sequence          uint32
 	TakerPays         types.CurrencyAmount
 	TakerGets         types.CurrencyAmount
 }
@@ -42,8 +46,8 @@ func (o *Offer) UnmarshalJSON(data []byte) error {
 		LedgerEntryType   LedgerEntryType
 		OwnerNode         string
 		PreviousTxnID     types.Hash256
-		PreviousTxnLgrSeq uint
-		Sequence          uint
+		PreviousTxnLgrSeq uint32
+		Sequence          uint32
 		TakerPays         json.RawMessage
 		TakerGets         json.RawMessage
 	}

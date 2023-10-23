@@ -15,131 +15,6 @@ func TestEncode(t *testing.T) {
 		output      string
 		expectedErr error
 	}{
-		// {
-		// 	description: "large test tx",
-		// 	input: &transactions.OfferCreate{
-		// 		BaseTx: transactions.BaseTx{
-		// 			Account:         "rMBzp8CgpE441cp5PVyA9rpVV7oT8hP3ys",
-		// 			TransactionType: transactions.OfferCreateTx,
-		// 			Fee:             10,
-		// 			Flags:           524288,
-		// 			Sequence:        1752792,
-		// 			SigningPubKey:   "03EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3",
-		// 			TxnSignature:    "30440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C",
-		// 			Memos: []transactions.MemoWrapper{
-		// 				{
-		// 					Memo: transactions.Memo{
-		// 						MemoData: "04C4D46544659A2D58525043686174",
-		// 					},
-		// 				},
-		// 			},
-		// 		},
-		// 		Expiration:    595640108,
-		// 		OfferSequence: 1752791,
-		// 		TakerGets:     types.XRPCurrencyAmount(15000000000),
-		// 		TakerPays: types.IssuedCurrencyAmount{
-		// 			Currency: "USD",
-		// 			Issuer:   "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
-		// 			Value:    "7072.8",
-		// 		},
-
-		// 		// "Account":       "rMBzp8CgpE441cp5PVyA9rpVV7oT8hP3ys",
-		// 		// "Expiration": 595640108,
-		// 		// "Fee":           "10",
-		// 		// "Flags":         524288,
-		// 		// "OfferSequence": 1752791,
-		// 		// "Sequence":      1752792,
-		// 		// "SigningPubKey": "03EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3",
-		// 		// "TakerGets": "15000000000",
-		// 		// "TakerPays": map[string]any{
-		// 		// 	"currency": "USD",
-		// 		// 	"issuer":   "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
-		// 		// 	"value":    "7072.8",
-		// 		// },
-		// 		// "TransactionType": "OfferCreate",
-		// 		// "TxnSignature":    "30440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C",
-		// 		// "Paths": []any{
-		// 		// 	[]any{
-		// 		// 		map[string]any{
-		// 		// 			"account":  "rPDXxSZcuVL3ZWoyU82bcde3zwvmShkRyF",
-		// 		// 			"type":     1,
-		// 		// 			"type_hex": "0000000000000001",
-		// 		// 		},
-		// 		// 		map[string]any{
-		// 		// 			"currency": "XRP",
-		// 		// 			"type":     16,
-		// 		// 			"type_hex": "0000000000000010",
-		// 		// 		},
-		// 		// 	},
-		// 		// 	[]any{
-		// 		// 		map[string]any{
-		// 		// 			"account":  "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-		// 		// 			"type":     1,
-		// 		// 			"type_hex": "0000000000000001",
-		// 		// 		},
-		// 		// 		map[string]any{
-		// 		// 			"account":  "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
-		// 		// 			"type":     1,
-		// 		// 			"type_hex": "0000000000000001",
-		// 		// 		},
-		// 		// 		map[string]any{
-		// 		// 			"currency": "XRP",
-		// 		// 			"type":     16,
-		// 		// 			"type_hex": "0000000000000010",
-		// 		// 		},
-		// 		// 	},
-		// 		// 	[]any{
-		// 		// 		map[string]any{
-		// 		// 			"account":  "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-		// 		// 			"type":     1,
-		// 		// 			"type_hex": "0000000000000001",
-		// 		// 		},
-		// 		// 		map[string]any{
-		// 		// 			"account":  "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
-		// 		// 			"type":     1,
-		// 		// 			"type_hex": "0000000000000001",
-		// 		// 		},
-		// 		// 		map[string]any{
-		// 		// 			"currency": "XRP",
-		// 		// 			"type":     16,
-		// 		// 			"type_hex": "0000000000000010",
-		// 		// 		},
-		// 		// 	},
-		// 		// },
-		// 		// "Memos": []any{
-		// 		// 	map[string]any{
-		// 		// 		"Memo": map[string]any{
-		// 		// 			"MemoData": "04C4D46544659A2D58525043686174",
-		// 		// 		},
-		// 		// 	},
-		// 		// // },
-		// 		// "LedgerEntryType": "RippleState",
-		// 		// "TransferFee":     30874,
-		// 		// "CloseResolution": 25,
-		// 		// "OwnerNode":       "0000018446744073",
-		// 		// "Amendments": []string{
-		// 		// 	"73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C",
-		// 		// 	"73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C",
-		// 		// },
-		// 		// "EmailHash":         "73734B611DDA23D3F5F62E20A173B78A",
-		// 		// "TakerPaysCurrency": "73734B611DDA23D3F5F62E20A173B78AB8406AC5",
-		// 		// "Digest":            "73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C",
-		// 	},
-		// 	output:      "11007212000714789A220008000024001ABED82A2380BF2C2019001ABED73400000184467440734173734B611DDA23D3F5F62E20A173B78A501573734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C64D55920AC9391400000000000000000000000000055534400000000000A20B3C85F482532A9578DBB3950B85CA06594D165400000037E11D60068400000000000000A732103EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3744630440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C8114DD76483FACDEE26E60D8A586BB58D09F27045C46F9EA7D0F04C4D46544659A2D58525043686174E1F1011019011173734B611DDA23D3F5F62E20A173B78AB8406AC5011201F3B1997562FD742B54D4EBDEA1D6AEA3D4906B8F100000000000000000000000000000000000000000FF014B4E9C06F24296074F7BC48F92A97916C6DC5EA901DD39C650A96EDA48334E70CC4A85B8B2E8502CD3100000000000000000000000000000000000000000FF014B4E9C06F24296074F7BC48F92A97916C6DC5EA901DD39C650A96EDA48334E70CC4A85B8B2E8502CD31000000000000000000000000000000000000000000003134073734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C",
-		// 	expectedErr: nil,
-		// },
-		// {
-		// 	description: "zero issued currency amount",
-		// 	input: map[string]any{
-		// 		"LowLimit": map[string]any{
-		// 			"currency": "LUC",
-		// 			"issuer":   "rsygE5ynt2iSasscfCCeqaGBGiFKMCAUu7",
-		// 			"value":    "0",
-		// 		},
-		// 	},
-		// 	output:      "6680000000000000000000000000000000000000004C5543000000000020A85019EA62B48F79EB67273B797EB916438FA4",
-		// 	expectedErr: nil,
-		// },
 		{
 			description: "successfully serialized signed transaction 1",
 			input: &transactions.OfferCreate{
@@ -147,7 +22,7 @@ func TestEncode(t *testing.T) {
 					Account:         "rMBzp8CgpE441cp5PVyA9rpVV7oT8hP3ys",
 					TransactionType: transactions.OfferCreateTx,
 					Fee:             10,
-					Flags:           types.Uint(524288),
+					Flags:           types.SetFlag(524288),
 					Sequence:        1752792,
 					SigningPubKey:   "03EE83BB432547885C219634A1BC407A9DB0474145D69737D09CCDC63E1DEE7FE3",
 					TxnSignature:    "30440220143759437C04F7B61F012563AFE90D8DAFC46E86035E1D965A9CED282C97D4CE02204CFD241E86F17E011298FC1A39B63386C74306A5DE047E213B0F29EFA4571C2C",
@@ -171,7 +46,7 @@ func TestEncode(t *testing.T) {
 					Account:         "r3Y6vCE8XqfZmYBRngy22uFYkmz3y9eCRA",
 					TransactionType: transactions.EscrowFinishTx,
 					Fee:             10101,
-					Flags:           types.Uint(2147483648),
+					Flags:           types.SetFlag(2147483648),
 					Sequence:        1,
 					SigningPubKey:   "0268D79CD579D077750740FA18A2370B7C2018B2714ECE70BA65C38D223E79BC9C",
 					TxnSignature:    "3045022100F06FB54049D6D50142E5CF2E2AC21946AF305A13E2A2D4BA881B36484DD01A540220311557EC8BEF536D729605A4CB4D4DC51B1E37C06C93434DD5B7651E1E2E28BF",
@@ -196,7 +71,7 @@ func TestEncode(t *testing.T) {
 					Account:         "rweYz56rfmQ98cAdRaeTxQS9wVMGnrdsFp",
 					TransactionType: transactions.PaymentTx,
 					Fee:             12,
-					Flags:           types.Uint(0),
+					Flags:           types.SetFlag(0),
 					Sequence:        842,
 					Memos: []transactions.MemoWrapper{
 						{
@@ -242,94 +117,6 @@ func TestEncode(t *testing.T) {
 			expectedErr: nil,
 			output:      "1200002200000000240000034A201B009717BE61400000000098968068400000000000000C69D4564B964A845AC0000000000000000000000000555344000000000069D33B18D53385F8A3185516C2EDA5DEDB8AC5C673210379F17CFA0FFD7518181594BE69FE9A10471D6DE1F4055C6D2746AFD6CF89889E74473045022100D55ED1953F860ADC1BC5CD993ABB927F48156ACA31C64737865F4F4FF6D015A80220630704D2BD09C8E99F26090C25F11B28F5D96A1350454402C2CED92B39FFDBAF811469D33B18D53385F8A3185516C2EDA5DEDB8AC5C6831469D33B18D53385F8A3185516C2EDA5DEDB8AC5C6F9EA7C06636C69656E747D077274312E312E31E1F1011201F3B1997562FD742B54D4EBDEA1D6AEA3D4906B8F100000000000000000000000000000000000000000FF014B4E9C06F24296074F7BC48F92A97916C6DC5EA901DD39C650A96EDA48334E70CC4A85B8B2E8502CD310000000000000000000000000000000000000000000",
 		},
-		// {
-		// 	description: "serialize OwnerNode example - UInt64",
-		// 	input:       map[string]any{"OwnerNode": "18446744073"},
-		// 	output:      "340000018446744073",
-		// 	expectedErr: nil,
-		// },
-		// {
-		// 	description: "serialize LedgerEntryType example - UInt8",
-		// 	input:       map[string]any{"LedgerEntryType": "RippleState"},
-		// 	output:      "110072",
-		// 	expectedErr: nil,
-		// },
-		// {
-		// 	description: "serialize int example - UInt8",
-		// 	input:       map[string]any{"CloseResolution": 25},
-		// 	output:      "011019",
-		// 	expectedErr: nil,
-		// },
-		// {
-		// 	description: "serialize hash 128",
-		// 	input:       map[string]any{"EmailHash": "73734B611DDA23D3F5F62E20A173B78A"},
-		// 	output:      "4173734B611DDA23D3F5F62E20A173B78A",
-		// 	expectedErr: nil,
-		// },
-		// {
-		// 	description: "hash128 wrong length",
-		// 	input:       map[string]any{"EmailHash": "73734B611DDA23D3F5F62E20A173"},
-		// 	output:      "",
-		// 	expectedErr: &types.ErrInvalidHashLength{Expected: 16},
-		// },
-		// {
-		// 	description: "serialize hash 160",
-		// 	input:       map[string]any{"TakerPaysCurrency": "73734B611DDA23D3F5F62E20A173B78AB8406AC5"},
-		// 	output:      "011173734B611DDA23D3F5F62E20A173B78AB8406AC5",
-		// 	expectedErr: nil,
-		// },
-		// {
-		// 	description: "hash160 wrong length",
-		// 	input:       map[string]any{"TakerPaysCurrency": "73734B611DDA23D3F5F62E20A173B789"},
-		// 	output:      "",
-		// 	expectedErr: &types.ErrInvalidHashLength{Expected: 20},
-		// },
-		// {
-		// 	description: "serialize hash 256",
-		// 	input:       map[string]any{"Digest": "73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C"},
-		// 	output:      "501573734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C",
-		// 	expectedErr: nil,
-		// },
-		// {
-		// 	description: "hash256 wrong length",
-		// 	input:       map[string]any{"Digest": "73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F537"},
-		// 	output:      "",
-		// 	expectedErr: &types.ErrInvalidHashLength{Expected: 32},
-		// },
-		// {
-		// 	description: "serialize Vector256 successfully,",
-		// 	input:       map[string]any{"Amendments": []string{"73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C", "73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C"}},
-		// 	output:      "03134073734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C",
-		// 	expectedErr: nil,
-		// },
-		// {
-		// 	description: "invalid input for Vector256 - not a string array",
-		// 	input:       map[string]any{"Amendments": []int{1, 2, 3}},
-		// 	output:      "",
-		// 	expectedErr: &types.ErrInvalidVector256Type{Got: "[]int"},
-		// },
-		// {
-		// 	description: "invalid input for Vector256 - wrong hash length",
-		// 	input:       map[string]any{"Amendments": []string{"73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06C56342689", "73734B611DDA23D3F5F62E20A173B78AB8406AC5015094DA53F53D39B9EDB06"}},
-		// 	output:      "",
-		// 	expectedErr: &types.ErrInvalidHashLength{Expected: types.HashLengthBytes},
-		// },
-		// {
-		// 	description: "serialize STObject correctly",
-		// 	input: &transactions.OfferCreate{
-		// 		BaseTx: transactions.BaseTx{
-		// 			Memos: []transactions.MemoWrapper{
-		// 				{
-		// 					Memo: transactions.Memo{
-		// 						MemoType: "04C4D46544659A2D58525043686174",
-		// 					},
-		// 				},
-		// 			},
-		// 		},
-		// 	},
-		// 	output:      "F9EA7C0F04C4D46544659A2D58525043686174E1F1",
-		// 	expectedErr: nil,
-		// },
 	}
 
 	for _, tc := range tt {

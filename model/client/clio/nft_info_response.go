@@ -14,6 +14,6 @@ type NFTInfoResponse struct {
 	TransferFee     uint               `json:"transfer_fee"`
 	Issuer          types.Address      `json:"issuer"`
 	NFTokenTaxon    uint               `json:"nft_taxon"`
-	NFTokenSequence uint               `json:"nft_sequence"`
+	NFTokenSequence uint32             `json:"nft_sequence"`
 	URI             types.NFTokenURI   `json:"uri,omitempty"`
 }

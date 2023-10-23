@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/CreatureDev/xrpl-go/binary-codec/serdes"
+	"github.com/CreatureDev/xrpl-go/model/transactions/types"
 )
 
 const HashLengthBytes = 32
@@ -27,18 +28,18 @@ type Vector256 struct{}
 // The input value is assumed to be an array of strings representing Hash256 values.
 // If the serialization fails, an error is returned.
 func (v *Vector256) FromJson(json any) ([]byte, error) {
-
-	if _, ok := json.([]string); !ok {
+	switch json := json.(type) {
+	case []string:
+		return vector256FromValue(json)
+	case []types.Hash256:
+		var values []string
+		for _, hash := range json {
+			values = append(values, string(hash))
+		}
+		return vector256FromValue([]string(values))
+	default:
 		return nil, &ErrInvalidVector256Type{fmt.Sprintf("%T", json)}
 	}
-
-	b, err := vector256FromValue(json.([]string))
-
-	if err != nil {
-		return nil, err
-	}
-
-	return b, nil
 }
 
 // vector256FromValue takes a slice of strings representing Hash256 values,

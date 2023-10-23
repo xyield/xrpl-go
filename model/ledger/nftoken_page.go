@@ -7,7 +7,7 @@ type NFTokenPage struct {
 	NextPageMin       types.Hash256 `json:",omitempty"`
 	PreviousPageMin   types.Hash256 `json:",omitempty"`
 	PreviousTxnID     types.Hash256 `json:",omitempty"`
-	PreviousTxnLgrSeq uint          `json:",omitempty"`
+	PreviousTxnLgrSeq uint32        `json:",omitempty"`
 	NFTokens          []types.NFToken
 }
 

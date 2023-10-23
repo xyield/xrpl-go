@@ -7,7 +7,7 @@ import (
 type EscrowCancel struct {
 	BaseTx
 	Owner         types.Address
-	OfferSequence uint
+	OfferSequence uint32
 }
 
 func (*EscrowCancel) TxType() TxType {

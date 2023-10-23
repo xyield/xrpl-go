@@ -3,9 +3,9 @@ package types
 import (
 	"bytes"
 	"encoding/binary"
-	"reflect"
 
 	"github.com/CreatureDev/xrpl-go/binary-codec/serdes"
+	"github.com/CreatureDev/xrpl-go/model/transactions/types"
 )
 
 // UInt32 represents a 32-bit unsigned integer.
@@ -16,7 +16,7 @@ type UInt32 struct{}
 func (u *UInt32) FromJson(value any) ([]byte, error) {
 	v := expandInt(value)
 	buf := new(bytes.Buffer)
-	err := binary.Write(buf, binary.BigEndian, uint32(v.(uint)))
+	err := binary.Write(buf, binary.BigEndian, v)
 
 	if err != nil {
 		return nil, err
@@ -35,10 +35,13 @@ func (u *UInt32) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
 	return int(binary.BigEndian.Uint32(b)), nil
 }
 
-func expandInt(v any) any {
-	rv := reflect.ValueOf(v)
-	if rv.Kind() == reflect.Ptr {
-		return rv.Elem().Interface()
+func expandInt(v any) uint32 {
+	switch v := v.(type) {
+	case types.FlagsI:
+		return v.ToUint()
+	case uint:
+		return uint32(v)
+	default:
+		return v.(uint32)
 	}
-	return v
 }

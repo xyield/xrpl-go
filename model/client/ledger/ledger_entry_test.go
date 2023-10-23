@@ -38,7 +38,7 @@ func TestLedgerEntryResponse(t *testing.T) {
 			Balance:           types.XRPCurrencyAmount(424021949),
 			Domain:            "6D64756F31332E636F6D",
 			EmailHash:         "98B4375E1D753E5B91627516F6D70977",
-			Flags:             9568256,
+			Flags:             types.SetFlag(9568256),
 			LedgerEntryType:   ledger.AccountRootEntry,
 			MessageKey:        "0000000000000000000000070000000300",
 			OwnerCount:        12,

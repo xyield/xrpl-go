@@ -13,11 +13,11 @@ type Escrow struct {
 	DestinationNode   string `json:",omitempty"`
 	DestinationTag    uint   `json:",omitempty"`
 	FinishAfter       uint   `json:",omitempty"`
-	Flags             uint
+	Flags             uint32
 	LedgerEntryType   LedgerEntryType
 	OwnerNode         string
 	PreviousTxnID     types.Hash256
-	PreviousTxnLgrSeq uint
+	PreviousTxnLgrSeq uint32
 	SourceTag         uint `json:",omitempty"`
 }
 

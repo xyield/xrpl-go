@@ -11,11 +11,11 @@ type PayChannel struct {
 	DestinationTag    uint   `json:",omitempty"`
 	DestinationNode   string `json:",omitempty"`
 	Expiration        uint   `json:",omitempty"`
-	Flags             uint
+	Flags             uint32
 	LedgerEntryType   LedgerEntryType
 	OwnerNode         string
 	PreviousTxnID     types.Hash256
-	PreviousTxnLgrSeq uint
+	PreviousTxnLgrSeq uint32
 	PublicKey         string
 	SettleDelay       uint
 	SourceTag         uint `json:",omitempty"`
