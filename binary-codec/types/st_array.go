@@ -29,8 +29,8 @@ func (t *STArray) FromJson(json any) ([]byte, error) {
 	}
 	var sink []byte
 	for i := 0; i < rv.Len(); i++ {
-		st := &STObject{}
 		val := rv.Index(i).Interface()
+		st := &STObject{}
 		b, err := st.FromJson(val)
 		if err != nil {
 			return nil, err
@@ -38,14 +38,6 @@ func (t *STArray) FromJson(json any) ([]byte, error) {
 		sink = append(sink, b...)
 	}
 
-	// for _, v := range json.([]any) {
-	// 	st := &STObject{}
-	// 	b, err := st.FromJson(v)
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// 	sink = append(sink, b...)
-	// }
 	sink = append(sink, ArrayEndMarker)
 
 	return sink, nil

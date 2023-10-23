@@ -125,7 +125,7 @@ type ModifiedNode struct {
 	FinalFields       ledger.LedgerObject    `json:"FinalFields,omitempty"`
 	PreviousFields    ledger.LedgerObject    `json:"PreviousFields,omitempty"`
 	PreviousTxnID     string                 `json:"PreviousTxnID,omitempty"`
-	PreviousTxnLgrSeq uint64                 `json:"PreviousTxnLgrSeq,omitempty"`
+	PreviousTxnLgrSeq uint32                 `json:"PreviousTxnLgrSeq,omitempty"`
 }
 
 func (n *ModifiedNode) UnmarshalJSON(data []byte) error {
@@ -135,7 +135,7 @@ func (n *ModifiedNode) UnmarshalJSON(data []byte) error {
 		FinalFields       json.RawMessage
 		PreviousFields    json.RawMessage
 		PreviousTxnID     string
-		PreviousTxnLgrSeq uint64
+		PreviousTxnLgrSeq uint32
 	}
 	err := json.Unmarshal(data, &h)
 	if err != nil {

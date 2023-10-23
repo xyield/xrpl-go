@@ -11,16 +11,16 @@ type AccountRoot struct {
 	BurnedNFTokens    uint32                  `json:",omitempty"`
 	Domain            string                  `json:",omitempty"`
 	EmailHash         types.Hash128           `json:",omitempty"`
-	Flags             uint64
+	Flags             *types.Flag
 	LedgerEntryType   LedgerEntryType
 	MessageKey        string        `json:",omitempty"`
 	MintedNFTokens    uint32        `json:",omitempty"`
 	NFTokenMinter     types.Address `json:",omitempty"`
-	OwnerCount        uint64
+	OwnerCount        uint32
 	PreviousTxnID     types.Hash256
-	PreviousTxnLgrSeq uint64
+	PreviousTxnLgrSeq uint32
 	RegularKey        types.Address `json:",omitempty"`
-	Sequence          uint64
+	Sequence          uint32
 	TicketCount       uint32 `json:",omitempty"`
 	TickSize          uint8  `json:",omitempty"`
 	TransferRate      uint32 `json:",omitempty"`

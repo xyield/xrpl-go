@@ -8,8 +8,8 @@ import (
 
 type OfferCreate struct {
 	BaseTx
-	Expiration    uint `json:",omitempty"`
-	OfferSequence uint `json:",omitempty"`
+	Expiration    uint   `json:",omitempty"`
+	OfferSequence uint32 `json:",omitempty"`
 	TakerGets     types.CurrencyAmount
 	TakerPays     types.CurrencyAmount
 }
@@ -21,8 +21,8 @@ func (*OfferCreate) TxType() TxType {
 func (o *OfferCreate) UnmarshalJSON(data []byte) error {
 	type ocHelper struct {
 		BaseTx
-		Expiration    uint `json:",omitempty"`
-		OfferSequence uint `json:",omitempty"`
+		Expiration    uint   `json:",omitempty"`
+		OfferSequence uint32 `json:",omitempty"`
 		TakerGets     json.RawMessage
 		TakerPays     json.RawMessage
 	}
