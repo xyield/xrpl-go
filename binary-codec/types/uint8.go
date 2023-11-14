@@ -15,25 +15,25 @@ type UInt8 struct{}
 // If the input value is a string, it's assumed to be a transaction result name, and the method will
 // attempt to convert it into a transaction result type code. If the conversion fails, an error is returned.
 func (u *UInt8) FromJson(value any) ([]byte, error) {
-	if s, ok := value.(string); ok {
-		tc, err := definitions.Get().GetTransactionResultTypeCodeByTransactionResultName(s)
+	var u8 uint8
+
+	switch v := value.(type) {
+	case string:
+		tc, err := definitions.Get().GetTransactionResultTypeCodeByTransactionResultName(v)
 		if err != nil {
 			return nil, err
 		}
-		value = tc
-	}
-
-	var intValue int
-
-	switch v := value.(type) {
+		u8 = uint8(tc)
+	case uint8:
+		u8 = v
 	case int:
-		intValue = v
+		u8 = uint8(v)
 	case int32:
-		intValue = int(v)
+		u8 = uint8(v)
 	}
 
 	buf := new(bytes.Buffer)
-	err := binary.Write(buf, binary.BigEndian, uint8(intValue))
+	err := binary.Write(buf, binary.BigEndian, u8)
 	if err != nil {
 		return nil, err
 	}
