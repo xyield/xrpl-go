@@ -6,16 +6,20 @@ import (
 	"encoding/hex"
 	"errors"
 	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/CreatureDev/xrpl-go/binary-codec/serdes"
 )
 
+var UINT64_HEX_REGEX = regexp.MustCompile("^[0-9a-fA-F]{1,16}$")
+
 // UInt64 represents a 64-bit unsigned integer.
 type UInt64 struct{}
 
-var ErrInvalidUInt64String error = errors.New("invalid UInt64 string, value should be a string representation of a UInt64")
+var (
+	ErrInvalidUInt64String error = errors.New("invalid UInt64 string, value should be hex encoded")
+	ErrInvalidUInt64Value  error = errors.New("invalid UInt64 value, value should be an uint or a hex encoded string")
+)
 
 // FromJson converts a JSON value into a serialized byte slice representing a 64-bit unsigned integer.
 // The input value is assumed to be a string representation of an integer. If the serialization fails, an error is returned.
@@ -23,34 +27,32 @@ func (u *UInt64) FromJson(value any) ([]byte, error) {
 
 	var buf = new(bytes.Buffer)
 
-	if _, ok := value.(string); !ok {
-		return nil, ErrInvalidUInt64String
-	}
-
-	if !isNumeric(value.(string)) {
-		if hex, err := hex.DecodeString(value.(string)); err == nil {
-			buf.Write(hex)
-			return buf.Bytes(), nil
-		}
-		stringToUint64, err := strconv.ParseUint(value.(string), 10, 64)
+	switch v := value.(type) {
+	case uint64:
+		value = v
+		err := binary.Write(buf, binary.BigEndian, value)
 		if err != nil {
 			return nil, err
 		}
-		value = stringToUint64
-		err = binary.Write(buf, binary.BigEndian, value)
+	case uint:
+		value = uint64(v)
+		err := binary.Write(buf, binary.BigEndian, value)
 		if err != nil {
 			return nil, err
 		}
-		return buf.Bytes(), nil
-	} else {
-		value = strings.Repeat("0", 16-len(value.(string))) + value.(string) // right justify the string
+	case string:
+		if !UINT64_HEX_REGEX.MatchString(v) {
+			return nil, ErrInvalidUInt64String
+		}
+		value = rjust(v, 16, "0") // right justify the string
 		decoded, err := hex.DecodeString(value.(string))
 		if err != nil {
 			return nil, err
 		}
 		buf.Write(decoded)
+	default:
+		return nil, ErrInvalidUInt64Value
 	}
-
 	return buf.Bytes(), nil
 }
 
@@ -65,8 +67,6 @@ func (u *UInt64) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
 	return strings.ToUpper(hex.EncodeToString(b)), nil
 }
 
-// isNumeric checks if a string only contains numerical values.
-func isNumeric(s string) bool {
-	match, _ := regexp.MatchString("^[0-9]+$", s)
-	return match
+func rjust(s string, n int, pad string) string {
+	return strings.Repeat(pad, n-len(s)) + s
 }
