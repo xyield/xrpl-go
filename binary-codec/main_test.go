@@ -121,7 +121,7 @@ func TestEncode(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.description, func(t *testing.T) {
-			got, err := Encode(tc.input, false)
+			got, err := Encode(tc.input)
 
 			if tc.expectedErr != nil {
 				require.EqualError(t, err, tc.expectedErr.Error())

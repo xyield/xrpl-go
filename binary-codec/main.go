@@ -36,8 +36,8 @@ func encode(tx transactions.Tx, onlySigning bool, mutations map[string]types.Fie
 
 // Encode converts a JSON transaction object to a hex string in the canonical binary format.
 // The binary format is defined in XRPL's core codebase.
-func Encode(tx transactions.Tx, onlySigning bool) (string, error) {
-	return encode(tx, onlySigning, nil)
+func Encode(tx transactions.Tx) (string, error) {
+	return encode(tx, false, nil)
 }
 
 // EncodeForMultiSign: encodes a transaction into binary format in preparation for providing one
@@ -73,7 +73,7 @@ func EncodeForMultisigning(tx transactions.Tx, xrpAccountID string) (string, err
 // Encodes a transaction into binary format in preparation for signing.
 func EncodeForSigning(tx transactions.Tx) (string, error) {
 
-	encoded, err := Encode(tx, true)
+	encoded, err := encode(tx, true, nil)
 
 	if err != nil {
 		return "", err
