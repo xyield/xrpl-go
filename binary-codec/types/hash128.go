@@ -33,6 +33,8 @@ func (h *Hash128) FromJson(json any) ([]byte, error) {
 		s = json
 	case types.Hash128:
 		s = string(json)
+	default:
+		return nil, ErrInvalidHashType
 	}
 	v, err := hex.DecodeString(s)
 	if err != nil {

@@ -1,7 +1,12 @@
 package types
 
 import (
+	"errors"
 	"fmt"
+)
+
+var (
+	ErrInvalidHashType = errors.New("invalid type for Hash, expected string")
 )
 
 // ErrInvalidHashLength struct is used when the hash length does not meet the expected value.
