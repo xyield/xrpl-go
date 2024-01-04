@@ -1,9 +1,15 @@
 package types
 
 import (
+	"errors"
+
 	addresscodec "github.com/CreatureDev/xrpl-go/address-codec"
 	"github.com/CreatureDev/xrpl-go/binary-codec/serdes"
 	"github.com/CreatureDev/xrpl-go/model/transactions/types"
+)
+
+var (
+	ErrInvalidAccountID = errors.New("invalid account ID type")
 )
 
 // AccountID struct represents an account ID.
@@ -18,7 +24,16 @@ type AccountID struct{}
 // AccountIDs that appear as children of special fields (Amount issuer and PathSet account) are not length-prefixed.
 // So in Amount and PathSet fields, don't use the length indicator 0x14.
 func (a *AccountID) FromJson(value any) ([]byte, error) {
-	_, accountID, err := addresscodec.DecodeClassicAddressToAccountID(string(value.(types.Address)))
+	var accountID []byte
+	var err error
+	switch v := value.(type) {
+	case types.Address:
+		_, accountID, err = addresscodec.DecodeClassicAddressToAccountID(string(v))
+	case string:
+		_, accountID, err = addresscodec.DecodeClassicAddressToAccountID(v)
+	default:
+		return nil, ErrInvalidAccountID
+	}
 
 	if err != nil {
 		return nil, err

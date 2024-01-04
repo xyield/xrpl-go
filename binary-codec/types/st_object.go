@@ -9,10 +9,23 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
+// FieldMutation allows values to mutated before being serialized.
+type FieldMutation func(any) any
+
+// Zero returns a FieldMutation that sets the value to its zero value.
+func Zero() FieldMutation {
+	return func(v any) any {
+		return reflect.Zero(reflect.TypeOf(v)).Interface()
+	}
+}
+
 // STObject represents a map of serialized field instances, where each key is a field name
 // and the associated value is the field's value. This structure allows us to represent nested
 // and complex structures of the Ripple protocol.
-type STObject struct{}
+type STObject struct {
+	OnlySigning bool
+	Mutations   map[string]FieldMutation
+}
 
 // FromJson converts a JSON object into a serialized byte slice.
 // It works by converting the JSON object into a map of field instances (which include the field definition
@@ -30,6 +43,12 @@ func (t *STObject) FromJson(json any) ([]byte, error) {
 		return nil, err
 	}
 
+	for k, v := range t.Mutations {
+		if _, ok := m[k]; ok {
+			m[k] = v(m[k])
+		}
+	}
+
 	fimap, err := createFieldInstanceMapFromJson(m)
 
 	if err != nil {
@@ -39,11 +58,15 @@ func (t *STObject) FromJson(json any) ([]byte, error) {
 	sk := getSortedKeys(fimap)
 
 	for _, v := range sk {
-		if checkZero(fimap[v]) {
+		if checkZero(fimap[v]) && !containsKey(t.Mutations, v.FieldName) {
 			continue
 		}
 
 		if !v.IsSerialized {
+			continue
+		}
+
+		if t.OnlySigning && !v.IsSigningField {
 			continue
 		}
 
@@ -227,4 +250,9 @@ func enumToStr(fieldType string, value any) (any, error) {
 func checkZero(v any) bool {
 	rv := reflect.ValueOf(v)
 	return rv.IsZero()
+}
+
+func containsKey[T any](m map[string]T, key string) bool {
+	_, ok := m[key]
+	return ok
 }

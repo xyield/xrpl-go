@@ -26,6 +26,9 @@ func (h *Hash160) getLength() int {
 // FromJson method for hash converts a hexadecimal string from JSON to a byte array.
 // It returns an error if the conversion fails or the length of the decoded byte array is not as expected.
 func (h *Hash160) FromJson(json any) ([]byte, error) {
+	if _, ok := json.(string); !ok {
+		return nil, ErrInvalidHashType
+	}
 	v, err := hex.DecodeString(json.(string))
 	if err != nil {
 		return nil, err
