@@ -50,5 +50,15 @@ func TestChannelAuthorizeValidate(t *testing.T) {
 		ChannelID: "abc",
 	}
 	err = s.Validate()
+	assert.ErrorContains(t, err, "seed")
+	s = ChannelAuthorizeRequest{
+		ChannelID: "abc",
+		Seed:      "123",
+	}
+	err = s.Validate()
 	assert.Nil(t, err)
+	s.Secret = "def"
+	err = s.Validate()
+	assert.ErrorContains(t, err, "seed")
+	assert.ErrorContains(t, err, "secret")
 }

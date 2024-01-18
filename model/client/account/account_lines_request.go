@@ -23,11 +23,17 @@ func (*AccountLinesRequest) Method() string {
 
 func (r *AccountLinesRequest) Validate() error {
 	if err := r.Account.Validate(); err != nil {
-		return fmt.Errorf("account lines request: %w", err)
+		return fmt.Errorf("account lines request account: %w", err)
 	}
 
 	if r.Limit != 0 && (r.Limit < 10 || r.Limit > 400) {
 		return fmt.Errorf("account lines request: invalid limit, must be 10 <= limit <= 400")
+	}
+
+	if r.Peer != "" {
+		if err := r.Peer.Validate(); err != nil {
+			return fmt.Errorf("account lines request peer: %w", err)
+		}
 	}
 
 	return nil

@@ -31,6 +31,23 @@ func (r *SignForRequest) Validate() error {
 		return fmt.Errorf("sign for request: empty tx")
 	}
 
+	cnt := 0
+	if r.Secret != "" {
+		cnt++
+	}
+	if r.Seed != "" {
+		cnt++
+	}
+	if r.SeedHex != "" {
+		cnt++
+	}
+	if r.Passphrase != "" {
+		cnt++
+	}
+	if cnt != 1 {
+		return fmt.Errorf("sign for request: must provide one of (secret, seed, seedhex, passphrase)")
+	}
+
 	return nil
 }
 

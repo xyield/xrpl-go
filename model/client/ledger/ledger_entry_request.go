@@ -22,6 +22,7 @@ type LedgerEntryRequest struct {
 	PaymentChannel string                 `json:"payment_channel,omitempty"`
 	DepositPreauth EntryRequestOrString   `json:"deposit_preauth,omitempty"`
 	Ticket         EntryRequestOrString   `json:"ticket,omitempty"`
+	NFTPage        string                 `json:"nft_page,omitempty"`
 }
 
 func (*LedgerEntryRequest) Method() string {
@@ -58,7 +59,7 @@ func (r *LedgerEntryRequest) Validate() error {
 
 	if r.RippleState != nil {
 		setCount++
-		if err := r.Offer.Validate(); err != nil {
+		if err := r.RippleState.Validate(); err != nil {
 			return fmt.Errorf("ledger entry ripple state: %w", err)
 		}
 	}
@@ -90,6 +91,10 @@ func (r *LedgerEntryRequest) Validate() error {
 		if err := r.Ticket.Validate(); err != nil {
 			return fmt.Errorf("ledger entry ticket: %w", err)
 		}
+	}
+
+	if r.NFTPage != "" {
+		setCount++
 	}
 
 	if setCount != 1 {

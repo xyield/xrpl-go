@@ -24,7 +24,25 @@ func (r *ChannelAuthorizeRequest) Validate() error {
 	if r.ChannelID == "" {
 		return fmt.Errorf("channel authorize request: missing channel id")
 	}
-
+	var set []string
+	if r.Secret != "" {
+		set = append(set, "secret")
+	}
+	if r.Seed != "" {
+		set = append(set, "seed")
+	}
+	if r.SeedHex != "" {
+		set = append(set, "seed_hex")
+	}
+	if r.Passphrase != "" {
+		set = append(set, "passphrase")
+	}
+	if len(set) == 0 {
+		return fmt.Errorf("channel authorize request: at least one of (secret, seed, seed_hex, passphrase) must be set")
+	}
+	if len(set) > 1 {
+		return fmt.Errorf("channel authorize request: only one signing method required, currently set %v", set)
+	}
 	return nil
 }
 
