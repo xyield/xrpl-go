@@ -1,6 +1,10 @@
 package subscribe
 
-import "github.com/xyield/xrpl-go/model/transactions/types"
+import (
+	"fmt"
+
+	"github.com/xyield/xrpl-go/model/transactions/types"
+)
 
 type SubscribeRequest struct {
 	Streams          []string             `json:"streams,omitempty"`
@@ -22,4 +26,20 @@ type SubscribeOrderBook struct {
 	Taker     types.Address              `json:"taker"`
 	Snapshot  bool                       `json:"snapshot,omitempty"`
 	Both      bool                       `json:"both,omitempty"`
+}
+
+func (r *SubscribeRequest) Validate() error {
+	for _, a := range r.Accounts {
+		if err := a.Validate(); err != nil {
+			return fmt.Errorf("subscribe request accounts: %w", err)
+		}
+	}
+
+	for _, a := range r.AccountsProposed {
+		if err := a.Validate(); err != nil {
+			return fmt.Errorf("subscribe request accounts proposed: %w", err)
+		}
+	}
+
+	return nil
 }

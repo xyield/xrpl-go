@@ -14,6 +14,10 @@ func (*CanDeleteRequest) Method() string {
 	return "can_delete"
 }
 
+func (*CanDeleteRequest) Validate() error {
+	return nil
+}
+
 func (r *CanDeleteRequest) UnmarshalJSON(data []byte) error {
 	type cdHelper struct {
 		CanDelete json.RawMessage `json:"can_delete"`

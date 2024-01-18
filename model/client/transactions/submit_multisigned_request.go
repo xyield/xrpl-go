@@ -2,6 +2,7 @@ package transactions
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/xyield/xrpl-go/model/transactions"
 )
@@ -33,5 +34,12 @@ func (r *SubmitMultisignedRequest) UnmarshalJSON(data []byte) error {
 	}
 	r.Tx = tx
 
+	return nil
+}
+
+func (s *SubmitMultisignedRequest) Validate() error {
+	if s.Tx == nil {
+		return fmt.Errorf("submit multisigned request: missing tx")
+	}
 	return nil
 }

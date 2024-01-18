@@ -10,3 +10,7 @@ type LedgerRequestRequest struct {
 func (*LedgerRequest) Method() string {
 	return "ledger_request"
 }
+
+func (*LedgerRequest) Validate() error {
+	return nil
+}

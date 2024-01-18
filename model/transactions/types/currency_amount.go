@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 )
 
@@ -14,6 +15,7 @@ const (
 
 type CurrencyAmount interface {
 	Kind() CurrencyKind
+	Validate() error
 }
 
 func UnmarshalCurrencyAmount(data []byte) (CurrencyAmount, error) {
@@ -42,6 +44,26 @@ type IssuedCurrencyAmount struct {
 	Value    string  `json:"value,omitempty"`
 }
 
+func (i IssuedCurrencyAmount) Validate() error {
+	if i.Currency == "" {
+		return fmt.Errorf("issued currency: missing currency code")
+	}
+	if i.Currency == "XRP" && i.Issuer != "" {
+		return fmt.Errorf("issued currency: xrp cannot be issued")
+
+	}
+	/*
+		// Issuer not required for source currencies field (path find request)
+		if i.Currency != "XRP" && i.Issuer == "" {
+			return fmt.Errorf("issued currency: non-xrp currencies require and issuer")
+		}
+	*/
+	if err := i.Issuer.Validate(); i.Issuer != "" && err != nil {
+		return fmt.Errorf("issued currency: %w", err)
+	}
+	return nil
+}
+
 func (IssuedCurrencyAmount) Kind() CurrencyKind {
 	return ISSUED
 }
@@ -50,6 +72,10 @@ type XRPCurrencyAmount uint64
 
 func (XRPCurrencyAmount) Kind() CurrencyKind {
 	return XRP
+}
+
+func (XRPCurrencyAmount) Validate() error {
+	return nil
 }
 
 func (a XRPCurrencyAmount) MarshalJSON() ([]byte, error) {

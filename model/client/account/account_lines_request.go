@@ -2,6 +2,7 @@ package account
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/xyield/xrpl-go/model/client/common"
 	"github.com/xyield/xrpl-go/model/transactions/types"
@@ -20,6 +21,23 @@ func (*AccountLinesRequest) Method() string {
 	return "account_lines"
 }
 
+func (r *AccountLinesRequest) Validate() error {
+	if err := r.Account.Validate(); err != nil {
+		return fmt.Errorf("account lines request account: %w", err)
+	}
+
+	if r.Limit != 0 && (r.Limit < 10 || r.Limit > 400) {
+		return fmt.Errorf("account lines request: invalid limit, must be 10 <= limit <= 400")
+	}
+
+	if r.Peer != "" {
+		if err := r.Peer.Validate(); err != nil {
+			return fmt.Errorf("account lines request peer: %w", err)
+		}
+	}
+
+	return nil
+}
 func (r *AccountLinesRequest) UnmarshalJSON(data []byte) error {
 	type alrHelper struct {
 		Account     types.Address     `json:"account"`
