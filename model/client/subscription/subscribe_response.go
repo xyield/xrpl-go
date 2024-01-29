@@ -1,4 +1,4 @@
-package subscribe
+package subscription
 
 import (
 	"github.com/xyield/xrpl-go/model/client/common"
