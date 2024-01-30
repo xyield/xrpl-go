@@ -44,3 +44,8 @@ func (r *LedgerDataRequest) UnmarshalJSON(data []byte) error {
 
 	return nil
 }
+
+func (r *LedgerDataRequest) Validate() error {
+	// invalid limits are overwritten server-side
+	return nil
+}

@@ -8,3 +8,7 @@ type FeatureRequest struct {
 func (*FeatureRequest) Method() string {
 	return "feature"
 }
+
+func (*FeatureRequest) Validate() error {
+	return nil
+}

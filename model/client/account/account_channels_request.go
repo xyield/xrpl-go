@@ -2,7 +2,7 @@ package account
 
 import (
 	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/xyield/xrpl-go/model/client/common"
 	"github.com/xyield/xrpl-go/model/transactions/types"
@@ -21,10 +21,14 @@ func (*AccountChannelsRequest) Method() string {
 	return "account_channels"
 }
 
-// Validate method to be added to each request struct
-func (a *AccountChannelsRequest) Validate() error {
-	if a.Account == "" {
-		return errors.New("no account ID specified")
+func (r *AccountChannelsRequest) Validate() error {
+	if err := r.Account.Validate(); err != nil {
+		return fmt.Errorf("account channels request: %w", err)
+	}
+	if len(r.DestinationAccount) > 0 {
+		if err := r.DestinationAccount.Validate(); err != nil {
+			return fmt.Errorf("account channels request: %w", err)
+		}
 	}
 
 	return nil

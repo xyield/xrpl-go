@@ -1,6 +1,10 @@
 package data
 
-import "github.com/xyield/xrpl-go/model/client/common"
+import (
+	"fmt"
+
+	"github.com/xyield/xrpl-go/model/client/common"
+)
 
 type DownloadShardRequest struct {
 	Shards []ShardDescriptor `json:"shards"`
@@ -13,4 +17,11 @@ type ShardDescriptor struct {
 
 func (*DownloadShardRequest) Method() string {
 	return "download_shard"
+}
+
+func (d *DownloadShardRequest) Validate() error {
+	if len(d.Shards) == 0 {
+		return fmt.Errorf("download shard request: no shard descriptors provided")
+	}
+	return nil
 }

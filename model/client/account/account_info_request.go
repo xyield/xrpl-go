@@ -2,6 +2,7 @@ package account
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/xyield/xrpl-go/model/client/common"
 	"github.com/xyield/xrpl-go/model/transactions/types"
@@ -20,7 +21,11 @@ func (*AccountInfoRequest) Method() string {
 	return "account_info"
 }
 
-func (*AccountInfoRequest) Validate() error {
+func (r *AccountInfoRequest) Validate() error {
+	if err := r.Account.Validate(); err != nil {
+		return fmt.Errorf("account info request: %w", err)
+	}
+
 	return nil
 }
 

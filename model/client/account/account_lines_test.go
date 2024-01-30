@@ -3,6 +3,7 @@ package account
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/xyield/xrpl-go/model/client/common"
 	"github.com/xyield/xrpl-go/test"
 )
@@ -73,4 +74,20 @@ func TestAccountLinesResponse(t *testing.T) {
 	if err := test.SerializeAndDeserialize(t, s, j); err != nil {
 		t.Error(err)
 	}
+}
+
+func TestAccountLinesValidate(t *testing.T) {
+	s := AccountLinesRequest{
+		Account: "",
+	}
+
+	err := s.Validate()
+
+	assert.ErrorContains(t, err, "missing xrpl address")
+
+	s.Account = "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59"
+	s.Limit = 2
+	err = s.Validate()
+
+	assert.ErrorContains(t, err, "invalid limit")
 }

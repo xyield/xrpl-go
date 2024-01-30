@@ -1,6 +1,10 @@
 package transactions
 
-import "github.com/xyield/xrpl-go/model/client/common"
+import (
+	"fmt"
+
+	"github.com/xyield/xrpl-go/model/client/common"
+)
 
 type TxRequest struct {
 	Transaction string             `json:"transaction"`
@@ -11,4 +15,11 @@ type TxRequest struct {
 
 func (*TxRequest) Method() string {
 	return "tx"
+}
+
+func (t *TxRequest) Validate() error {
+	if t.Transaction == "" {
+		return fmt.Errorf("transaction request: missing transaction")
+	}
+	return nil
 }

@@ -2,6 +2,7 @@ package path
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/xyield/xrpl-go/model/client/common"
 	"github.com/xyield/xrpl-go/model/transactions/types"
@@ -16,6 +17,17 @@ type DepositAuthorizedRequest struct {
 
 func (*DepositAuthorizedRequest) Method() string {
 	return "deposit_authorized"
+}
+
+func (r *DepositAuthorizedRequest) Validate() error {
+	if err := r.SourceAccount.Validate(); err != nil {
+		return fmt.Errorf("deposit authorized source: %w", err)
+	}
+	if err := r.DestinationAccount.Validate(); err != nil {
+		return fmt.Errorf("deposit authorized destination: %w", err)
+	}
+
+	return nil
 }
 
 func (r *DepositAuthorizedRequest) UnmarshalJSON(data []byte) error {

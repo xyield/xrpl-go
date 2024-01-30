@@ -2,6 +2,7 @@ package transactions
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/xyield/xrpl-go/model/client/common"
 )
@@ -36,5 +37,12 @@ func (t *TransactionEntryRequest) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	t.LedgerIndex = i
+	return nil
+}
+
+func (t *TransactionEntryRequest) Validate() error {
+	if t.TxHash == "" {
+		return fmt.Errorf("transaction entry request: missing txhash")
+	}
 	return nil
 }

@@ -2,6 +2,7 @@ package clio
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/xyield/xrpl-go/model/client/common"
 	"github.com/xyield/xrpl-go/model/transactions/types"
@@ -15,6 +16,13 @@ type NFTInfoRequest struct {
 
 func (*NFTInfoRequest) Method() string {
 	return "nft_info"
+}
+
+func (r *NFTInfoRequest) Validate() error {
+	if err := r.NFTokenID.Validate(); err != nil {
+		return fmt.Errorf("nft info request: %w", err)
+	}
+	return nil
 }
 
 func (r *NFTInfoRequest) UnmarshalJSON(data []byte) error {

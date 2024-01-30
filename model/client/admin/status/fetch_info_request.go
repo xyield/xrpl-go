@@ -7,3 +7,7 @@ type FetchInfoRequest struct {
 func (*FetchInfoRequest) Method() string {
 	return "fetch_info"
 }
+
+func (*FetchInfoRequest) Validate() error {
+	return nil
+}

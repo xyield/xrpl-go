@@ -2,6 +2,7 @@ package path
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/xyield/xrpl-go/model/transactions"
 	"github.com/xyield/xrpl-go/model/transactions/types"
@@ -26,6 +27,31 @@ type PathFindRequest struct {
 
 func (*PathFindRequest) Method() string {
 	return "path_find"
+}
+
+func (r *PathFindRequest) Validate() error {
+	switch r.Subcommand {
+	case CREATE:
+		if err := r.SourceAccount.Validate(); err != nil {
+			return fmt.Errorf("path find create source: %w", err)
+		}
+		if err := r.DestinationAccount.Validate(); err != nil {
+			return fmt.Errorf("path find create destination: %w", err)
+		}
+		if err := r.DestinationAmount.Validate(); err != nil {
+			return fmt.Errorf("path find create destination amount: %w", err)
+		}
+		if r.SendMax != nil {
+			if err := r.SendMax.Validate(); err != nil {
+				return fmt.Errorf("path find create send max: %w", err)
+			}
+		}
+		return nil
+	case CLOSE, STATUS:
+		return nil
+	default:
+		return fmt.Errorf("path find: invalid subcommand")
+	}
 }
 
 func (r *PathFindRequest) UnmarshalJSON(data []byte) error {

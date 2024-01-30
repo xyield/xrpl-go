@@ -2,6 +2,7 @@ package signing
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/xyield/xrpl-go/model/transactions"
 	"github.com/xyield/xrpl-go/model/transactions/types"
@@ -19,6 +20,35 @@ type SignForRequest struct {
 
 func (*SignForRequest) Method() string {
 	return "sign_for"
+}
+
+func (r *SignForRequest) Validate() error {
+	if err := r.Account.Validate(); err != nil {
+		return fmt.Errorf("sign for request: %w", err)
+	}
+
+	if r.TxJson == nil {
+		return fmt.Errorf("sign for request: empty tx")
+	}
+
+	cnt := 0
+	if r.Secret != "" {
+		cnt++
+	}
+	if r.Seed != "" {
+		cnt++
+	}
+	if r.SeedHex != "" {
+		cnt++
+	}
+	if r.Passphrase != "" {
+		cnt++
+	}
+	if cnt != 1 {
+		return fmt.Errorf("sign for request: must provide one of (secret, seed, seedhex, passphrase)")
+	}
+
+	return nil
 }
 
 func (r *SignForRequest) UnmarshalJSON(data []byte) error {

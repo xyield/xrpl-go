@@ -72,5 +72,5 @@ func TestValidate(t *testing.T) {
 
 	err := s.Validate()
 
-	assert.EqualError(t, err, "no account ID specified")
+	assert.ErrorContains(t, err, "missing xrpl address")
 }

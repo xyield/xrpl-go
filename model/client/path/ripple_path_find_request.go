@@ -2,6 +2,7 @@ package path
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/xyield/xrpl-go/model/client/common"
 	"github.com/xyield/xrpl-go/model/transactions/types"
@@ -19,6 +20,34 @@ type RipplePathFindRequest struct {
 
 func (*RipplePathFindRequest) Method() string {
 	return "ripple_path_find"
+}
+
+func (r *RipplePathFindRequest) Validate() error {
+	if err := r.SourceAccount.Validate(); err != nil {
+		return fmt.Errorf("ripple path find source: %w", err)
+	}
+	if err := r.DestinationAccount.Validate(); err != nil {
+		return fmt.Errorf("ripple path find destination: %w", err)
+	}
+	if err := r.DestinationAmount.Validate(); err != nil {
+		return fmt.Errorf("ripple path find destination amount: %w", err)
+	}
+	if r.SendMax != nil && len(r.SourceCurrencies) != 0 {
+		return fmt.Errorf("ripple path find cannot have send max and source currencies set simultaneously")
+	}
+	if r.SendMax != nil {
+		if err := r.SendMax.Validate(); err != nil {
+			return fmt.Errorf("ripple path find send max: %w", err)
+		}
+	}
+	if len(r.SourceCurrencies) != 0 {
+		for _, c := range r.SourceCurrencies {
+			if err := c.Validate(); err != nil {
+				return fmt.Errorf("ripple path find source currencies: %w", err)
+			}
+		}
+	}
+	return nil
 }
 
 func (r *RipplePathFindRequest) UnmarshalJSON(data []byte) error {

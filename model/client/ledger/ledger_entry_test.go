@@ -3,6 +3,7 @@ package ledger
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/xyield/xrpl-go/model/client/common"
 	"github.com/xyield/xrpl-go/model/ledger"
 	"github.com/xyield/xrpl-go/model/transactions/types"
@@ -71,4 +72,61 @@ func TestLedgerEntryResponse(t *testing.T) {
 	if err := test.SerializeAndDeserialize(t, s, j); err != nil {
 		t.Error(err)
 	}
+}
+
+func TestLedgerEntryValidate(t *testing.T) {
+	off := &OfferEntryReq{}
+	err := off.Validate()
+	assert.ErrorContains(t, err, "offer")
+	off.Account = "rG1QQv2nh2gr7RCZ1P8YYcBUKCCN633jCn"
+	err = off.Validate()
+	assert.Nil(t, err)
+
+	rs := RippleStateEntryReq{}
+	err = rs.Validate()
+	assert.ErrorContains(t, err, "requires two accounts")
+	rs.Accounts = []types.Address{"rG1QQv2nh2gr7RCZ1P8YYcBUKCCN633jCn", ""}
+	err = rs.Validate()
+	assert.ErrorContains(t, err, "account 2")
+	rs.Accounts[1] = "rG1QQv2nh2gr7RCZ1P8YYcBUKCCN633jCc"
+	err = rs.Validate()
+	assert.Nil(t, err)
+
+	esc := EscrowEntryReq{}
+	err = esc.Validate()
+	assert.ErrorContains(t, err, "escrow entry owner")
+	esc.Owner = "rG1QQv2nh2gr7RCZ1P8YYcBUKCCN633jCn"
+	err = esc.Validate()
+	assert.Nil(t, err)
+
+	dep := DepositPreauthEntryReq{}
+	err = dep.Validate()
+	assert.ErrorContains(t, err, "deposit preauth")
+	dep.Owner = "rG1QQv2nh2gr7RCZ1P8YYcBUKCCN633jCn"
+	err = dep.Validate()
+	assert.ErrorContains(t, err, "authorized")
+	dep.Authorized = "rG1QQv2nh2gr7RCZ1P8YYcBUKCCN633jCC"
+	err = dep.Validate()
+	assert.Nil(t, err)
+
+	tick := TicketEntryReq{}
+	err = tick.Validate()
+	assert.ErrorContains(t, err, "ticket")
+	tick.Account = "rG1QQv2nh2gr7RCZ1P8YYcBUKCCN633jCn"
+	err = tick.Validate()
+	assert.Nil(t, err)
+
+	s := LedgerEntryRequest{}
+	err = s.Validate()
+	assert.ErrorContains(t, err, "0")
+	s.AccountRoot = "rG1QQv2nh2gr7RCZ1P8YYcBUKCCN633jCn"
+	err = s.Validate()
+	assert.Nil(t, err)
+	s.Offer = off
+	err = s.Validate()
+	assert.ErrorContains(t, err, "2")
+	s.AccountRoot = ""
+	s.Offer = &OfferEntryReq{}
+	err = s.Validate()
+	assert.ErrorContains(t, err, "ledger entry offer")
 }
