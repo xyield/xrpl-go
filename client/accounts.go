@@ -6,7 +6,7 @@ import (
 
 type Account interface {
 	AccountChannels(req *account.AccountChannelsRequest) (*account.AccountChannelsResponse, XRPLResponse, error)
-	AccountCurrencies(req *account.AccountInfoRequest) (*account.AccountInfoResponse, XRPLResponse, error)
+	AccountCurrencies(req *account.AccountCurrenciesRequest) (*account.AccountCurrenciesResponse, XRPLResponse, error)
 	AccountInfo(req *account.AccountInfoRequest) (*account.AccountInfoResponse, XRPLResponse, error)
 	AccountLines(req *account.AccountLinesRequest) (*account.AccountLinesResponse, XRPLResponse, error)
 	AccountNFTs(req *account.AccountNFTsRequest) (*account.AccountNFTsResponse, XRPLResponse, error)

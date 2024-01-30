@@ -118,7 +118,7 @@ func TestGetAccountChannels(t *testing.T) {
 
 			cl.On("SendRequest", &tc.input).Return(&tc.sendRequestResult, nil)
 
-			res, _, err := a.GetAccountChannels(&tc.input)
+			res, _, err := a.AccountChannels(&tc.input)
 
 			if tc.expectedErr != nil {
 				require.EqualError(t, err, tc.expectedErr.Error())

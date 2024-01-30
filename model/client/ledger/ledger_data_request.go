@@ -49,3 +49,7 @@ func (r *LedgerDataRequest) Validate() error {
 	// invalid limits are overwritten server-side
 	return nil
 }
+
+func (r *LedgerDataRequest) Method() string {
+	return "ledger_data"
+}

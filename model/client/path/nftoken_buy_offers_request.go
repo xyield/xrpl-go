@@ -20,7 +20,7 @@ func (*NFTokenBuyOffersRequest) Method() string {
 	return "nft_buy_offers"
 }
 
-func (r *NFTokenBuyOffersRequest) Validat() error {
+func (r *NFTokenBuyOffersRequest) Validate() error {
 	if r.NFTokenID == "" {
 		return fmt.Errorf("nft buy offer missing token id")
 	}

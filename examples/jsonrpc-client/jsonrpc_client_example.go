@@ -22,7 +22,7 @@ func main() {
 
 	// call the desired method
 	var req *account.AccountChannelsRequest
-	ac, xrplRes, err := client.Account.GetAccountChannels(req)
+	ac, xrplRes, err := client.Account.AccountChannels(req)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
