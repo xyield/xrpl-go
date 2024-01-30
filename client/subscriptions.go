@@ -1,7 +1,7 @@
 package client
 
 import (
-	"github.com/xyield/xrpl-go/model/client/subscription"
+	"github.com/CreatureDev/xrpl-go/model/client/subscription"
 )
 
 type Subscription interface {

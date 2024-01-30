@@ -1,8 +1,8 @@
 package account
 
 import (
-	"github.com/xyield/xrpl-go/model/client/common"
-	"github.com/xyield/xrpl-go/model/transactions/types"
+	"github.com/CreatureDev/xrpl-go/model/client/common"
+	"github.com/CreatureDev/xrpl-go/model/transactions/types"
 )
 
 type AccountNFTsResponse struct {

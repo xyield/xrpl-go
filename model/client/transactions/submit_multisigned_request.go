@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/xyield/xrpl-go/model/transactions"
+	"github.com/CreatureDev/xrpl-go/model/transactions"
 )
 
 type SubmitMultisignedRequest struct {

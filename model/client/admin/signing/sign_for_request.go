@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/xyield/xrpl-go/model/transactions"
-	"github.com/xyield/xrpl-go/model/transactions/types"
+	"github.com/CreatureDev/xrpl-go/model/transactions"
+	"github.com/CreatureDev/xrpl-go/model/transactions/types"
 )
 
 type SignForRequest struct {

@@ -3,7 +3,7 @@ package clio
 import (
 	"testing"
 
-	"github.com/xyield/xrpl-go/test"
+	"github.com/CreatureDev/xrpl-go/test"
 )
 
 func TestServerInfoResponseLocalhost(t *testing.T) {

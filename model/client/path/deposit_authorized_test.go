@@ -3,8 +3,8 @@ package path
 import (
 	"testing"
 
-	"github.com/xyield/xrpl-go/model/client/common"
-	"github.com/xyield/xrpl-go/test"
+	"github.com/CreatureDev/xrpl-go/model/client/common"
+	"github.com/CreatureDev/xrpl-go/test"
 )
 
 func TestDepositAuthorizedRequest(t *testing.T) {

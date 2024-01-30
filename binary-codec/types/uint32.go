@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 
-	"github.com/xyield/xrpl-go/binary-codec/serdes"
+	"github.com/CreatureDev/xrpl-go/binary-codec/serdes"
 )
 
 // UInt32 represents a 32-bit unsigned integer.

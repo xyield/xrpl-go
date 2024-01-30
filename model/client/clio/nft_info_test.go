@@ -3,8 +3,8 @@ package clio
 import (
 	"testing"
 
-	"github.com/xyield/xrpl-go/model/client/common"
-	"github.com/xyield/xrpl-go/test"
+	"github.com/CreatureDev/xrpl-go/model/client/common"
+	"github.com/CreatureDev/xrpl-go/test"
 )
 
 func TestNFTInfoRequest(t *testing.T) {

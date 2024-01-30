@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/xyield/xrpl-go/client"
-	"github.com/xyield/xrpl-go/model/client/account"
+	"github.com/CreatureDev/xrpl-go/client"
+	"github.com/CreatureDev/xrpl-go/model/client/account"
 )
 
 func TestGetResult(t *testing.T) {

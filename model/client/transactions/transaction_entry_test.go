@@ -3,11 +3,11 @@ package transactions
 import (
 	"testing"
 
-	"github.com/xyield/xrpl-go/model/client/common"
-	"github.com/xyield/xrpl-go/model/ledger"
-	"github.com/xyield/xrpl-go/model/transactions"
-	"github.com/xyield/xrpl-go/model/transactions/types"
-	"github.com/xyield/xrpl-go/test"
+	"github.com/CreatureDev/xrpl-go/model/client/common"
+	"github.com/CreatureDev/xrpl-go/model/ledger"
+	"github.com/CreatureDev/xrpl-go/model/transactions"
+	"github.com/CreatureDev/xrpl-go/model/transactions/types"
+	"github.com/CreatureDev/xrpl-go/test"
 )
 
 func TestTransactionEntryRequest(t *testing.T) {

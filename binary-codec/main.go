@@ -6,10 +6,10 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/xyield/xrpl-go/binary-codec/definitions"
+	"github.com/CreatureDev/xrpl-go/binary-codec/definitions"
 
-	"github.com/xyield/xrpl-go/binary-codec/serdes"
-	"github.com/xyield/xrpl-go/binary-codec/types"
+	"github.com/CreatureDev/xrpl-go/binary-codec/serdes"
+	"github.com/CreatureDev/xrpl-go/binary-codec/types"
 )
 
 var ErrSigningClaimFieldNotFound = errors.New("'Channel' & 'Amount' fields are both required, but were not found")

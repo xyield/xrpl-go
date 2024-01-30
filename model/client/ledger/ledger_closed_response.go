@@ -1,6 +1,6 @@
 package ledger
 
-import "github.com/xyield/xrpl-go/model/client/common"
+import "github.com/CreatureDev/xrpl-go/model/client/common"
 
 type LedgerClosedResponse struct {
 	LedgerHash  string             `json:"ledger_hash"`

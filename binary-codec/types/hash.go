@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/xyield/xrpl-go/binary-codec/serdes"
+	"github.com/CreatureDev/xrpl-go/binary-codec/serdes"
 )
 
 // ErrInvalidHashLength struct is used when the hash length does not meet the expected value.

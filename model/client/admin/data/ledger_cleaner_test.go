@@ -3,7 +3,7 @@ package data
 import (
 	"testing"
 
-	"github.com/xyield/xrpl-go/test"
+	"github.com/CreatureDev/xrpl-go/test"
 )
 
 func TestLedgerCleanerRequest(t *testing.T) {

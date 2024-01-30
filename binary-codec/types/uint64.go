@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/xyield/xrpl-go/binary-codec/serdes"
+	"github.com/CreatureDev/xrpl-go/binary-codec/serdes"
 )
 
 // UInt64 represents a 64-bit unsigned integer.

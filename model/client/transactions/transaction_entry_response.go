@@ -3,8 +3,8 @@ package transactions
 import (
 	"encoding/json"
 
-	"github.com/xyield/xrpl-go/model/client/common"
-	"github.com/xyield/xrpl-go/model/transactions"
+	"github.com/CreatureDev/xrpl-go/model/client/common"
+	"github.com/CreatureDev/xrpl-go/model/transactions"
 )
 
 type TransactionEntryResponse struct {

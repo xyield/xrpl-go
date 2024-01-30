@@ -1,6 +1,6 @@
 package data
 
-import "github.com/xyield/xrpl-go/model/client/common"
+import "github.com/CreatureDev/xrpl-go/model/client/common"
 
 type LedgerCleanerRequest struct {
 	Ledger     common.LedgerIndex `json:"ledger,omitempty"`

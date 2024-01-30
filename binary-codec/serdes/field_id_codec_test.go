@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/xyield/xrpl-go/binary-codec/definitions"
+	"github.com/CreatureDev/xrpl-go/binary-codec/definitions"
 )
 
 func TestEncodeFieldID(t *testing.T) {

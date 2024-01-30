@@ -3,8 +3,8 @@ package data
 import (
 	"encoding/json"
 
-	"github.com/xyield/xrpl-go/model/client/common"
-	"github.com/xyield/xrpl-go/model/client/ledger"
+	"github.com/CreatureDev/xrpl-go/model/client/common"
+	"github.com/CreatureDev/xrpl-go/model/client/ledger"
 )
 
 type LedgerRequestResponse struct {

@@ -6,9 +6,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/xyield/xrpl-go/model/ledger"
-	"github.com/xyield/xrpl-go/model/transactions"
-	"github.com/xyield/xrpl-go/model/transactions/types"
+	"github.com/CreatureDev/xrpl-go/model/ledger"
+	"github.com/CreatureDev/xrpl-go/model/transactions"
+	"github.com/CreatureDev/xrpl-go/model/transactions/types"
 )
 
 func TestTxResponse(t *testing.T) {

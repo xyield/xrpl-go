@@ -3,7 +3,7 @@ package utility
 import (
 	"testing"
 
-	"github.com/xyield/xrpl-go/test"
+	"github.com/CreatureDev/xrpl-go/test"
 )
 
 func TestRandomResponse(t *testing.T) {

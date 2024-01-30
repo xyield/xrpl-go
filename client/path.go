@@ -1,6 +1,6 @@
 package client
 
-import "github.com/xyield/xrpl-go/model/client/path"
+import "github.com/CreatureDev/xrpl-go/model/client/path"
 
 type PathBook interface {
 	BookOffers(req *path.BookOffersRequest) (*path.BookOffersResponse, XRPLResponse, error)

@@ -7,8 +7,8 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
-	"github.com/xyield/xrpl-go/model/client/account"
-	"github.com/xyield/xrpl-go/model/client/common"
+	"github.com/CreatureDev/xrpl-go/model/client/account"
+	"github.com/CreatureDev/xrpl-go/model/client/common"
 )
 
 type mockClient struct {

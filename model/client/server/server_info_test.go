@@ -3,7 +3,7 @@ package server
 import (
 	"testing"
 
-	"github.com/xyield/xrpl-go/test"
+	"github.com/CreatureDev/xrpl-go/test"
 )
 
 func TestServerInfoResponse(t *testing.T) {

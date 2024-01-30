@@ -3,9 +3,9 @@ package ledger
 import (
 	"testing"
 
-	"github.com/xyield/xrpl-go/model/client/common"
-	"github.com/xyield/xrpl-go/model/transactions/types"
-	"github.com/xyield/xrpl-go/test"
+	"github.com/CreatureDev/xrpl-go/model/client/common"
+	"github.com/CreatureDev/xrpl-go/model/transactions/types"
+	"github.com/CreatureDev/xrpl-go/test"
 )
 
 func TestLedgerRequest(t *testing.T) {

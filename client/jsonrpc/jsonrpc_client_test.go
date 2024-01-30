@@ -11,11 +11,11 @@ import (
 
 	jsoniter "github.com/json-iterator/go"
 	"github.com/stretchr/testify/assert"
-	"github.com/xyield/xrpl-go/client"
-	jsonrpcmodels "github.com/xyield/xrpl-go/client/jsonrpc/models"
-	"github.com/xyield/xrpl-go/model/client/account"
-	"github.com/xyield/xrpl-go/model/client/common"
-	"github.com/xyield/xrpl-go/model/client/utility"
+	"github.com/CreatureDev/xrpl-go/client"
+	jsonrpcmodels "github.com/CreatureDev/xrpl-go/client/jsonrpc/models"
+	"github.com/CreatureDev/xrpl-go/model/client/account"
+	"github.com/CreatureDev/xrpl-go/model/client/common"
+	"github.com/CreatureDev/xrpl-go/model/client/utility"
 )
 
 func TestJsonRpcClientCreation(t *testing.T) {

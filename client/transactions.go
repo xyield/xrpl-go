@@ -1,7 +1,7 @@
 package client
 
 import (
-	"github.com/xyield/xrpl-go/model/client/transactions"
+	"github.com/CreatureDev/xrpl-go/model/client/transactions"
 )
 
 type Transaction interface {

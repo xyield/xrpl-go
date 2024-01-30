@@ -1,7 +1,7 @@
 package transactions
 
 import (
-	"github.com/xyield/xrpl-go/model/transactions/types"
+	"github.com/CreatureDev/xrpl-go/model/transactions/types"
 )
 
 type PaymentChannelFund struct {

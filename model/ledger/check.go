@@ -1,6 +1,6 @@
 package ledger
 
-import "github.com/xyield/xrpl-go/model/transactions/types"
+import "github.com/CreatureDev/xrpl-go/model/transactions/types"
 
 // TODO verify format of SendMax
 type Check struct {

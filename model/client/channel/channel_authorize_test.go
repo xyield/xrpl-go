@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/xyield/xrpl-go/model/transactions/types"
-	"github.com/xyield/xrpl-go/test"
+	"github.com/CreatureDev/xrpl-go/model/transactions/types"
+	"github.com/CreatureDev/xrpl-go/test"
 )
 
 func TestChannelAuthorizeRequest(t *testing.T) {

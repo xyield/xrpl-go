@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/xyield/xrpl-go/client/websocket"
-	"github.com/xyield/xrpl-go/model/client/account"
+	"github.com/CreatureDev/xrpl-go/client/websocket"
+	"github.com/CreatureDev/xrpl-go/model/client/account"
 )
 
 func main() {

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/mitchellh/mapstructure"
-	"github.com/xyield/xrpl-go/client"
+	"github.com/CreatureDev/xrpl-go/client"
 )
 
 func (c *WebsocketClient) formatRequest(req client.XRPLRequest, id int, marker any) ([]byte, error) {

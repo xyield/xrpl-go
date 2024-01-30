@@ -1,6 +1,6 @@
 package status
 
-import "github.com/xyield/xrpl-go/model/client/common"
+import "github.com/CreatureDev/xrpl-go/model/client/common"
 
 type ConsensusInfoResponse struct {
 	Info ConsensusInfo `json:"info"`

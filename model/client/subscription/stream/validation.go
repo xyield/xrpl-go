@@ -1,7 +1,7 @@
 package stream
 
 import (
-	"github.com/xyield/xrpl-go/model/client/common"
+	"github.com/CreatureDev/xrpl-go/model/client/common"
 )
 
 type ValidationStream struct {

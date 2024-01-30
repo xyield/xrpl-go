@@ -1,7 +1,7 @@
 package client
 
 import (
-	"github.com/xyield/xrpl-go/model/client/ledger"
+	"github.com/CreatureDev/xrpl-go/model/client/ledger"
 )
 
 type Ledger interface {

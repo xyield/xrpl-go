@@ -5,7 +5,7 @@ import (
 	"crypto/ed25519"
 	"encoding/hex"
 
-	addresscodec "github.com/xyield/xrpl-go/address-codec"
+	addresscodec "github.com/CreatureDev/xrpl-go/address-codec"
 )
 
 type ed25519Alg struct{}

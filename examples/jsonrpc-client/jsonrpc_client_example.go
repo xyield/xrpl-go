@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/xyield/xrpl-go/client"
-	jsonrpcclient "github.com/xyield/xrpl-go/client/jsonrpc"
-	"github.com/xyield/xrpl-go/model/client/account"
+	"github.com/CreatureDev/xrpl-go/client"
+	jsonrpcclient "github.com/CreatureDev/xrpl-go/client/jsonrpc"
+	"github.com/CreatureDev/xrpl-go/model/client/account"
 )
 
 func main() {

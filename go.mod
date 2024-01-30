@@ -1,4 +1,4 @@
-module github.com/xyield/xrpl-go
+module github.com/CreatureDev/xrpl-go
 
 go 1.19
 

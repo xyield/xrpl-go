@@ -1,7 +1,7 @@
 package transactions
 
 import (
-	"github.com/xyield/xrpl-go/model/ledger"
+	"github.com/CreatureDev/xrpl-go/model/ledger"
 )
 
 type SignerListSet struct {

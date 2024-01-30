@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/xyield/xrpl-go/client"
-	"github.com/xyield/xrpl-go/model/client/account"
+	"github.com/CreatureDev/xrpl-go/client"
+	"github.com/CreatureDev/xrpl-go/model/client/account"
 )
 
 func TestFormatRequest(t *testing.T) {

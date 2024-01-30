@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"encoding/binary"
 
-	"github.com/xyield/xrpl-go/binary-codec/definitions"
-	"github.com/xyield/xrpl-go/binary-codec/serdes"
+	"github.com/CreatureDev/xrpl-go/binary-codec/definitions"
+	"github.com/CreatureDev/xrpl-go/binary-codec/serdes"
 )
 
 // UInt8 represents an 8-bit unsigned integer.

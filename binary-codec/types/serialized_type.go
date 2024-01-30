@@ -1,6 +1,6 @@
 package types
 
-import "github.com/xyield/xrpl-go/binary-codec/serdes"
+import "github.com/CreatureDev/xrpl-go/binary-codec/serdes"
 
 // SerializedType is an interface representing any type that can be serialized
 // and deserialized to and from JSON.

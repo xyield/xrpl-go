@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"encoding/binary"
 
-	"github.com/xyield/xrpl-go/binary-codec/definitions"
-	"github.com/xyield/xrpl-go/binary-codec/serdes"
+	"github.com/CreatureDev/xrpl-go/binary-codec/definitions"
+	"github.com/CreatureDev/xrpl-go/binary-codec/serdes"
 )
 
 // UInt16 represents a 16-bit unsigned integer.

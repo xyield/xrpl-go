@@ -1,6 +1,6 @@
 package client
 
-import "github.com/xyield/xrpl-go/model/client/server"
+import "github.com/CreatureDev/xrpl-go/model/client/server"
 
 type Server interface {
 	Fee(*server.FeeRequest) (*server.FeeResponse, XRPLResponse, error)
