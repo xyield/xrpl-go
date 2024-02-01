@@ -6,8 +6,8 @@ import (
 	"errors"
 	"sync/atomic"
 
-	"github.com/gorilla/websocket"
 	"github.com/CreatureDev/xrpl-go/client"
+	"github.com/gorilla/websocket"
 )
 
 var _ client.Client = (*WebsocketClient)(nil)
@@ -62,7 +62,7 @@ func (c *WebsocketClient) SendRequest(req client.XRPLRequest) (client.XRPLRespon
 	if res.ID != int(id) {
 		return nil, ErrIncorrectId
 	}
-	if err := res.CheckError(); err != nil {
+	if err := res.GetError(); err != nil {
 		return nil, err
 	}
 

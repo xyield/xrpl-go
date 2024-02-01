@@ -16,6 +16,7 @@ type XRPLRequest interface {
 
 type XRPLResponse interface {
 	GetResult(v any) error
+	GetError() error
 }
 
 type XRPLResponseWarning struct {

@@ -4,11 +4,11 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/CreatureDev/xrpl-go/model/client/account"
+	"github.com/CreatureDev/xrpl-go/model/client/common"
 	"github.com/mitchellh/mapstructure"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
-	"github.com/CreatureDev/xrpl-go/model/client/account"
-	"github.com/CreatureDev/xrpl-go/model/client/common"
 )
 
 type mockClient struct {
@@ -17,6 +17,10 @@ type mockClient struct {
 
 type mockClientXrplResponse struct {
 	Result map[string]any
+}
+
+func (m *mockClientXrplResponse) GetError() error {
+	return nil
 }
 
 func (m *mockClientXrplResponse) GetResult(v any) error {

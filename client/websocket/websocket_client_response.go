@@ -1,7 +1,8 @@
 package websocket
 
 import (
-	"github.com/mitchellh/mapstructure"
+	"encoding/json"
+
 	"github.com/CreatureDev/xrpl-go/client"
 )
 
@@ -21,7 +22,7 @@ type WebSocketClientXrplResponse struct {
 	Status    string                       `json:"status"`
 	Type      string                       `json:"type"`
 	Error     string                       `json:"error,omitempty"`
-	Result    map[string]any               `json:"result,omitempty"`
+	Result    json.RawMessage              `json:"result,omitempty"`
 	Value     map[string]any               `json:"value,omitempty"`
 	Warning   string                       `json:"warning,omitempty"`
 	Warnings  []client.XRPLResponseWarning `json:"warnings,omitempty"`
@@ -29,14 +30,10 @@ type WebSocketClientXrplResponse struct {
 }
 
 func (r *WebSocketClientXrplResponse) GetResult(v any) error {
-	dec, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{TagName: "json", Result: &v, DecodeHook: mapstructure.TextUnmarshallerHookFunc()})
-	if err != nil {
-		return err
-	}
-	return dec.Decode(r.Result)
+	return json.Unmarshal(r.Result, v)
 }
 
-func (r *WebSocketClientXrplResponse) CheckError() error {
+func (r *WebSocketClientXrplResponse) GetError() error {
 	if r.Error != "" {
 		return &ErrorWebsocketClientXrplResponse{
 			Type:    r.Error,

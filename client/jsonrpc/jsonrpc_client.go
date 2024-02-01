@@ -11,9 +11,9 @@ import (
 	"strings"
 	"time"
 
-	jsoniter "github.com/json-iterator/go"
 	"github.com/CreatureDev/xrpl-go/client"
 	jsonrpcmodels "github.com/CreatureDev/xrpl-go/client/jsonrpc/models"
+	jsoniter "github.com/json-iterator/go"
 )
 
 type JsonRpcClient struct {
@@ -52,6 +52,7 @@ func (c *JsonRpcClient) SendRequest(reqParams client.XRPLRequest) (client.XRPLRe
 	}
 
 	body, err := CreateRequest(reqParams)
+	fmt.Printf("sending request: %s\n", string(body))
 	if err != nil {
 		return nil, err
 	}
@@ -180,8 +181,8 @@ func CheckForError(res *http.Response) (jsonrpcmodels.JsonRpcResponse, error) {
 	}
 
 	// result will have 'error' if error response
-	if _, ok := jr.Result["error"]; ok {
-		return jr, &JsonRpcClientError{ErrorString: jr.Result["error"].(string)}
+	if err := jr.GetError(); err != nil {
+		return jr, &JsonRpcClientError{ErrorString: err.Error()}
 	}
 
 	return jr, nil

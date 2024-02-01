@@ -1,18 +1,18 @@
 package jsonrpcmodels
 
 import (
-	"github.com/mitchellh/mapstructure"
+	"encoding/json"
+	"fmt"
+
 	"github.com/CreatureDev/xrpl-go/client"
 )
 
 type JsonRpcResponse struct {
-	Result    AnyJson                      `json:"result"`
+	Result    json.RawMessage              `json:"result"`
 	Warning   string                       `json:"warning,omitempty"`
 	Warnings  []client.XRPLResponseWarning `json:"warnings,omitempty"`
 	Forwarded bool                         `json:"forwarded,omitempty"`
 }
-
-type AnyJson map[string]interface{}
 
 type ApiWarning struct {
 	Id      int         `json:"id"`
@@ -21,15 +21,30 @@ type ApiWarning struct {
 }
 
 func (r JsonRpcResponse) GetResult(v any) error {
-	dec, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{TagName: "json",
-		Result: &v, DecodeHook: mapstructure.TextUnmarshallerHookFunc()})
-
+	if len(r.Result) == 0 {
+		return nil
+	}
+	err := json.Unmarshal(r.Result, v)
 	if err != nil {
 		return err
 	}
-	err = dec.Decode(r.Result)
+	return nil
+}
+
+func (r JsonRpcResponse) GetError() error {
+	if len(r.Result) == 0 {
+		return nil
+	}
+	type reqError struct {
+		Error string `json:"error"`
+	}
+	var errResponse reqError
+	err := json.Unmarshal(r.Result, &errResponse)
 	if err != nil {
 		return err
+	}
+	if errResponse.Error != "" {
+		return fmt.Errorf(errResponse.Error)
 	}
 	return nil
 }

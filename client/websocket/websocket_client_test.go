@@ -2,13 +2,14 @@ package websocket
 
 import (
 	"encoding/json"
+	"fmt"
 	"testing"
 
-	"github.com/gorilla/websocket"
-	"github.com/stretchr/testify/require"
 	"github.com/CreatureDev/xrpl-go/client"
 	"github.com/CreatureDev/xrpl-go/model/client/account"
 	"github.com/CreatureDev/xrpl-go/test"
+	"github.com/gorilla/websocket"
+	"github.com/stretchr/testify/require"
 )
 
 func TestSendRequest(t *testing.T) {
@@ -25,25 +26,8 @@ func TestSendRequest(t *testing.T) {
 				Account: "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
 			},
 			res: &WebSocketClientXrplResponse{
-				ID: 1,
-				Result: map[string]any{
-					"account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-					"channels": []any{
-						map[string]any{
-							"account":             "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-							"amount":              "1000",
-							"balance":             "0",
-							"channel_id":          "C7F634794B79DB40E87179A9D1BF05D05797AE7E92DF8E93FD6656E8C4BE3AE7",
-							"destination_account": "ra5nK24KXen9AHvsdFTKHSANinZseWnPcX",
-							"public_key":          "aBR7mdD75Ycs8DRhMgQ4EMUEmBArF8SEh1hfjrT2V9DQTLNbJVqw",
-							"public_key_hex":      "03CFD18E689434F032A4E84C63E2A3A6472D684EAF4FD52CA67742F3E24BAE81B2",
-							"settle_delay":        json.Number("60"),
-						},
-					},
-					"ledger_hash":  "1EDBBA3C793863366DF5B31C2174B6B5E6DF6DB89A7212B86838489148E2A581",
-					"ledger_index": json.Number("71766314"),
-					"validated":    true,
-				},
+				ID:     1,
+				Result: json.RawMessage(`{"account":"rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn","channels":[{"account":"rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn","amount":"1000","balance":"0","channel_id":"C7F634794B79DB40E87179A9D1BF05D05797AE7E92DF8E93FD6656E8C4BE3AE7","destination_account":"ra5nK24KXen9AHvsdFTKHSANinZseWnPcX","public_key":"aBR7mdD75Ycs8DRhMgQ4EMUEmBArF8SEh1hfjrT2V9DQTLNbJVqw","public_key_hex":"03CFD18E689434F032A4E84C63E2A3A6472D684EAF4FD52CA67742F3E24BAE81B2","settle_delay":60}],"ledger_hash":"1EDBBA3C793863366DF5B31C2174B6B5E6DF6DB89A7212B86838489148E2A581","ledger_index":71766314,"validated":true}`),
 			},
 			expectedErr: nil,
 			serverMessages: []map[string]any{
@@ -76,24 +60,24 @@ func TestSendRequest(t *testing.T) {
 				Account: "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
 			},
 			res: &WebSocketClientXrplResponse{
-				Result: map[string]any{
-					"account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-					"channels": []any{
-						map[string]any{
-							"account":             "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-							"amount":              "1000",
-							"balance":             "0",
-							"channel_id":          "C7F634794B79DB40E87179A9D1BF05D05797AE7E92DF8E93FD6656E8C4BE3AE7",
-							"destination_account": "ra5nK24KXen9AHvsdFTKHSANinZseWnPcX",
-							"public_key":          "aBR7mdD75Ycs8DRhMgQ4EMUEmBArF8SEh1hfjrT2V9DQTLNbJVqw",
-							"public_key_hex":      "03CFD18E689434F032A4E84C63E2A3A6472D684EAF4FD52CA67742F3E24BAE81B2",
-							"settle_delay":        json.Number("60"),
-						},
-					},
-					"ledger_hash":  "1EDBBA3C793863366DF5B31C2174B6B5E6DF6DB89A7212B86838489148E2A581",
-					"ledger_index": json.Number("71766314"),
-					"validated":    true,
-				},
+				Result: json.RawMessage(`{
+	"account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+	"channels": [
+		{
+			"account":             "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+			"amount":              "1000",
+			"balance":             "0",
+			"channel_id":          "C7F634794B79DB40E87179A9D1BF05D05797AE7E92DF8E93FD6656E8C4BE3AE7",
+			"destination_account": "ra5nK24KXen9AHvsdFTKHSANinZseWnPcX",
+			"public_key":          "aBR7mdD75Ycs8DRhMgQ4EMUEmBArF8SEh1hfjrT2V9DQTLNbJVqw",
+			"public_key_hex":      "03CFD18E689434F032A4E84C63E2A3A6472D684EAF4FD52CA67742F3E24BAE81B2",
+			"settle_delay":        json.Number("60"),
+		}
+	],
+	"ledger_hash":  "1EDBBA3C793863366DF5B31C2174B6B5E6DF6DB89A7212B86838489148E2A581",
+	"ledger_index": 71766314,
+	"validated":    true
+}`),
 			},
 			expectedErr: ErrIncorrectId,
 			serverMessages: []map[string]any{
@@ -127,24 +111,24 @@ func TestSendRequest(t *testing.T) {
 			},
 			res: &WebSocketClientXrplResponse{
 				ID: 1,
-				Result: map[string]any{
-					"account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-					"channels": []any{
-						map[string]any{
-							"account":             "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-							"amount":              "1000",
-							"balance":             "0",
-							"channel_id":          "C7F634794B79DB40E87179A9D1BF05D05797AE7E92DF8E93FD6656E8C4BE3AE7",
-							"destination_account": "ra5nK24KXen9AHvsdFTKHSANinZseWnPcX",
-							"public_key":          "aBR7mdD75Ycs8DRhMgQ4EMUEmBArF8SEh1hfjrT2V9DQTLNbJVqw",
-							"public_key_hex":      "03CFD18E689434F032A4E84C63E2A3A6472D684EAF4FD52CA67742F3E24BAE81B2",
-							"settle_delay":        json.Number("60"),
-						},
-					},
-					"ledger_hash":  "1EDBBA3C793863366DF5B31C2174B6B5E6DF6DB89A7212B86838489148E2A581",
-					"ledger_index": json.Number("71766314"),
-					"validated":    true,
-				},
+				Result: json.RawMessage(`{
+"account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+"channels": [
+	{
+		"account":             "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+		"amount":              "1000",
+		"balance":             "0",
+		"channel_id":          "C7F634794B79DB40E87179A9D1BF05D05797AE7E92DF8E93FD6656E8C4BE3AE7",
+		"destination_account": "ra5nK24KXen9AHvsdFTKHSANinZseWnPcX",
+		"public_key":          "aBR7mdD75Ycs8DRhMgQ4EMUEmBArF8SEh1hfjrT2V9DQTLNbJVqw",
+		"public_key_hex":      "03CFD18E689434F032A4E84C63E2A3A6472D684EAF4FD52CA67742F3E24BAE81B2",
+		"settle_delay":        json.Number("60"),
+	}
+],
+"ledger_hash":  "1EDBBA3C793863366DF5B31C2174B6B5E6DF6DB89A7212B86838489148E2A581",
+"ledger_index": 71766314,
+"validated":    true
+}`),
 			},
 			expectedErr: &ErrorWebsocketClientXrplResponse{
 				Type: "invalidParams",
@@ -166,6 +150,7 @@ func TestSendRequest(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.description, func(t *testing.T) {
+			fmt.Println(tc.description)
 			ws := &test.MockWebSocketServer{Msgs: tc.serverMessages}
 			s := ws.TestWebSocketServer(func(c *websocket.Conn) {
 				for _, m := range tc.serverMessages {
