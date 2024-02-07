@@ -2,7 +2,7 @@ package client
 
 import "github.com/CreatureDev/xrpl-go/model/client/path"
 
-type PathBook interface {
+type Path interface {
 	BookOffers(req *path.BookOffersRequest) (*path.BookOffersResponse, XRPLResponse, error)
 	DepositAuthorized(req *path.DepositAuthorizedRequest) (*path.DepositAuthorizedResponse, XRPLResponse, error)
 	NFTokenBuyOffers(req *path.NFTokenBuyOffersRequest) (*path.NFTokenBuyOffersResponse, XRPLResponse, error)
@@ -41,7 +41,7 @@ func (p *pathImpl) DepositAuthorized(req *path.DepositAuthorizedRequest) (*path.
 	return &dar, res, nil
 }
 
-func (p *pathImpl) NFTBuyOffers(req *path.NFTokenBuyOffersRequest) (*path.NFTokenBuyOffersResponse, XRPLResponse, error) {
+func (p *pathImpl) NFTokenBuyOffers(req *path.NFTokenBuyOffersRequest) (*path.NFTokenBuyOffersResponse, XRPLResponse, error) {
 	res, err := p.client.SendRequest(req)
 	if err != nil {
 		return nil, nil, err

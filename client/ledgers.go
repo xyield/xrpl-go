@@ -5,11 +5,11 @@ import (
 )
 
 type Ledger interface {
-	LedgerClosed(req *ledger.LedgerClosedRequest) (*ledger.LedgerClosedRequest, XRPLResponse, error)
-	LedgerCurrent(req *ledger.LedgerCurrentRequest) (*ledger.LedgerCurrentRequest, XRPLResponse, error)
-	LedgerData(req *ledger.LedgerDataRequest) (*ledger.LedgerDataRequest, XRPLResponse, error)
-	LedgerEntry(req *ledger.LedgerEntryRequest) (*ledger.LedgerEntryRequest, XRPLResponse, error)
-	Ledger(req *ledger.LedgerRequest) (*ledger.LedgerRequest, XRPLResponse, error)
+	LedgerClosed(req *ledger.LedgerClosedRequest) (*ledger.LedgerClosedResponse, XRPLResponse, error)
+	LedgerCurrent(req *ledger.LedgerCurrentRequest) (*ledger.LedgerCurrentResponse, XRPLResponse, error)
+	LedgerData(req *ledger.LedgerDataRequest) (*ledger.LedgerDataResponse, XRPLResponse, error)
+	LedgerEntry(req *ledger.LedgerEntryRequest) (*ledger.LedgerEntryResponse, XRPLResponse, error)
+	Ledger(req *ledger.LedgerRequest) (*ledger.LedgerResponse, XRPLResponse, error)
 }
 
 type ledgerImpl struct {

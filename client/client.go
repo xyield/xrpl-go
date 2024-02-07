@@ -5,8 +5,13 @@ type Client interface {
 }
 
 type XRPLClient struct {
-	client  Client
-	Account Account
+	client       Client
+	Account      Account
+	Channel      Channel
+	Ledger       Ledger
+	Path         Path
+	Subscription Subscription
+	Transaction  Transaction
 }
 
 type XRPLRequest interface {
@@ -27,8 +32,13 @@ type XRPLResponseWarning struct {
 
 func NewXRPLClient(cl Client) *XRPLClient {
 	return &XRPLClient{
-		client:  cl,
-		Account: &accountImpl{client: cl},
+		client:       cl,
+		Account:      &accountImpl{client: cl},
+		Channel:      &channelImpl{client: cl},
+		Ledger:       &ledgerImpl{client: cl},
+		Path:         &pathImpl{client: cl},
+		Subscription: &subscriptionImpl{client: cl},
+		Transaction:  &transactionImpl{client: cl},
 	}
 }
 

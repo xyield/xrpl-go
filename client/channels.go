@@ -5,7 +5,7 @@ import (
 )
 
 type Channel interface {
-	ChannelAuthorize(req *channel.ChannelAuthorizeRequest) (*channel.ChannelAuthorizeRequest, XRPLResponse, error)
+	ChannelAuthorize(req *channel.ChannelAuthorizeRequest) (*channel.ChannelAuthorizeResponse, XRPLResponse, error)
 	ChannelVerify(req *channel.ChannelVerifyRequest) (*channel.ChannelVerifyResponse, XRPLResponse, error)
 }
 
