@@ -12,6 +12,8 @@ type XRPLClient struct {
 	Path         Path
 	Subscription Subscription
 	Transaction  Transaction
+	Server       Server
+	Clio         Clio
 }
 
 type XRPLRequest interface {
@@ -39,6 +41,7 @@ func NewXRPLClient(cl Client) *XRPLClient {
 		Path:         &pathImpl{client: cl},
 		Subscription: &subscriptionImpl{client: cl},
 		Transaction:  &transactionImpl{client: cl},
+		Clio:         &clioImpl{client: cl},
 	}
 }
 
