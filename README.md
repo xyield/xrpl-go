@@ -21,9 +21,9 @@ Install [pre-commit](https://github.com/pre-commit/pre-commit-hooks)
 * Binary Codec
 * Address Codec
 * Keypairs Generation - **to finish**
-* Go Models - **to finish**
-* Json Rpc Client - **to finish**
-* Webhook Client - **todo**
+* Go Models 
+* Json Rpc Client
+* Webhook Client
 
 ## Usage
 * Keys and Wallets
