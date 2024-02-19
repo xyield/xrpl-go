@@ -17,7 +17,7 @@ type RippleState struct {
 	LowQualityIn      uint `json:",omitempty"`
 	LowQualityOut     uint `json:",omitempty"`
 	PreviousTxnID     types.Hash256
-	PreviousTxnLgrSeq uint
+	PreviousTxnLgrSeq uint32
 }
 
 func (*RippleState) EntryType() LedgerEntryType {

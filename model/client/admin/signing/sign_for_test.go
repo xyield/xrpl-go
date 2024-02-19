@@ -17,7 +17,7 @@ func TestSignForRequest(t *testing.T) {
 			BaseTx: transactions.BaseTx{
 				TransactionType: transactions.TrustSetTx,
 				Account:         "rEuLyBCvcw4CFmzv8RepSiAoNgF8tTGJQC",
-				Flags:           262144,
+				Flags:           types.SetFlag(262144),
 				Sequence:        2,
 				Fee:             types.XRPCurrencyAmount(30000),
 			},
@@ -60,7 +60,7 @@ func TestSignForResponse(t *testing.T) {
 				TransactionType: transactions.TrustSetTx,
 				Fee:             types.XRPCurrencyAmount(30000),
 				Sequence:        2,
-				Flags:           262144,
+				Flags:           types.SetFlag(262144),
 				Signers: []transactions.Signer{
 					{
 						SignerData: transactions.SignerData{

@@ -8,15 +8,19 @@ const (
 	LsfOneOwnerCount SignerListFlags = 0x00010000
 )
 
+func (f SignerListFlags) ToUint() uint32 {
+	return uint32(f)
+}
+
 type SignerList struct {
 	LedgerEntryType   LedgerEntryType
 	Flags             SignerListFlags
 	PreviousTxnID     string
-	PreviousTxnLgrSeq uint64
+	PreviousTxnLgrSeq uint32
 	OwnerNode         string
 	SignerEntries     []SignerEntryWrapper
-	SignerListID      uint64
-	SignerQuorum      uint64
+	SignerListID      uint32
+	SignerQuorum      uint32
 }
 
 type SignerEntryWrapper struct {
@@ -25,7 +29,7 @@ type SignerEntryWrapper struct {
 
 type SignerEntry struct {
 	Account       types.Address
-	SignerWeight  uint64
+	SignerWeight  uint16
 	WalletLocator types.Hash256 `json:",omitempty"`
 }
 

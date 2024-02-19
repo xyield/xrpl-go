@@ -9,13 +9,19 @@ import (
 )
 
 // ErrNoLengthPrefix error is raised when no length prefix size is given.
-var ErrNoLengthPrefix error = errors.New("no length prefix size given")
+var (
+	ErrNoLengthPrefix  error = errors.New("no length prefix size given")
+	ErrInvalidBlobType error = errors.New("invalid type for Blob")
+)
 
 // Blob struct is used for manipulating hexadecimal data.
 type Blob struct{}
 
 // FromJson method for Blob converts a hexadecimal string from JSON to a byte array.
 func (b *Blob) FromJson(json any) ([]byte, error) {
+	if _, ok := json.(string); !ok {
+		return nil, ErrInvalidBlobType
+	}
 	// Convert hexadecimal string to byte array.
 	// Return an error if the conversion fails.
 	v, err := hex.DecodeString(json.(string))

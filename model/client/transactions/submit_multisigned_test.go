@@ -22,7 +22,7 @@ func TestSubmitMultisignedRequest(t *testing.T) {
 				TransactionType: "Payment",
 				Fee:             types.XRPCurrencyAmount(10000),
 				Sequence:        360,
-				Flags:           2147483648,
+				Flags:           types.SetFlag(2147483648),
 				SigningPubKey:   "03AB40A0490F9B7ED8DF29D246BF2D6269820A0EE7742ACDD457BEA7C7D0931EDB",
 				TxnSignature:    "304402200E5C2DD81FDF0BE9AB2A8D797885ED49E804DBF28E806604D878756410CA98B102203349581946B0DDA06B36B35DBC20EDA27552C1F167BCF5C6ECFF49C6A46F8580",
 				Signers: []transactions.Signer{
@@ -104,7 +104,7 @@ func TestSubmitMultisignedResponse(t *testing.T) {
 				TransactionType: "Payment",
 				Fee:             types.XRPCurrencyAmount(10000),
 				Sequence:        360,
-				Flags:           2147483648,
+				Flags:           types.SetFlag(2147483648),
 				SigningPubKey:   "03AB40A0490F9B7ED8DF29D246BF2D6269820A0EE7742ACDD457BEA7C7D0931EDB",
 				TxnSignature:    "304402200E5C2DD81FDF0BE9AB2A8D797885ED49E804DBF28E806604D878756410CA98B102203349581946B0DDA06B36B35DBC20EDA27552C1F167BCF5C6ECFF49C6A46F8580",
 				Signers: []transactions.Signer{

@@ -2,7 +2,7 @@ package ledger
 
 type FeeSettings struct {
 	BaseFee           string
-	Flags             uint
+	Flags             uint32
 	LedgerEntryType   LedgerEntryType
 	ReferenceFeeUnits uint
 	ReserveBase       uint

@@ -2,7 +2,7 @@ package transactions
 
 type OfferCancel struct {
 	BaseTx
-	OfferSequence uint
+	OfferSequence uint32
 }
 
 func (*OfferCancel) TxType() TxType {

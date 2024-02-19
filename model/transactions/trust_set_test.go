@@ -15,7 +15,7 @@ func TestTrustSetTx(t *testing.T) {
 			Account:            "ra5nK24KXen9AHvsdFTKHSANinZseWnPcX",
 			TransactionType:    TrustSetTx,
 			Fee:                types.XRPCurrencyAmount(12),
-			Flags:              262144,
+			Flags:              types.SetFlag(262144),
 			Sequence:           12,
 			LastLedgerSequence: 8007750,
 		},

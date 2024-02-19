@@ -14,8 +14,8 @@ type SubmitResponse struct {
 	TxBlob                   string             `json:"tx_blob"`
 	Tx                       transactions.Tx    `json:"tx_json"`
 	Accepted                 bool               `json:"accepted"`
-	AccountSequenceAvailable uint               `json:"account_sequence_available"`
-	AccountSequenceNext      uint               `json:"account_sequence_next"`
+	AccountSequenceAvailable uint32             `json:"account_sequence_available"`
+	AccountSequenceNext      uint32             `json:"account_sequence_next"`
 	Applied                  bool               `json:"applied"`
 	Broadcast                bool               `json:"broadcast"`
 	Kept                     bool               `json:"kept"`
@@ -32,8 +32,8 @@ func (r *SubmitResponse) UnmarshalJSON(data []byte) error {
 		TxBlob                   string             `json:"tx_blob"`
 		Tx                       json.RawMessage    `json:"tx_json"`
 		Accepted                 bool               `json:"accepted"`
-		AccountSequenceAvailable uint               `json:"account_sequence_available"`
-		AccountSequenceNext      uint               `json:"account_sequence_next"`
+		AccountSequenceAvailable uint32             `json:"account_sequence_available"`
+		AccountSequenceNext      uint32             `json:"account_sequence_next"`
 		Applied                  bool               `json:"applied"`
 		Broadcast                bool               `json:"broadcast"`
 		Kept                     bool               `json:"kept"`

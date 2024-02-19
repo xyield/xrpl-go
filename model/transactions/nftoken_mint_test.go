@@ -15,7 +15,7 @@ func TestNFTokenMintTx(t *testing.T) {
 			Account:         "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
 			TransactionType: NFTokenMintTx,
 			Fee:             types.XRPCurrencyAmount(10),
-			Flags:           8,
+			Flags:           types.SetFlag(8),
 			Memos: []MemoWrapper{
 				{
 					Memo: Memo{

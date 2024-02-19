@@ -9,7 +9,7 @@ import (
 
 func TestOfferDirectoryNode(t *testing.T) {
 	var s LedgerObject = &DirectoryNode{
-		Flags: 0,
+		Flags: types.SetFlag(0),
 		Indexes: []types.Hash256{
 			"AD7EAE148287EF12D213A251015F86E6D4BD34B3C4A0A1ED9A17198373F908AD",
 		},
@@ -41,7 +41,7 @@ func TestOfferDirectoryNode(t *testing.T) {
 
 func TestOwnerDirectoryNode(t *testing.T) {
 	var s LedgerObject = &DirectoryNode{
-		Flags: 0,
+		Flags: types.SetFlag(0),
 		Indexes: []types.Hash256{
 			"AD7EAE148287EF12D213A251015F86E6D4BD34B3C4A0A1ED9A17198373F908AD",
 			"E83BBB58949A8303DF07172B16FB8EFBA66B9191F3836EC27A4568ED5997BAC5",

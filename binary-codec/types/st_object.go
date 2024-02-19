@@ -1,17 +1,31 @@
 package types
 
 import (
-	"fmt"
+	"reflect"
 	"sort"
 
+	"github.com/mitchellh/mapstructure"
 	"github.com/xyield/xrpl-go/binary-codec/definitions"
 	"github.com/xyield/xrpl-go/binary-codec/serdes"
 )
 
+// FieldMutation allows values to mutated before being serialized.
+type FieldMutation func(any) any
+
+// Zero returns a FieldMutation that sets the value to its zero value.
+func Zero() FieldMutation {
+	return func(v any) any {
+		return reflect.Zero(reflect.TypeOf(v)).Interface()
+	}
+}
+
 // STObject represents a map of serialized field instances, where each key is a field name
 // and the associated value is the field's value. This structure allows us to represent nested
 // and complex structures of the Ripple protocol.
-type STObject struct{}
+type STObject struct {
+	OnlySigning bool
+	Mutations   map[string]FieldMutation
+}
 
 // FromJson converts a JSON object into a serialized byte slice.
 // It works by converting the JSON object into a map of field instances (which include the field definition
@@ -19,10 +33,23 @@ type STObject struct{}
 // This method returns an error if the JSON input is not a valid object.
 func (t *STObject) FromJson(json any) ([]byte, error) {
 	s := serdes.NewSerializer()
-	if _, ok := json.(map[string]any); !ok {
-		return nil, fmt.Errorf("not a valid json node")
+	var m map[string]any
+	dec, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{TagName: "json", Result: &m, Squash: true})
+	if err != nil {
+		return nil, err
 	}
-	fimap, err := createFieldInstanceMapFromJson(json.(map[string]any))
+	err = dec.Decode(json)
+	if err != nil {
+		return nil, err
+	}
+
+	for k, v := range t.Mutations {
+		if _, ok := m[k]; ok {
+			m[k] = v(m[k])
+		}
+	}
+
+	fimap, err := createFieldInstanceMapFromJson(m)
 
 	if err != nil {
 		return nil, err
@@ -31,7 +58,15 @@ func (t *STObject) FromJson(json any) ([]byte, error) {
 	sk := getSortedKeys(fimap)
 
 	for _, v := range sk {
+		if checkZero(fimap[v]) && !containsKey(t.Mutations, v.FieldName) {
+			continue
+		}
+
 		if !v.IsSerialized {
+			continue
+		}
+
+		if t.OnlySigning && !v.IsSigningField {
 			continue
 		}
 
@@ -94,6 +129,48 @@ func (t *STObject) ToJson(p *serdes.BinaryParser, opts ...int) (any, error) {
 	return m, nil
 }
 
+// type fieldInstanceMap map[definitions.FieldInstance]any
+
+// func (f fieldInstanceMap) addFieldInstanceFromMap(rv reflect.Value) error {
+// 	if rv.Kind() != reflect.Map {
+// 		return errors.New("not of type map")
+// 	}
+
+// 	iter := rv.MapRange()
+// 	for iter.Next() {
+// 		fi, err := definitions.Get().GetFieldInstanceByFieldName(iter.Key().String())
+// 		if err != nil {
+// 			return err
+// 		}
+// 		f[*fi] = iter.Value().Interface()
+// 	}
+// 	return nil
+// }
+
+// func (f fieldInstanceMap) addFieldInstanceFromStruct(rv reflect.Value) error {
+// 	if rv.Kind() != reflect.Struct {
+// 		return errors.New("not of type struct")
+// 	}
+// 	for i := 0; i < rv.NumField(); i++ {
+
+// 		rvField := rv.Type().Field(i)
+// 		if rvField.Name == "BaseTx" {
+// 			continue
+// 		}
+// 		if rv.Field(i).IsZero() {
+// 			continue
+// 		}
+// 		fi, err := definitions.Get().GetFieldInstanceByFieldName(rvField.Name)
+
+// 		if err != nil {
+// 			return err
+// 		}
+
+// 		f[*fi] = rv.Field(i).Interface()
+// 	}
+// 	return nil
+// }
+
 // nolint
 // createFieldInstanceMapFromJson creates a map of field instances from a JSON object.
 // Each key-value pair in the JSON object is converted into a field instance, where the key
@@ -113,6 +190,23 @@ func createFieldInstanceMapFromJson(json map[string]any) (map[definitions.FieldI
 		m[*fi] = v
 	}
 	return m, nil
+	// rv := reflect.ValueOf(json)
+	// m := make(fieldInstanceMap)
+	// switch rv.Kind() {
+	// case reflect.Map:
+	// 	err := m.addFieldInstanceFromMap(rv)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// case reflect.Struct:
+	// 	err := m.addFieldInstanceFromStruct(rv)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// default:
+	// 	return nil, errors.New("not a valid json node")
+	// }
+	// return m, nil
 }
 
 // nolint
@@ -150,4 +244,15 @@ func enumToStr(fieldType string, value any) (any, error) {
 	default:
 		return value, nil
 	}
+}
+
+// check for zero value
+func checkZero(v any) bool {
+	rv := reflect.ValueOf(v)
+	return rv.IsZero()
+}
+
+func containsKey[T any](m map[string]T, key string) bool {
+	_, ok := m[key]
+	return ok
 }

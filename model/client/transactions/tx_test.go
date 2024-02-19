@@ -18,7 +18,7 @@ func TestTxResponse(t *testing.T) {
 				TransactionType:    transactions.OfferCreateTx,
 				Account:            "rhhh49pFH96roGyuC4E5P4CHaNjS1k8gzM",
 				Fee:                types.XRPCurrencyAmount(12),
-				Flags:              0,
+				Flags:              types.SetFlag(0),
 				LastLedgerSequence: 56865248,
 				Sequence:           5037710,
 				SigningPubKey:      "03B51A3EDF70E4098DA7FB053A01C5A6A0A163A30ED1445F14F87C7C3295FCB3BE",
@@ -41,7 +41,7 @@ func TestTxResponse(t *testing.T) {
 				{
 					ModifiedNode: &transactions.ModifiedNode{
 						FinalFields: &ledger.DirectoryNode{
-							Flags:             0,
+							Flags:             types.SetFlag(0),
 							RootIndex:         "02BAAC1E67C1CE0E96F0FA2E8061020536CEDD043FEB0FF54F04C66806CF7400",
 							TakerGetsCurrency: "0000000000000000000000000000000000000000",
 							TakerGetsIssuer:   "0000000000000000000000000000000000000000",
@@ -57,7 +57,7 @@ func TestTxResponse(t *testing.T) {
 						FinalFields: &ledger.AccountRoot{
 							Account:    "rhhh49pFH96roGyuC4E5P4CHaNjS1k8gzM",
 							Balance:    types.XRPCurrencyAmount(10404767991),
-							Flags:      0,
+							Flags:      types.SetFlag(0),
 							OwnerCount: 3,
 							Sequence:   5037711,
 						},
@@ -96,7 +96,7 @@ func TestTxResponse(t *testing.T) {
 				{
 					ModifiedNode: &transactions.ModifiedNode{
 						FinalFields: &ledger.DirectoryNode{
-							Flags:         0,
+							Flags:         types.SetFlag(0),
 							IndexNext:     "0000000000000000",
 							IndexPrevious: "0000000000000000",
 							Owner:         "rhhh49pFH96roGyuC4E5P4CHaNjS1k8gzM",

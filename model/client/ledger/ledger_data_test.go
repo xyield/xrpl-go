@@ -36,6 +36,7 @@ func TestLedgerDataResponse(t *testing.T) {
 					Account:           "rKKzk9ghA2iuy3imqMXUHJqdRPMtNDGf4c",
 					Balance:           types.XRPCurrencyAmount(893730848),
 					LedgerEntryType:   ledger.AccountRootEntry,
+					Flags:             types.SetFlag(0),
 					PreviousTxnID:     "C204A65CF2542946289A3358C67D991B5E135FABFA89F271DBA7A150C08CA046",
 					PreviousTxnLgrSeq: 6487716,
 					Sequence:          1,

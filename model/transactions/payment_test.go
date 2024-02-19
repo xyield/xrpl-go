@@ -15,7 +15,7 @@ func TestPaymentTx(t *testing.T) {
 			Account:         "abc",
 			TransactionType: PaymentTx,
 			Fee:             types.XRPCurrencyAmount(1000),
-			Flags:           262144,
+			Flags:           types.SetFlag(262144),
 		},
 		Amount: types.IssuedCurrencyAmount{
 			Issuer:   "def",

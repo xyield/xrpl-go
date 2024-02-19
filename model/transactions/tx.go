@@ -29,15 +29,15 @@ type BaseTx struct {
 	Account            types.Address
 	TransactionType    TxType
 	Fee                types.XRPCurrencyAmount `json:",omitempty"`
-	Sequence           uint                    `json:",omitempty"`
+	Sequence           uint32                  `json:",omitempty"`
 	AccountTxnID       types.Hash256           `json:",omitempty"`
-	Flags              uint                    `json:",omitempty"`
-	LastLedgerSequence uint                    `json:",omitempty"`
+	Flags              *types.Flag             `json:",omitempty"`
+	LastLedgerSequence uint32                  `json:",omitempty"`
 	Memos              []MemoWrapper           `json:",omitempty"`
 	Signers            []Signer                `json:",omitempty"`
 	SourceTag          uint                    `json:",omitempty"`
 	SigningPubKey      string                  `json:",omitempty"`
-	TicketSequence     uint                    `json:",omitempty"`
+	TicketSequence     uint32                  `json:",omitempty"`
 	TxnSignature       string                  `json:",omitempty"`
 }
 

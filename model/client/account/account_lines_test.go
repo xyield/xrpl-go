@@ -34,7 +34,7 @@ func TestAccountLinesRequest(t *testing.T) {
 }
 
 func TestAccountLinesResponse(t *testing.T) {
-	s := AccountLinesReponse{
+	s := AccountLinesResponse{
 		Account: "rLHmBn4fT92w4F6ViyYbjoizLTo83tHTHu",
 		Lines: []TrustLine{
 			{

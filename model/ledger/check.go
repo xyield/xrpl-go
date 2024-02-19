@@ -9,7 +9,7 @@ type Check struct {
 	DestinationNode   string `json:",omitempty"`
 	DestinationTag    uint   `json:",omitempty"`
 	Expiration        uint   `json:",omitempty"`
-	Flags             uint
+	Flags             uint32
 	InvoiceID         types.Hash256 `json:",omitempty"`
 	LedgerEntryType   LedgerEntryType
 	OwnerNode         string

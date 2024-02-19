@@ -14,7 +14,7 @@ func TestNFTokenCreateOfferTx(t *testing.T) {
 		BaseTx: BaseTx{
 			Account:         "rs8jBmmfpwgmrSPgwMsh7CvKRmRt1JTVSX",
 			TransactionType: NFTokenCreateOfferTx,
-			Flags:           1,
+			Flags:           types.SetFlag(1),
 		},
 		NFTokenID: "000100001E962F495F07A990F4ED55ACCFEEF365DBAA76B6A048C0A200000007",
 		Amount:    types.XRPCurrencyAmount(1000000),
