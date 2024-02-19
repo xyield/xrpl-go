@@ -31,12 +31,12 @@ func (t *transactionImpl) SubmitMultisigned(req *transactions.SubmitMultisignedR
 func (t *transactionImpl) Submit(req *transactions.SubmitRequest) (*transactions.SubmitResponse, XRPLResponse, error) {
 	res, err := t.client.SendRequest(req)
 	if err != nil {
-		return nil, nil, err
+		return nil, res, err
 	}
 	var sr transactions.SubmitResponse
 	err = res.GetResult(&sr)
 	if err != nil {
-		return nil, nil, err
+		return nil, res, err
 	}
 	return &sr, res, nil
 }
