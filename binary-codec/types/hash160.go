@@ -4,7 +4,7 @@ import (
 	"encoding/hex"
 	"strings"
 
-	"github.com/xyield/xrpl-go/binary-codec/serdes"
+	"github.com/CreatureDev/xrpl-go/binary-codec/serdes"
 )
 
 var _ hashI = (*Hash128)(nil)

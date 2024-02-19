@@ -4,8 +4,8 @@ import (
 	"encoding/hex"
 	"strings"
 
-	"github.com/xyield/xrpl-go/binary-codec/serdes"
-	"github.com/xyield/xrpl-go/model/transactions/types"
+	"github.com/CreatureDev/xrpl-go/binary-codec/serdes"
+	"github.com/CreatureDev/xrpl-go/model/transactions/types"
 )
 
 var _ hashI = (*Hash256)(nil)

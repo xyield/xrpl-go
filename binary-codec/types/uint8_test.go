@@ -3,8 +3,8 @@ package types
 import (
 	"testing"
 
+	"github.com/CreatureDev/xrpl-go/binary-codec/definitions"
 	"github.com/stretchr/testify/require"
-	"github.com/xyield/xrpl-go/binary-codec/definitions"
 )
 
 func TestUint8FromJson(t *testing.T) {

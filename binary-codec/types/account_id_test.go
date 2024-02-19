@@ -3,8 +3,8 @@ package types
 import (
 	"testing"
 
+	"github.com/CreatureDev/xrpl-go/model/transactions/types"
 	"github.com/stretchr/testify/require"
-	"github.com/xyield/xrpl-go/model/transactions/types"
 )
 
 func TestAccountIDFromJson(t *testing.T) {

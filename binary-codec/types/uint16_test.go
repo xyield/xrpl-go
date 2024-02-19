@@ -3,9 +3,9 @@ package types
 import (
 	"testing"
 
+	"github.com/CreatureDev/xrpl-go/model/ledger"
+	"github.com/CreatureDev/xrpl-go/model/transactions"
 	"github.com/stretchr/testify/require"
-	"github.com/xyield/xrpl-go/model/ledger"
-	"github.com/xyield/xrpl-go/model/transactions"
 )
 
 func TestUInt16FromJson(t *testing.T) {
