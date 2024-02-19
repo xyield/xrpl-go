@@ -112,7 +112,7 @@ func (c *JsonRpcClient) SendRequest(reqParams client.XRPLRequest) (client.XRPLRe
 	var jr jsonrpcmodels.JsonRpcResponse
 	jr, err = CheckForError(response)
 	if err != nil {
-		return nil, err
+		return &jr, err
 	}
 
 	return &jr, nil
